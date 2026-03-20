@@ -95,9 +95,7 @@ let svgShape   = '';
 let svgViewBox = '0 0 400 300';
 try {
   const topojson = await import('topojson-client');
-  const { createRequire } = await import('node:module');
-  const req      = createRequire(import.meta.url);
-  const worldTopo = req('world-atlas/countries-10m.json');
+  const { default: worldTopo } = await import('world-atlas/countries-10m.json');
   const geojson  = topojson.feature(worldTopo, worldTopo.objects.countries);
   const ccn3     = rc?.ccn3 || (COUNTRY_CCN3 as any)[localName] || '';
   if (ccn3) {

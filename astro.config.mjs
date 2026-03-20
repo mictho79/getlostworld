@@ -1,10 +1,13 @@
-import { defineConfig } from 'astro/config';
-import node from '@astrojs/node';
+import { defineConfig, passthroughImageService } from 'astro/config';
+import cloudflare from '@astrojs/cloudflare';
 
 export default defineConfig({
   output: 'hybrid',
-  adapter: node({ mode: 'middleware' }),
+  adapter: cloudflare(),
+  image: {
+    service: passthroughImageService(),
+  },
   build: {
-    format: 'directory', // /country/france/ au lieu de /country/france.html
+    format: 'directory', // /country/france/ instead of /country/france.html
   },
 });

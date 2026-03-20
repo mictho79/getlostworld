@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "include": [
+    "/*"
+  ],
+  "exclude": [
+    "/_astro/*",
+    "/config.js",
+    "/countries.js",
+    "/lang.js",
+    "/map.js",
+    "/sidebar.js",
+    "/style.css",
+    "/topojson.min.js",
+    "/uk-nations.geojson"
+  ]
+}

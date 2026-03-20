@@ -15,7 +15,8 @@
       "Bash(python3 -c \":*)",
       "Bash(head -3 grep -o 'cp-fact[^>]*>[^<]*' \"c:/Users/micth/Desktop/dev/seo/claud/maps/dist/country/iceland/index.html\")",
       "Bash(head -2 grep -o 'cp-stat-val[^>]*>[^<]*' \"c:/Users/micth/Desktop/dev/seo/claud/maps/dist/country/georgia/index.html\")",
-      "Bash(node -e \"const {COUNTRY_DATA} = require\\(''./src/lib/countryData.js''\\); console.log\\(Object.keys\\(COUNTRY_DATA\\).sort\\(\\).join\\(''\\\\n''\\)\\); console.log\\(''TOTAL:'', Object.keys\\(COUNTRY_DATA\\).length\\);\")"
+      "Bash(node -e \"const {COUNTRY_DATA} = require\\(''./src/lib/countryData.js''\\); console.log\\(Object.keys\\(COUNTRY_DATA\\).sort\\(\\).join\\(''\\\\n''\\)\\); console.log\\(''TOTAL:'', Object.keys\\(COUNTRY_DATA\\).length\\);\")",
+      "Bash(npm info:*)"
     ]
   }
 }
