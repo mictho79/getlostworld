@@ -1,0 +1,1712 @@
+[
+  {
+    "name": "Afghanistan",
+    "capital": "Kabul",
+    "pop": "40.1M",
+    "lang": "Dari, Pashto",
+    "sport": "Buzkashi",
+    "dish": "Kabuli Pulao",
+    "peak": null
+  },
+  {
+    "name": "Albania",
+    "capital": "Tirana",
+    "pop": "2.8M",
+    "lang": "Albanian",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Algeria",
+    "capital": "Algiers",
+    "pop": "44.9M",
+    "lang": "Arabic, Berber",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Angola",
+    "capital": "Luanda",
+    "pop": "34.5M",
+    "lang": "Portuguese",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Argentina",
+    "capital": "Buenos Aires",
+    "pop": "45.4M",
+    "lang": "Spanish",
+    "sport": "Football",
+    "dish": "Asado",
+    "peak": null
+  },
+  {
+    "name": "Australia",
+    "capital": "Canberra",
+    "pop": "26.1M",
+    "lang": "English",
+    "sport": "Cricket / AFL",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Austria",
+    "capital": "Vienna",
+    "pop": "9.1M",
+    "lang": "German",
+    "sport": "Football / Skiing",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Bangladesh",
+    "capital": "Dhaka",
+    "pop": "167M",
+    "lang": "Bengali",
+    "sport": "Cricket",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Belgium",
+    "capital": "Brussels",
+    "pop": "11.6M",
+    "lang": "Dutch, French, German",
+    "sport": "Football / Cycling",
+    "dish": "Moules-frites",
+    "peak": null
+  },
+  {
+    "name": "Bolivia",
+    "capital": "Sucre / La Paz",
+    "pop": "12.1M",
+    "lang": "Spanish, Quechua, Aymara",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Brazil",
+    "capital": "Brasília",
+    "pop": "214M",
+    "lang": "Portuguese",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Bulgaria",
+    "capital": "Sofia",
+    "pop": "6.5M",
+    "lang": "Bulgarian",
+    "sport": "Football / Wrestling",
+    "dish": "Banitsa",
+    "peak": null
+  },
+  {
+    "name": "Cambodia",
+    "capital": "Phnom Penh",
+    "pop": "16.7M",
+    "lang": "Khmer",
+    "sport": "Bokator",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Cameroon",
+    "capital": "Yaoundé",
+    "pop": "27.2M",
+    "lang": "French, English",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Canada",
+    "capital": "Ottawa",
+    "pop": "38.2M",
+    "lang": "English, French",
+    "sport": "Ice Hockey",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Chile",
+    "capital": "Santiago",
+    "pop": "19.2M",
+    "lang": "Spanish",
+    "sport": "Football",
+    "dish": "Cazuela",
+    "peak": null
+  },
+  {
+    "name": "China",
+    "capital": "Beijing",
+    "pop": "1.41B",
+    "lang": "Mandarin",
+    "sport": "Table Tennis",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Colombia",
+    "capital": "Bogotá",
+    "pop": "51.2M",
+    "lang": "Spanish",
+    "sport": "Football / Cycling",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Croatia",
+    "capital": "Zagreb",
+    "pop": "3.9M",
+    "lang": "Croatian",
+    "sport": "Football / Waterpolo",
+    "dish": "Peka",
+    "peak": null
+  },
+  {
+    "name": "Cuba",
+    "capital": "Havana",
+    "pop": "11.3M",
+    "lang": "Spanish",
+    "sport": "Baseball",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Czech Republic",
+    "capital": "Prague",
+    "pop": "10.9M",
+    "lang": "Czech",
+    "sport": "Ice Hockey / Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Denmark",
+    "capital": "Copenhagen",
+    "pop": "5.9M",
+    "lang": "Danish",
+    "sport": "Football / Handball",
+    "dish": "Smørrebrød",
+    "peak": null
+  },
+  {
+    "name": "Ecuador",
+    "capital": "Quito",
+    "pop": "18.0M",
+    "lang": "Spanish",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Egypt",
+    "capital": "Cairo",
+    "pop": "104M",
+    "lang": "Arabic",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Ethiopia",
+    "capital": "Addis Ababa",
+    "pop": "120M",
+    "lang": "Amharic",
+    "sport": "Long-distance running",
+    "dish": "Injera & Wat",
+    "peak": null
+  },
+  {
+    "name": "Finland",
+    "capital": "Helsinki",
+    "pop": "5.5M",
+    "lang": "Finnish, Swedish",
+    "sport": "Ice Hockey / Pesäpallo",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "France",
+    "capital": "Paris",
+    "pop": "67.8M",
+    "lang": "French",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Germany",
+    "capital": "Berlin",
+    "pop": "83.2M",
+    "lang": "German",
+    "sport": "Football",
+    "dish": "Sauerbraten",
+    "peak": null
+  },
+  {
+    "name": "Ghana",
+    "capital": "Accra",
+    "pop": "32.4M",
+    "lang": "English",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Greece",
+    "capital": "Athens",
+    "pop": "10.7M",
+    "lang": "Greek",
+    "sport": "Football / Basketball",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Guatemala",
+    "capital": "Guatemala City",
+    "pop": "17.4M",
+    "lang": "Spanish",
+    "sport": "Football",
+    "dish": "Pepián",
+    "peak": null
+  },
+  {
+    "name": "Hungary",
+    "capital": "Budapest",
+    "pop": "9.7M",
+    "lang": "Hungarian",
+    "sport": "Football / Water Polo",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "India",
+    "capital": "New Delhi",
+    "pop": "1.43B",
+    "lang": "Hindi, English + 21 others",
+    "sport": "Cricket",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Indonesia",
+    "capital": "Jakarta",
+    "pop": "275M",
+    "lang": "Indonesian",
+    "sport": "Badminton",
+    "dish": "Nasi Goreng",
+    "peak": null
+  },
+  {
+    "name": "Iran",
+    "capital": "Tehran",
+    "pop": "85.0M",
+    "lang": "Persian (Farsi)",
+    "sport": "Wrestling / Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Iraq",
+    "capital": "Baghdad",
+    "pop": "41.2M",
+    "lang": "Arabic, Kurdish",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Ireland",
+    "capital": "Dublin",
+    "pop": "5.1M",
+    "lang": "Irish, English",
+    "sport": "Gaelic Football / Hurling",
+    "dish": "Irish Stew",
+    "peak": null
+  },
+  {
+    "name": "Israel",
+    "capital": "Jerusalem",
+    "pop": "9.4M",
+    "lang": "Hebrew, Arabic",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Italy",
+    "capital": "Rome",
+    "pop": "60.3M",
+    "lang": "Italian",
+    "sport": "Football / Cycling",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Japan",
+    "capital": "Tokyo",
+    "pop": "125M",
+    "lang": "Japanese",
+    "sport": "Baseball / Sumo",
+    "dish": "Ramen",
+    "peak": null
+  },
+  {
+    "name": "Kazakhstan",
+    "capital": "Astana",
+    "pop": "19.4M",
+    "lang": "Kazakh, Russian",
+    "sport": "Football / Boxing",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Kenya",
+    "capital": "Nairobi",
+    "pop": "54.0M",
+    "lang": "Swahili, English",
+    "sport": "Long-distance running",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Malaysia",
+    "capital": "Kuala Lumpur",
+    "pop": "32.7M",
+    "lang": "Malay",
+    "sport": "Badminton / Football",
+    "dish": "Nasi Lemak",
+    "peak": null
+  },
+  {
+    "name": "Mexico",
+    "capital": "Mexico City",
+    "pop": "130M",
+    "lang": "Spanish",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Morocco",
+    "capital": "Rabat",
+    "pop": "37.1M",
+    "lang": "Arabic, Berber, French",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Mozambique",
+    "capital": "Maputo",
+    "pop": "32.8M",
+    "lang": "Portuguese",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Nepal",
+    "capital": "Kathmandu",
+    "pop": "29.7M",
+    "lang": "Nepali",
+    "sport": "Volleyball / Football",
+    "dish": "Dal Bhat",
+    "peak": null
+  },
+  {
+    "name": "Netherlands",
+    "capital": "Amsterdam",
+    "pop": "17.6M",
+    "lang": "Dutch",
+    "sport": "Football / Cycling",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "New Zealand",
+    "capital": "Wellington",
+    "pop": "5.1M",
+    "lang": "English, Māori",
+    "sport": "Rugby Union",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Nigeria",
+    "capital": "Abuja",
+    "pop": "218M",
+    "lang": "English",
+    "sport": "Football",
+    "dish": "Jollof Rice",
+    "peak": null
+  },
+  {
+    "name": "North Korea",
+    "capital": "Pyongyang",
+    "pop": "25.9M",
+    "lang": "Korean",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Norway",
+    "capital": "Oslo",
+    "pop": "5.4M",
+    "lang": "Norwegian",
+    "sport": "Cross-country skiing",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Pakistan",
+    "capital": "Islamabad",
+    "pop": "231M",
+    "lang": "Urdu, English",
+    "sport": "Cricket",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Peru",
+    "capital": "Lima",
+    "pop": "33.4M",
+    "lang": "Spanish, Quechua",
+    "sport": "Football",
+    "dish": "Ceviche",
+    "peak": null
+  },
+  {
+    "name": "Philippines",
+    "capital": "Manila",
+    "pop": "114M",
+    "lang": "Filipino, English",
+    "sport": "Basketball / Boxing",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Poland",
+    "capital": "Warsaw",
+    "pop": "37.9M",
+    "lang": "Polish",
+    "sport": "Football / Volleyball",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Portugal",
+    "capital": "Lisbon",
+    "pop": "10.3M",
+    "lang": "Portuguese",
+    "sport": "Football",
+    "dish": "Bacalhau",
+    "peak": null
+  },
+  {
+    "name": "Romania",
+    "capital": "Bucharest",
+    "pop": "19.2M",
+    "lang": "Romanian",
+    "sport": "Football / Gymnastics",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Russia",
+    "capital": "Moscow",
+    "pop": "145M",
+    "lang": "Russian",
+    "sport": "Ice Hockey / Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Saudi Arabia",
+    "capital": "Riyadh",
+    "pop": "35.0M",
+    "lang": "Arabic",
+    "sport": "Football",
+    "dish": "Kabsa",
+    "peak": null
+  },
+  {
+    "name": "Senegal",
+    "capital": "Dakar",
+    "pop": "17.2M",
+    "lang": "French, Wolof",
+    "sport": "Football / Wrestling",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Serbia",
+    "capital": "Belgrade",
+    "pop": "6.8M",
+    "lang": "Serbian",
+    "sport": "Tennis / Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Singapore",
+    "capital": "Singapore",
+    "pop": "5.9M",
+    "lang": "English, Mandarin, Malay, Tamil",
+    "sport": "Football / Swimming",
+    "dish": "Hainanese Chicken Rice",
+    "peak": null
+  },
+  {
+    "name": "South Africa",
+    "capital": "Pretoria / Cape Town / Bloemfontein",
+    "pop": "60.0M",
+    "lang": "11 official languages",
+    "sport": "Rugby / Cricket / Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "South Korea",
+    "capital": "Seoul",
+    "pop": "51.7M",
+    "lang": "Korean",
+    "sport": "Taekwondo / Football",
+    "dish": "Kimchi",
+    "peak": null
+  },
+  {
+    "name": "Spain",
+    "capital": "Madrid",
+    "pop": "47.4M",
+    "lang": "Spanish",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Sri Lanka",
+    "capital": "Sri Jayawardenepura Kotte",
+    "pop": "22.2M",
+    "lang": "Sinhala, Tamil",
+    "sport": "Cricket",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Sudan",
+    "capital": "Khartoum",
+    "pop": "44.9M",
+    "lang": "Arabic, English",
+    "sport": "Football",
+    "dish": "Ful Medames",
+    "peak": null
+  },
+  {
+    "name": "Sweden",
+    "capital": "Stockholm",
+    "pop": "10.5M",
+    "lang": "Swedish",
+    "sport": "Football / Ice Hockey",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Switzerland",
+    "capital": "Bern",
+    "pop": "8.7M",
+    "lang": "German, French, Italian, Romansh",
+    "sport": "Football / Skiing",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Syria",
+    "capital": "Damascus",
+    "pop": "21.3M",
+    "lang": "Arabic",
+    "sport": "Football",
+    "dish": "Kibbeh",
+    "peak": null
+  },
+  {
+    "name": "Tanzania",
+    "capital": "Dodoma",
+    "pop": "63.3M",
+    "lang": "Swahili, English",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Thailand",
+    "capital": "Bangkok",
+    "pop": "71.6M",
+    "lang": "Thai",
+    "sport": "Muay Thai / Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Turkey",
+    "capital": "Ankara",
+    "pop": "85.3M",
+    "lang": "Turkish",
+    "sport": "Football / Wrestling",
+    "dish": "Döner Kebab",
+    "peak": null
+  },
+  {
+    "name": "Uganda",
+    "capital": "Kampala",
+    "pop": "47.1M",
+    "lang": "English, Swahili",
+    "sport": "Football / Cricket",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Ukraine",
+    "capital": "Kyiv",
+    "pop": "44.0M",
+    "lang": "Ukrainian",
+    "sport": "Football / Boxing",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "United Kingdom",
+    "capital": "London",
+    "pop": "67.7M",
+    "lang": "English",
+    "sport": "Football / Cricket",
+    "dish": "Fish & Chips",
+    "peak": null
+  },
+  {
+    "name": "United States of America",
+    "capital": "Washington D.C.",
+    "pop": "335M",
+    "lang": "English",
+    "sport": "American Football / Baseball",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Uruguay",
+    "capital": "Montevideo",
+    "pop": "3.5M",
+    "lang": "Spanish",
+    "sport": "Football",
+    "dish": "Chivito",
+    "peak": null
+  },
+  {
+    "name": "Uzbekistan",
+    "capital": "Tashkent",
+    "pop": "35.3M",
+    "lang": "Uzbek",
+    "sport": "Football / Wrestling",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Venezuela",
+    "capital": "Caracas",
+    "pop": "28.3M",
+    "lang": "Spanish",
+    "sport": "Baseball",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Vietnam",
+    "capital": "Hanoi",
+    "pop": "98.2M",
+    "lang": "Vietnamese",
+    "sport": "Football",
+    "dish": "Phở",
+    "peak": null
+  },
+  {
+    "name": "Yemen",
+    "capital": "Sana'a",
+    "pop": "33.7M",
+    "lang": "Arabic",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Zimbabwe",
+    "capital": "Harare",
+    "pop": "15.1M",
+    "lang": "16 official languages",
+    "sport": "Football / Cricket",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Zambia",
+    "capital": "Lusaka",
+    "pop": "19.5M",
+    "lang": "English",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Armenia",
+    "capital": "Yerevan",
+    "pop": "2.8M",
+    "lang": "Armenian",
+    "sport": "Football / Wrestling",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Azerbaijan",
+    "capital": "Baku",
+    "pop": "10.2M",
+    "lang": "Azerbaijani",
+    "sport": "Football / Wrestling",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Bahrain",
+    "capital": "Manama",
+    "pop": "1.5M",
+    "lang": "Arabic",
+    "sport": "Football / Formula One",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Bahamas",
+    "capital": "Nassau",
+    "pop": "400,000",
+    "lang": "English",
+    "sport": "Athletics / Cricket",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Barbados",
+    "capital": "Bridgetown",
+    "pop": "280,000",
+    "lang": "English",
+    "sport": "Cricket",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Belarus",
+    "capital": "Minsk",
+    "pop": "9.4M",
+    "lang": "Belarusian, Russian",
+    "sport": "Ice Hockey / Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Belize",
+    "capital": "Belmopan",
+    "pop": "410,000",
+    "lang": "English",
+    "sport": "Football / Basketball",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Benin",
+    "capital": "Porto-Novo",
+    "pop": "13.0M",
+    "lang": "French",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Bhutan",
+    "capital": "Thimphu",
+    "pop": "760,000",
+    "lang": "Dzongkha",
+    "sport": "Archery",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Bosnia and Herzegovina",
+    "capital": "Sarajevo",
+    "pop": "3.2M",
+    "lang": "Bosnian, Croatian, Serbian",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Botswana",
+    "capital": "Gaborone",
+    "pop": "2.6M",
+    "lang": "English, Setswana",
+    "sport": "Football / Athletics",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Brunei",
+    "capital": "Bandar Seri Begawan",
+    "pop": "440,000",
+    "lang": "Malay",
+    "sport": "Football / Badminton",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Burkina Faso",
+    "capital": "Ouagadougou",
+    "pop": "22.1M",
+    "lang": "French",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Burundi",
+    "capital": "Gitega",
+    "pop": "12.6M",
+    "lang": "Kirundi, French, English",
+    "sport": "Football / Athletics",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Cabo Verde",
+    "capital": "Praia",
+    "pop": "560,000",
+    "lang": "Portuguese, Cape Verdean Creole",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Cape Verde",
+    "capital": "Praia",
+    "pop": "560,000",
+    "lang": "Portuguese, Cape Verdean Creole",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Central African Republic",
+    "capital": "Bangui",
+    "pop": "5.5M",
+    "lang": "French, Sango",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Chad",
+    "capital": "N'Djamena",
+    "pop": "17.4M",
+    "lang": "French, Arabic",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Comoros",
+    "capital": "Moroni",
+    "pop": "870,000",
+    "lang": "Comorian, Arabic, French",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Costa Rica",
+    "capital": "San José",
+    "pop": "5.2M",
+    "lang": "Spanish",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Côte d'Ivoire",
+    "capital": "Yamoussoukro",
+    "pop": "27.5M",
+    "lang": "French",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Cyprus",
+    "capital": "Nicosia",
+    "pop": "1.2M",
+    "lang": "Greek, Turkish",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Democratic Republic of the Congo",
+    "capital": "Kinshasa",
+    "pop": "99.0M",
+    "lang": "French",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Djibouti",
+    "capital": "Djibouti City",
+    "pop": "1.0M",
+    "lang": "French, Arabic",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Dominican Republic",
+    "capital": "Santo Domingo",
+    "pop": "11.1M",
+    "lang": "Spanish",
+    "sport": "Baseball",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "El Salvador",
+    "capital": "San Salvador",
+    "pop": "6.3M",
+    "lang": "Spanish",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Equatorial Guinea",
+    "capital": "Malabo",
+    "pop": "1.5M",
+    "lang": "Spanish, French, Portuguese",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Eritrea",
+    "capital": "Asmara",
+    "pop": "3.5M",
+    "lang": "Tigrinya, Arabic, English",
+    "sport": "Cycling / Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Eswatini",
+    "capital": "Mbabane / Lobamba",
+    "pop": "1.2M",
+    "lang": "Swati, English",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Estonia",
+    "capital": "Tallinn",
+    "pop": "1.4M",
+    "lang": "Estonian",
+    "sport": "Basketball / Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Fiji",
+    "capital": "Suva",
+    "pop": "930,000",
+    "lang": "English, Fijian, Hindi",
+    "sport": "Rugby Sevens",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Gabon",
+    "capital": "Libreville",
+    "pop": "2.3M",
+    "lang": "French",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Gambia",
+    "capital": "Banjul",
+    "pop": "2.5M",
+    "lang": "English",
+    "sport": "Football / Wrestling",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Georgia",
+    "capital": "Tbilisi",
+    "pop": "3.7M",
+    "lang": "Georgian",
+    "sport": "Football / Rugby / Wrestling",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Guinea",
+    "capital": "Conakry",
+    "pop": "13.5M",
+    "lang": "French",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Guinea-Bissau",
+    "capital": "Bissau",
+    "pop": "2.1M",
+    "lang": "Portuguese, Creole",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Guyana",
+    "capital": "Georgetown",
+    "pop": "790,000",
+    "lang": "English",
+    "sport": "Cricket / Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Haiti",
+    "capital": "Port-au-Prince",
+    "pop": "11.5M",
+    "lang": "Haitian Creole, French",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Honduras",
+    "capital": "Tegucigalpa",
+    "pop": "10.3M",
+    "lang": "Spanish",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Iceland",
+    "capital": "Reykjavik",
+    "pop": "370,000",
+    "lang": "Icelandic",
+    "sport": "Handball / Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Jamaica",
+    "capital": "Kingston",
+    "pop": "2.8M",
+    "lang": "English, Patois",
+    "sport": "Athletics / Cricket",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Jordan",
+    "capital": "Amman",
+    "pop": "10.3M",
+    "lang": "Arabic",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Kiribati",
+    "capital": "South Tarawa",
+    "pop": "120,000",
+    "lang": "English, Gilbertese",
+    "sport": "Football / Volleyball",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Kosovo",
+    "capital": "Pristina",
+    "pop": "1.8M",
+    "lang": "Albanian, Serbian",
+    "sport": "Football / Weightlifting",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Kuwait",
+    "capital": "Kuwait City",
+    "pop": "4.3M",
+    "lang": "Arabic",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Kyrgyzstan",
+    "capital": "Bishkek",
+    "pop": "6.7M",
+    "lang": "Kyrgyz, Russian",
+    "sport": "Football / Nomadic sports",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Laos",
+    "capital": "Vientiane",
+    "pop": "7.4M",
+    "lang": "Lao",
+    "sport": "Football / Petanque",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Latvia",
+    "capital": "Riga",
+    "pop": "1.8M",
+    "lang": "Latvian",
+    "sport": "Ice Hockey / Basketball",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Lebanon",
+    "capital": "Beirut",
+    "pop": "5.3M",
+    "lang": "Arabic, French",
+    "sport": "Football / Basketball",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Lesotho",
+    "capital": "Maseru",
+    "pop": "2.3M",
+    "lang": "Sesotho, English",
+    "sport": "Football / Equestrian",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Liberia",
+    "capital": "Monrovia",
+    "pop": "5.3M",
+    "lang": "English",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Libya",
+    "capital": "Tripoli",
+    "pop": "7.0M",
+    "lang": "Arabic",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Liechtenstein",
+    "capital": "Vaduz",
+    "pop": "38,000",
+    "lang": "German",
+    "sport": "Football / Skiing",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Lithuania",
+    "capital": "Vilnius",
+    "pop": "2.8M",
+    "lang": "Lithuanian",
+    "sport": "Basketball / Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Luxembourg",
+    "capital": "Luxembourg City",
+    "pop": "660,000",
+    "lang": "Luxembourgish, French, German",
+    "sport": "Football / Cycling",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Madagascar",
+    "capital": "Antananarivo",
+    "pop": "28.9M",
+    "lang": "Malagasy, French",
+    "sport": "Football / Pétanque",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Malawi",
+    "capital": "Lilongwe",
+    "pop": "20.4M",
+    "lang": "English, Chichewa",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Maldives",
+    "capital": "Malé",
+    "pop": "520,000",
+    "lang": "Dhivehi",
+    "sport": "Football / Volleyball",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Malta",
+    "capital": "Valletta",
+    "pop": "530,000",
+    "lang": "Maltese, English",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Marshall Islands",
+    "capital": "Majuro",
+    "pop": "42,000",
+    "lang": "Marshallese, English",
+    "sport": "Outrigger Canoe Racing / Volleyball",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Mauritania",
+    "capital": "Nouakchott",
+    "pop": "4.6M",
+    "lang": "Arabic, French",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Mauritius",
+    "capital": "Port Louis",
+    "pop": "1.3M",
+    "lang": "English, French, Creole",
+    "sport": "Football / Sailing",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Micronesia",
+    "capital": "Palikir",
+    "pop": "115,000",
+    "lang": "English",
+    "sport": "Baseball / Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Moldova",
+    "capital": "Chișinău",
+    "pop": "2.6M",
+    "lang": "Romanian (Moldovan)",
+    "sport": "Football / Wrestling",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Monaco",
+    "capital": "Monaco",
+    "pop": "36,000",
+    "lang": "French",
+    "sport": "Football / Formula One",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Mongolia",
+    "capital": "Ulaanbaatar",
+    "pop": "3.4M",
+    "lang": "Mongolian",
+    "sport": "Wrestling / Archery / Horse Racing",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Montenegro",
+    "capital": "Podgorica",
+    "pop": "620,000",
+    "lang": "Montenegrin",
+    "sport": "Football / Water Polo",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Myanmar",
+    "capital": "Naypyidaw",
+    "pop": "54.0M",
+    "lang": "Burmese",
+    "sport": "Football / Chinlone",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Namibia",
+    "capital": "Windhoek",
+    "pop": "2.6M",
+    "lang": "English",
+    "sport": "Football / Rugby",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Nauru",
+    "capital": "Yaren (de facto)",
+    "pop": "10,000",
+    "lang": "Nauruan, English",
+    "sport": "Australian Rules Football / Weightlifting",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Nicaragua",
+    "capital": "Managua",
+    "pop": "6.8M",
+    "lang": "Spanish",
+    "sport": "Baseball / Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Niger",
+    "capital": "Niamey",
+    "pop": "25.3M",
+    "lang": "French",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "North Macedonia",
+    "capital": "Skopje",
+    "pop": "2.1M",
+    "lang": "Macedonian, Albanian",
+    "sport": "Football / Basketball",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Oman",
+    "capital": "Muscat",
+    "pop": "4.5M",
+    "lang": "Arabic",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Palestine",
+    "capital": "Ramallah (admin.) / Jerusalem (claimed)",
+    "pop": "5.3M",
+    "lang": "Arabic",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Panama",
+    "capital": "Panama City",
+    "pop": "4.4M",
+    "lang": "Spanish",
+    "sport": "Baseball / Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Papua New Guinea",
+    "capital": "Port Moresby",
+    "pop": "9.1M",
+    "lang": "Tok Pisin, English, Hiri Motu",
+    "sport": "Rugby League / Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Paraguay",
+    "capital": "Asunción",
+    "pop": "7.4M",
+    "lang": "Spanish, Guaraní",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Qatar",
+    "capital": "Doha",
+    "pop": "2.7M",
+    "lang": "Arabic",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Republic of the Congo",
+    "capital": "Brazzaville",
+    "pop": "5.8M",
+    "lang": "French",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Rwanda",
+    "capital": "Kigali",
+    "pop": "13.5M",
+    "lang": "Kinyarwanda, French, English",
+    "sport": "Football / Cycling",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Saint Lucia",
+    "capital": "Castries",
+    "pop": "180,000",
+    "lang": "English",
+    "sport": "Cricket / Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Samoa",
+    "capital": "Apia",
+    "pop": "220,000",
+    "lang": "Samoan, English",
+    "sport": "Rugby Union / American Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "San Marino",
+    "capital": "San Marino City",
+    "pop": "34,000",
+    "lang": "Italian",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "São Tomé and Príncipe",
+    "capital": "São Tomé",
+    "pop": "220,000",
+    "lang": "Portuguese",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Seychelles",
+    "capital": "Victoria",
+    "pop": "98,000",
+    "lang": "Seychellois Creole, English, French",
+    "sport": "Football / Sailing",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Sierra Leone",
+    "capital": "Freetown",
+    "pop": "8.2M",
+    "lang": "English, Krio",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Slovakia",
+    "capital": "Bratislava",
+    "pop": "5.5M",
+    "lang": "Slovak",
+    "sport": "Ice Hockey / Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Slovenia",
+    "capital": "Ljubljana",
+    "pop": "2.1M",
+    "lang": "Slovenian",
+    "sport": "Football / Skiing",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Solomon Islands",
+    "capital": "Honiara",
+    "pop": "720,000",
+    "lang": "English, Pijin",
+    "sport": "Football / Rugby",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Somalia",
+    "capital": "Mogadishu",
+    "pop": "17.1M",
+    "lang": "Somali, Arabic",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "South Sudan",
+    "capital": "Juba",
+    "pop": "11.0M",
+    "lang": "English",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Suriname",
+    "capital": "Paramaribo",
+    "pop": "620,000",
+    "lang": "Dutch",
+    "sport": "Football / Cricket",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Tajikistan",
+    "capital": "Dushanbe",
+    "pop": "9.9M",
+    "lang": "Tajik",
+    "sport": "Football / Wrestling",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Timor-Leste",
+    "capital": "Dili",
+    "pop": "1.3M",
+    "lang": "Tetum, Portuguese",
+    "sport": "Football / Martial Arts",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Togo",
+    "capital": "Lomé",
+    "pop": "8.6M",
+    "lang": "French",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Tonga",
+    "capital": "Nukuʻalofa",
+    "pop": "100,000",
+    "lang": "Tongan, English",
+    "sport": "Rugby Union",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Trinidad and Tobago",
+    "capital": "Port of Spain",
+    "pop": "1.4M",
+    "lang": "English",
+    "sport": "Cricket / Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Tunisia",
+    "capital": "Tunis",
+    "pop": "12.0M",
+    "lang": "Arabic, French",
+    "sport": "Football",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Turkmenistan",
+    "capital": "Ashgabat",
+    "pop": "6.1M",
+    "lang": "Turkmen",
+    "sport": "Football / Horse Racing",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Tuvalu",
+    "capital": "Funafuti",
+    "pop": "11,000",
+    "lang": "Tuvaluan, English",
+    "sport": "Football / Volleyball",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "United Arab Emirates",
+    "capital": "Abu Dhabi",
+    "pop": "9.9M",
+    "lang": "Arabic",
+    "sport": "Football / Camel Racing",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Vanuatu",
+    "capital": "Port Vila",
+    "pop": "330,000",
+    "lang": "Bislama, English, French",
+    "sport": "Football / Rugby",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Andorra",
+    "capital": "Andorra la Vella",
+    "pop": "77,000",
+    "lang": "Catalan",
+    "sport": "Football / Skiing",
+    "dish": null,
+    "peak": null
+  },
+  {
+    "name": "Antigua and Barbuda",
+    "capital": "Saint John's",
+    "pop": "97,000",
+    "lang": "English",
+    "sport": "Cricket",
+    "dish": null,
+    "peak": null
+  }
+]

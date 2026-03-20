@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(npm install:*)",
+      "Bash(cp config.js public/config.js)",
+      "Bash(cp sidebar.js public/sidebar.js)",
+      "Bash(cp lang.js public/lang.js)",
+      "Bash(cp style.css public/style.css)",
+      "Bash(cp topojson.min.js public/topojson.min.js)",
+      "Bash(npm run:*)",
+      "Bash(node -e \":*)",
+      "Bash(node -e \"const t = require\\(''topojson-client''\\); console.log\\(''ok'', typeof t.feature\\)\")",
+      "Bash(npx astro:*)",
+      "Bash(python3 -c \":*)",
+      "Bash(head -3 grep -o 'cp-fact[^>]*>[^<]*' \"c:/Users/micth/Desktop/dev/seo/claud/maps/dist/country/iceland/index.html\")",
+      "Bash(head -2 grep -o 'cp-stat-val[^>]*>[^<]*' \"c:/Users/micth/Desktop/dev/seo/claud/maps/dist/country/georgia/index.html\")",
+      "Bash(node -e \"const {COUNTRY_DATA} = require\\(''./src/lib/countryData.js''\\); console.log\\(Object.keys\\(COUNTRY_DATA\\).sort\\(\\).join\\(''\\\\n''\\)\\); console.log\\(''TOTAL:'', Object.keys\\(COUNTRY_DATA\\).length\\);\")"
+    ]
+  }
+}

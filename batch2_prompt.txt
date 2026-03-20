@@ -1,0 +1,48 @@
+- New Zealand: capital=Wellington, sport=Rugby Union
+- Nigeria: capital=Abuja, sport=Football, dish=Jollof Rice
+- North Korea: capital=Pyongyang, sport=Football
+- Norway: capital=Oslo, sport=Cross-country skiing
+- Pakistan: capital=Islamabad, sport=Cricket
+- Peru: capital=Lima, sport=Football, dish=Ceviche
+- Philippines: capital=Manila, sport=Basketball / Boxing
+- Poland: capital=Warsaw, sport=Football / Volleyball
+- Portugal: capital=Lisbon, sport=Football, dish=Bacalhau
+- Romania: capital=Bucharest, sport=Football / Gymnastics
+- Russia: capital=Moscow, sport=Ice Hockey / Football
+- Saudi Arabia: capital=Riyadh, sport=Football, dish=Kabsa
+- Senegal: capital=Dakar, sport=Football / Wrestling
+- Serbia: capital=Belgrade, sport=Tennis / Football
+- Singapore: capital=Singapore, sport=Football / Swimming, dish=Hainanese Chicken Rice
+- South Africa: capital=Pretoria / Cape Town / Bloemfontein, sport=Rugby / Cricket / Football
+- South Korea: capital=Seoul, sport=Taekwondo / Football, dish=Kimchi
+- Spain: capital=Madrid, sport=Football
+- Sri Lanka: capital=Sri Jayawardenepura Kotte, sport=Cricket
+- Sudan: capital=Khartoum, sport=Football, dish=Ful Medames
+- Sweden: capital=Stockholm, sport=Football / Ice Hockey
+- Switzerland: capital=Bern, sport=Football / Skiing
+- Syria: capital=Damascus, sport=Football, dish=Kibbeh
+- Tanzania: capital=Dodoma, sport=Football
+- Thailand: capital=Bangkok, sport=Muay Thai / Football
+- Turkey: capital=Ankara, sport=Football / Wrestling, dish=Döner Kebab
+- Uganda: capital=Kampala, sport=Football / Cricket
+- Ukraine: capital=Kyiv, sport=Football / Boxing
+- United Kingdom: capital=London, sport=Football / Cricket, dish=Fish & Chips
+- United States of America: capital=Washington D.C., sport=American Football / Baseball
+- Uruguay: capital=Montevideo, sport=Football, dish=Chivito
+- Uzbekistan: capital=Tashkent, sport=Football / Wrestling
+- Venezuela: capital=Caracas, sport=Baseball
+- Vietnam: capital=Hanoi, sport=Football, dish=Phở
+- Yemen: capital=Sana'a, sport=Football
+- Zimbabwe: capital=Harare, sport=Football / Cricket
+- Zambia: capital=Lusaka, sport=Football
+- Armenia: capital=Yerevan, sport=Football / Wrestling
+- Azerbaijan: capital=Baku, sport=Football / Wrestling
+- Bahrain: capital=Manama, sport=Football / Formula One
+- Bahamas: capital=Nassau, sport=Athletics / Cricket
+- Barbados: capital=Bridgetown, sport=Cricket
+- Belarus: capital=Minsk, sport=Ice Hockey / Football
+- Belize: capital=Belmopan, sport=Football / Basketball
+- Benin: capital=Porto-Novo, sport=Football
+- Bhutan: capital=Thimphu, sport=Archery
+- Bosnia and Herzegovina: capital=Sarajevo, sport=Football
+- Botswana: capital=Gaborone, sport=Football / Athletics

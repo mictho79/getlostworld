@@ -1,0 +1,48 @@
+- Brunei: capital=Bandar Seri Begawan, sport=Football / Badminton
+- Burkina Faso: capital=Ouagadougou, sport=Football
+- Burundi: capital=Gitega, sport=Football / Athletics
+- Cabo Verde: capital=Praia, sport=Football
+- Cape Verde: capital=Praia, sport=Football
+- Central African Republic: capital=Bangui, sport=Football
+- Chad: capital=N'Djamena, sport=Football
+- Comoros: capital=Moroni, sport=Football
+- Costa Rica: capital=San José, sport=Football
+- Côte d'Ivoire: capital=Yamoussoukro, sport=Football
+- Cyprus: capital=Nicosia, sport=Football
+- Democratic Republic of the Congo: capital=Kinshasa, sport=Football
+- Djibouti: capital=Djibouti City, sport=Football
+- Dominican Republic: capital=Santo Domingo, sport=Baseball
+- El Salvador: capital=San Salvador, sport=Football
+- Equatorial Guinea: capital=Malabo, sport=Football
+- Eritrea: capital=Asmara, sport=Cycling / Football
+- Eswatini: capital=Mbabane / Lobamba, sport=Football
+- Estonia: capital=Tallinn, sport=Basketball / Football
+- Fiji: capital=Suva, sport=Rugby Sevens
+- Gabon: capital=Libreville, sport=Football
+- Gambia: capital=Banjul, sport=Football / Wrestling
+- Georgia: capital=Tbilisi, sport=Football / Rugby / Wrestling
+- Guinea: capital=Conakry, sport=Football
+- Guinea-Bissau: capital=Bissau, sport=Football
+- Guyana: capital=Georgetown, sport=Cricket / Football
+- Haiti: capital=Port-au-Prince, sport=Football
+- Honduras: capital=Tegucigalpa, sport=Football
+- Iceland: capital=Reykjavik, sport=Handball / Football
+- Jamaica: capital=Kingston, sport=Athletics / Cricket
+- Jordan: capital=Amman, sport=Football
+- Kiribati: capital=South Tarawa, sport=Football / Volleyball
+- Kosovo: capital=Pristina, sport=Football / Weightlifting
+- Kuwait: capital=Kuwait City, sport=Football
+- Kyrgyzstan: capital=Bishkek, sport=Football / Nomadic sports
+- Laos: capital=Vientiane, sport=Football / Petanque
+- Latvia: capital=Riga, sport=Ice Hockey / Basketball
+- Lebanon: capital=Beirut, sport=Football / Basketball
+- Lesotho: capital=Maseru, sport=Football / Equestrian
+- Liberia: capital=Monrovia, sport=Football
+- Libya: capital=Tripoli, sport=Football
+- Liechtenstein: capital=Vaduz, sport=Football / Skiing
+- Lithuania: capital=Vilnius, sport=Basketball / Football
+- Luxembourg: capital=Luxembourg City, sport=Football / Cycling
+- Madagascar: capital=Antananarivo, sport=Football / Pétanque
+- Malawi: capital=Lilongwe, sport=Football
+- Maldives: capital=Malé, sport=Football / Volleyball
+- Malta: capital=Valletta, sport=Football

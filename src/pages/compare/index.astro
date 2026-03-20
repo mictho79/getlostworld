@@ -1,0 +1,715 @@
+---
+export const prerender = false;
+import Base from '../../layouts/Base.astro';
+import { COUNTRY_DATA as DATA_EN, COUNTRY_VIBES as VIBES_EN, COUNTRY_PEAKS, COUNTRY_DISHES, COUNTRY_INSIGHTS as INSIGHTS_EN, slugify } from '../../lib/countryData.js';
+import { getT, translateRegion } from '../../i18n/translations';
+import { detectLang } from '../../i18n/detect';
+
+const lang = detectLang(Astro.request.headers.get('accept-language') || '');
+const t = getT(lang);
+
+let COUNTRY_DATA: any = DATA_EN;
+let COUNTRY_VIBES: any = VIBES_EN;
+let COUNTRY_INSIGHTS: any = INSIGHTS_EN;
+
+if (lang === 'fr') {
+  const fr = await import('../../lib/countryData.fr.js');
+  COUNTRY_DATA    = { ...(DATA_EN    as any), ...(fr.COUNTRY_DATA    as any) };
+  COUNTRY_VIBES   = { ...(VIBES_EN   as any), ...(fr.COUNTRY_VIBES   as any) };
+  COUNTRY_INSIGHTS = { ...(INSIGHTS_EN as any), ...(fr.COUNTRY_INSIGHTS as any) };
+}
+
+const REGION_MAP: Record<string,string> = {
+  Algeria:'Africa',Angola:'Africa',Benin:'Africa',Botswana:'Africa','Burkina Faso':'Africa',
+  Burundi:'Africa',Cameroon:'Africa','Cape Verde':'Africa','Central African Republic':'Africa',
+  Chad:'Africa',Comoros:'Africa','Democratic Republic of the Congo':'Africa',Djibouti:'Africa',
+  Egypt:'Africa','Equatorial Guinea':'Africa',Eritrea:'Africa',Eswatini:'Africa',Ethiopia:'Africa',
+  Gabon:'Africa',Gambia:'Africa',Ghana:'Africa',Guinea:'Africa','Guinea-Bissau':'Africa',
+  'Ivory Coast':'Africa',Kenya:'Africa',Lesotho:'Africa',Liberia:'Africa',Libya:'Africa',
+  Madagascar:'Africa',Malawi:'Africa',Mali:'Africa',Mauritania:'Africa',Mauritius:'Africa',
+  Morocco:'Africa',Mozambique:'Africa',Namibia:'Africa',Niger:'Africa',Nigeria:'Africa',
+  'Republic of the Congo':'Africa',Rwanda:'Africa','São Tomé and Príncipe':'Africa',
+  Senegal:'Africa',Seychelles:'Africa','Sierra Leone':'Africa',Somalia:'Africa',
+  'South Africa':'Africa','South Sudan':'Africa',Sudan:'Africa',Tanzania:'Africa',
+  Togo:'Africa',Tunisia:'Africa',Uganda:'Africa',Zambia:'Africa',Zimbabwe:'Africa',
+  'Antigua and Barbuda':'Americas',Argentina:'Americas',Bahamas:'Americas',Barbados:'Americas',
+  Belize:'Americas',Bolivia:'Americas',Brazil:'Americas',Canada:'Americas',Chile:'Americas',
+  Colombia:'Americas','Costa Rica':'Americas',Cuba:'Americas',Dominica:'Americas',
+  'Dominican Republic':'Americas',Ecuador:'Americas','El Salvador':'Americas',Grenada:'Americas',
+  Guatemala:'Americas',Guyana:'Americas',Haiti:'Americas',Honduras:'Americas',Jamaica:'Americas',
+  Mexico:'Americas',Nicaragua:'Americas',Panama:'Americas',Paraguay:'Americas',Peru:'Americas',
+  'Saint Kitts and Nevis':'Americas','Saint Lucia':'Americas',
+  'Saint Vincent and the Grenadines':'Americas',Suriname:'Americas',
+  'Trinidad and Tobago':'Americas','United States':'Americas',Uruguay:'Americas',Venezuela:'Americas',
+  Afghanistan:'Asia',Armenia:'Asia',Azerbaijan:'Asia',Bahrain:'Asia',Bangladesh:'Asia',
+  Bhutan:'Asia',Brunei:'Asia',Cambodia:'Asia',China:'Asia',Cyprus:'Asia',Georgia:'Asia',
+  India:'Asia',Indonesia:'Asia',Iran:'Asia',Iraq:'Asia',Israel:'Asia',Japan:'Asia',
+  Jordan:'Asia',Kazakhstan:'Asia',Kuwait:'Asia',Kyrgyzstan:'Asia',Laos:'Asia',Lebanon:'Asia',
+  Malaysia:'Asia',Maldives:'Asia',Mongolia:'Asia',Myanmar:'Asia',Nepal:'Asia',
+  'North Korea':'Asia',Oman:'Asia',Pakistan:'Asia',Philippines:'Asia',Qatar:'Asia',
+  'Saudi Arabia':'Asia',Singapore:'Asia','South Korea':'Asia','Sri Lanka':'Asia',Syria:'Asia',
+  Taiwan:'Asia',Tajikistan:'Asia',Thailand:'Asia','Timor-Leste':'Asia',Turkey:'Asia',
+  Turkmenistan:'Asia','United Arab Emirates':'Asia',Uzbekistan:'Asia',Vietnam:'Asia',Yemen:'Asia',
+  Albania:'Europe',Andorra:'Europe',Austria:'Europe',Belarus:'Europe',Belgium:'Europe',
+  'Bosnia and Herzegovina':'Europe',Bulgaria:'Europe',Croatia:'Europe',Czechia:'Europe',
+  Denmark:'Europe',Estonia:'Europe',Finland:'Europe',France:'Europe',Germany:'Europe',
+  Greece:'Europe',Hungary:'Europe',Iceland:'Europe',Ireland:'Europe',Italy:'Europe',
+  Kosovo:'Europe',Latvia:'Europe',Liechtenstein:'Europe',Lithuania:'Europe',Luxembourg:'Europe',
+  Malta:'Europe',Moldova:'Europe',Monaco:'Europe',Montenegro:'Europe',Netherlands:'Europe',
+  'North Macedonia':'Europe',Norway:'Europe',Poland:'Europe',Portugal:'Europe',Romania:'Europe',
+  Russia:'Europe',Serbia:'Europe',Slovakia:'Europe',Slovenia:'Europe',Spain:'Europe',
+  Sweden:'Europe',Switzerland:'Europe',Ukraine:'Europe',
+  England:'Europe',Scotland:'Europe',Wales:'Europe','Northern Ireland':'Europe',
+  Australia:'Oceania',Fiji:'Oceania',Kiribati:'Oceania','Marshall Islands':'Oceania',
+  Micronesia:'Oceania',Nauru:'Oceania','New Zealand':'Oceania',Palau:'Oceania',
+  'Papua New Guinea':'Oceania',Samoa:'Oceania','Solomon Islands':'Oceania',Tonga:'Oceania',
+  Tuvalu:'Oceania',Vanuatu:'Oceania',
+};
+
+const REGION_ACCENT: Record<string,string> = {
+  Europe:'#5b8fff', Asia:'#ff7043', Africa:'#ffb74d', Americas:'#69d89a', Oceania:'#26c6da',
+};
+
+const cd = COUNTRY_DATA  as Record<string,any>;
+const cv = COUNTRY_VIBES as Record<string,any>;
+
+const allData: Record<string,any> = {};
+const allNames = [...new Set([...Object.keys(DATA_EN as any), ...Object.keys(cd), ...Object.keys(cv)])];
+for (const name of allNames) {
+  const slug = slugify(name);
+  const region = REGION_MAP[name] || '';
+  const regionLocalized = translateRegion(region, lang);
+  allData[slug] = {
+    name, slug,
+    region: regionLocalized,
+    flag:       cd[name]?.flag       || '🌍',
+    capital:    cd[name]?.capital    || '—',
+    population: cd[name]?.population || '—',
+    language:   cd[name]?.language   || '—',
+    sport:      cd[name]?.sport      || '—',
+    vibe:       cv[name]             || 'Fascinating · Historic · Unique',
+    dish:       (COUNTRY_DISHES  as any)[name] || null,
+    peak:       (COUNTRY_PEAKS   as any)[name] || null,
+    insights:   (COUNTRY_INSIGHTS as any)[name] || {},
+    accent: REGION_ACCENT[REGION_MAP[name]] || '#aaaaaa',
+  };
+}
+
+const countriesList = Object.values(allData)
+  .map((c:any) => ({ name: c.name, slug: c.slug }))
+  .sort((a:any, b:any) => a.name.localeCompare(b.name));
+
+const title       = lang === 'fr'
+  ? 'Comparer les pays — Côte à côte | World Explorer'
+  : 'Compare Countries — Side-by-Side | World Explorer';
+const description = lang === 'fr'
+  ? 'Comparez deux pays côte à côte : faits, gastronomie, sport, nature et culture. Recherchez et choisissez parmi tous les pays du monde.'
+  : 'Compare any two countries side by side: facts, food, sport, nature and culture. Search and pick any countries from around the world.';
+
+// Serialise translated UI labels for client-side use
+const uiLabels = {
+  countryA:       t.countryA,
+  countryB:       t.countryB,
+  searchPlaceholder: t.typeCountryName,
+  swap:           t.swap,
+  keyFacts:       t.keyFacts,
+  capital:        t.capitalLabel,
+  population:     t.populationLabel,
+  language:       t.languageLabel,
+  sport:          t.nationalSportLabel,
+  dish:           t.nationalDishLabel,
+  peak:           t.highestPeakLabel,
+  geographyNature: t.geographyNature,
+  peopleCulture:   t.peopleCulture,
+  foodCuisine:     t.foodCuisine,
+  sportSection:    t.sportSection,
+  whichVisit:      t.whichVisit,
+  exploreEach:     lang === 'fr' ? 'Explorer chaque pays' : lang === 'es' ? 'Explorar cada país' : lang === 'de' ? 'Jedes Land entdecken' : 'Explore each country',
+  exploreMap:      t.exploreOnMap,
+  emptyState:      lang === 'fr' ? 'Sélectionnez deux pays ci-dessus pour les comparer' : lang === 'es' ? 'Selecciona dos países arriba para compararlos' : lang === 'de' ? 'Wählen Sie oben zwei Länder aus, um sie zu vergleichen' : 'Select two countries above to compare them',
+  backToMap:       lang === 'fr' ? 'Carte du monde' : lang === 'es' ? 'Mapa mundial' : lang === 'de' ? 'Weltkarte' : 'World map',
+};
+---
+
+<Base title={title} description={description}>
+
+  <script type="application/json" id="cmp-all-data"     set:html={JSON.stringify(allData)} />
+  <script type="application/json" id="cmp-country-list" set:html={JSON.stringify(countriesList)} />
+  <script type="application/json" id="cmp-ui-labels"    set:html={JSON.stringify(uiLabels)} />
+
+  <div class="cmp-page" id="cmp-page">
+
+    <div class="cmp-bg-deco" aria-hidden="true">
+      <div class="cmp-bg-ring cmp-bg-ring-1"></div>
+      <div class="cmp-bg-ring cmp-bg-ring-2"></div>
+      <div class="cmp-bg-ring cmp-bg-ring-3"></div>
+    </div>
+
+    <div class="cmp-wrap">
+
+      <a href="/map" class="cmp-back">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12L6 8l4-4"/></svg>
+        {uiLabels.backToMap}
+      </a>
+
+      <!-- Switcher -->
+      <div class="cmp-switcher" role="search" aria-label="Compare countries">
+        <div class="cmp-switcher-field">
+          <label class="cmp-switcher-label" for="cmp-input-a">{uiLabels.countryA}</label>
+          <div class="cmp-switcher-input-wrap">
+            <input id="cmp-input-a" type="text" class="cmp-switcher-input" autocomplete="off" spellcheck="false" placeholder={uiLabels.searchPlaceholder} />
+            <div class="cmp-dropdown" id="cmp-dropdown-a" role="listbox" hidden></div>
+          </div>
+        </div>
+        <button class="cmp-swap" id="cmp-swap" title={uiLabels.swap} aria-label={uiLabels.swap}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 16V4m0 0L3 8m4-4l4 4"/><path d="M17 8v12m0 0l4-4m-4 4l-4-4"/>
+          </svg>
+        </button>
+        <div class="cmp-switcher-field">
+          <label class="cmp-switcher-label" for="cmp-input-b">{uiLabels.countryB}</label>
+          <div class="cmp-switcher-input-wrap">
+            <input id="cmp-input-b" type="text" class="cmp-switcher-input" autocomplete="off" spellcheck="false" placeholder={uiLabels.searchPlaceholder} />
+            <div class="cmp-dropdown" id="cmp-dropdown-b" role="listbox" hidden></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dynamic comparison content -->
+      <div id="cmp-content">
+        <div class="cmp-empty">
+          <div class="cmp-empty-icon">🌍</div>
+          <p class="cmp-empty-text">{uiLabels.emptyState}</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</Base>
+
+<style is:global>
+  html, body { overflow: auto !important; height: auto !important; background: #0d0d10 !important; }
+  .cmp-dropdown, .cmp-dropdown .ac-option { color: #fff !important; }
+</style>
+
+<style>
+.cmp-page {
+  position: relative;
+  min-height: 100vh;
+}
+.cmp-page::before {
+  content:'';
+  position:fixed; top:-20vh; left:50%;
+  transform:translateX(-50%);
+  width:1100px; height:600px;
+  background:
+    radial-gradient(ellipse at 30% 0%, color-mix(in srgb, var(--accent-a,#5b8fff) 12%, transparent), transparent 60%),
+    radial-gradient(ellipse at 70% 0%, color-mix(in srgb, var(--accent-b,#ff7043) 12%, transparent), transparent 60%);
+  pointer-events:none; z-index:0;
+}
+.cmp-bg-deco { position:fixed; inset:0; pointer-events:none; z-index:1; overflow:hidden; }
+.cmp-bg-ring {
+  position:absolute; border-radius:50%;
+  border:0.5px solid rgba(91,143,255,0.08);
+}
+.cmp-bg-ring-1 { width:80vmax; height:80vmax; top:50%; left:30%; transform:translate(-50%,-50%); }
+.cmp-bg-ring-2 { width:70vmax; height:70vmax; top:50%; left:70%; transform:translate(-50%,-50%); border-color:rgba(255,112,67,0.07); }
+.cmp-bg-ring-3 { width:45vmax; height:45vmax; top:50%; left:50%; transform:translate(-50%,-50%); }
+
+.cmp-wrap {
+  position:relative; z-index:2;
+  max-width:960px; margin:0 auto;
+  padding:36px 24px 96px;
+  animation:cmp-in 0.5s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes cmp-in { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+
+.cmp-back {
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:11px; color:rgba(255,255,255,0.25); text-decoration:none;
+  letter-spacing:0.08em; text-transform:uppercase; transition:color 0.2s;
+  margin-bottom:32px;
+}
+.cmp-back:hover { color:rgba(255,255,255,0.6); }
+
+/* ── Switcher ── */
+.cmp-switcher {
+  display:grid; grid-template-columns:1fr auto 1fr;
+  align-items:end; gap:12px; margin-bottom:48px;
+  padding:20px 22px;
+  background:rgba(255,255,255,0.025);
+  border:0.5px solid rgba(255,255,255,0.08);
+  border-radius:16px;
+}
+.cmp-switcher-label {
+  display:block; font-size:8.5px; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.16em;
+  color:rgba(255,255,255,0.25); margin-bottom:8px;
+}
+.cmp-switcher-input-wrap { position:relative; }
+.cmp-switcher-input {
+  width:100%; box-sizing:border-box;
+  background:rgba(255,255,255,0.04);
+  border:0.5px solid rgba(255,255,255,0.12);
+  border-radius:10px; padding:11px 14px;
+  font-size:14px; font-family:'DM Sans',sans-serif;
+  color:#fff; outline:none;
+  color-scheme: dark;
+  transition:border-color 0.18s, background 0.18s;
+}
+.cmp-switcher-input:focus {
+  border-color:rgba(255,255,255,0.25);
+  background:rgba(255,255,255,0.07);
+}
+.cmp-switcher-input::placeholder { color:rgba(255,255,255,0.2); }
+
+.cmp-swap {
+  width:40px; height:40px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:50%;
+  background:rgba(255,255,255,0.04);
+  border:0.5px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.35); cursor:pointer;
+  transition:background 0.18s, border-color 0.18s, color 0.18s, transform 0.3s;
+  flex-shrink:0; margin-bottom:1px;
+}
+.cmp-swap:hover {
+  background:rgba(255,255,255,0.08);
+  border-color:rgba(255,255,255,0.22);
+  color:rgba(255,255,255,0.85);
+  transform:rotate(180deg);
+}
+
+.cmp-dropdown {
+  position:absolute; top:calc(100% + 6px); left:0; right:0;
+  z-index:100; background:#18181f; color:#fff;
+  border:0.5px solid rgba(255,255,255,0.12);
+  border-radius:10px; overflow:hidden;
+  box-shadow:0 16px 40px rgba(0,0,0,0.6);
+}
+.cmp-dropdown { background:#18181f; border:0.5px solid rgba(255,255,255,0.12); border-radius:10px; overflow:hidden; box-shadow:0 16px 40px rgba(0,0,0,0.6); }
+.ac-option { padding:10px 14px; font-size:13.5px; color:rgba(255,255,255,0.75); cursor:pointer; border-bottom:0.5px solid rgba(255,255,255,0.04); transition:background 0.1s, color 0.1s; }
+.ac-option:last-child { border-bottom:none; }
+.ac-option:hover, .ac-option--active { background:rgba(255,255,255,0.07); color:#fff; }
+
+/* ── Empty state ── */
+.cmp-empty {
+  text-align:center; padding:80px 20px;
+}
+.cmp-empty-icon { font-size:56px; margin-bottom:20px; opacity:0.3; }
+.cmp-empty-text { font-size:14px; color:rgba(255,255,255,0.25); letter-spacing:0.05em; }
+
+/* ── Dynamic content styles (injected via JS) ── */
+:global(.cmp-section)       { margin-bottom:48px; }
+:global(.cmp-section-label) {
+  font-size:9px; font-weight:700; text-transform:uppercase;
+  letter-spacing:0.2em; color:rgba(255,255,255,0.3); margin:0 0 18px;
+}
+:global(.cmp-hero) {
+  display:grid; grid-template-columns:1fr auto 1fr;
+  align-items:center; gap:28px; margin-bottom:52px; text-align:center;
+}
+:global(.cmp-hero-country) { display:flex; flex-direction:column; align-items:center; gap:10px; }
+:global(.cmp-hero-flag) { font-size:68px; line-height:1; filter:drop-shadow(0 8px 28px rgba(0,0,0,0.55)); }
+:global(.cmp-hero-name) {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(20px,3.5vw,34px); font-weight:700;
+  line-height:1.1; margin:0;
+}
+:global(.cmp-hero-name--a) { color:var(--accent-a,#5b8fff); }
+:global(.cmp-hero-name--b) { color:var(--accent-b,#ff7043); }
+:global(.cmp-region-badge) {
+  display:inline-block; font-size:9px; letter-spacing:0.18em;
+  text-transform:uppercase; padding:3px 10px;
+  border-radius:20px;
+}
+:global(.cmp-vibe) { font-size:10px; color:rgba(255,255,255,0.22); letter-spacing:0.16em; font-variant:small-caps; }
+:global(.cmp-vs-badge) {
+  font-family:'Playfair Display',serif; font-size:13px; font-weight:700;
+  color:rgba(255,255,255,0.12); letter-spacing:0.2em;
+  padding:10px 14px; border:0.5px solid rgba(255,255,255,0.07);
+  border-radius:50%; width:52px; height:52px;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; background:rgba(255,255,255,0.02);
+}
+:global(.cmp-divider) {
+  height:1px; border:none; margin:0 0 44px;
+  background:linear-gradient(90deg,
+    transparent,
+    color-mix(in srgb, var(--accent-a,#5b8fff) 35%, transparent) 30%,
+    color-mix(in srgb, var(--accent-b,#ff7043) 35%, transparent) 70%,
+    transparent
+  );
+}
+:global(.cmp-facts-table) {
+  border:0.5px solid rgba(255,255,255,0.07);
+  border-radius:14px; overflow:hidden;
+}
+:global(.cmp-facts-header),
+:global(.cmp-facts-row) { display:grid; grid-template-columns:1fr 120px 1fr; align-items:center; }
+:global(.cmp-facts-header) {
+  background:rgba(255,255,255,0.03);
+  border-bottom:0.5px solid rgba(255,255,255,0.06);
+  padding:10px 0; font-size:10px; font-weight:700;
+  letter-spacing:0.1em; text-transform:uppercase;
+}
+:global(.cmp-facts-row) {
+  border-bottom:0.5px solid rgba(255,255,255,0.04);
+  transition:background 0.15s;
+}
+:global(.cmp-facts-row:last-child) { border-bottom:none; }
+:global(.cmp-facts-row:hover) { background:rgba(255,255,255,0.025); }
+:global(.cmp-facts-cell) { padding:12px 14px; font-size:12.5px; line-height:1.4; color:rgba(255,255,255,0.65); }
+:global(.cmp-facts-cell--metric) {
+  text-align:center; font-size:8px; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.12em;
+  color:rgba(255,255,255,0.2); padding:12px 6px;
+}
+:global(.cmp-facts-cell--a) { text-align:right; }
+:global(.cmp-facts-cell--b) { text-align:left; }
+:global(.cmp-facts-cell--winner) { color:rgba(255,255,255,0.92)!important; font-weight:500; }
+:global(.cmp-cols) {
+  display:grid; grid-template-columns:1fr 1px 1fr;
+  border:0.5px solid rgba(255,255,255,0.07);
+  border-radius:14px; overflow:hidden;
+}
+:global(.cmp-col-sep) { background:rgba(255,255,255,0.06); }
+:global(.cmp-col) { padding:20px 22px; background:rgba(255,255,255,0.02); transition:background 0.18s; }
+:global(.cmp-col:hover) { background:rgba(255,255,255,0.04); }
+:global(.cmp-col-header) {
+  font-size:11px; font-weight:700; text-transform:uppercase;
+  letter-spacing:0.1em; margin-bottom:10px;
+}
+:global(.cmp-col-text) { font-size:13px; line-height:1.85; color:rgba(255,255,255,0.58); margin:0; }
+:global(.cmp-col-text strong) { color:rgba(255,255,255,0.88); font-weight:500; }
+:global(.cmp-editorial) {
+  font-family:'Playfair Display',serif; font-style:italic;
+  font-size:15px; line-height:1.9; color:rgba(255,255,255,0.7);
+  padding:22px 26px; margin:0;
+  background:rgba(255,255,255,0.02);
+  border-left:2px solid var(--accent-a,#5b8fff);
+  border-radius:0 12px 12px 0;
+}
+:global(.cmp-cta-row) { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+:global(.cmp-cta-card) {
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+  padding:22px 18px;
+  border-radius:14px; text-decoration:none; text-align:center;
+  transition:background 0.2s, border-color 0.2s, transform 0.2s;
+}
+:global(.cmp-cta-card:hover) { transform:translateY(-2px); }
+:global(.cmp-cta-flag) { font-size:42px; line-height:1; }
+:global(.cmp-cta-name) { font-size:16px; font-weight:600; color:rgba(255,255,255,0.9); font-family:'Playfair Display',serif; }
+:global(.cmp-cta-sub)  { font-size:9px; text-transform:uppercase; letter-spacing:0.14em; opacity:0.75; }
+:global(.cmp-cta-arrow){ font-size:14px; opacity:0.55; margin-top:4px; }
+:global(.cmp-map-cta)  { margin-top:48px; padding-top:28px; border-top:0.5px solid rgba(255,255,255,0.05); text-align:center; }
+:global(.cmp-map-btn)  {
+  display:inline-flex; align-items:center; gap:9px;
+  padding:13px 28px; background:rgba(255,255,255,0.04);
+  border:0.5px solid rgba(255,255,255,0.1); border-radius:28px;
+  font-size:13px; color:rgba(255,255,255,0.5); text-decoration:none;
+  transition:background 0.2s, border-color 0.2s, color 0.2s; letter-spacing:0.04em;
+}
+:global(.cmp-map-btn:hover) {
+  background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2); color:rgba(255,255,255,0.95);
+}
+
+@media (max-width:640px) {
+  .cmp-switcher { grid-template-columns:1fr; gap:10px; }
+  .cmp-swap { margin:0 auto; }
+  :global(.cmp-hero)  { grid-template-columns:1fr; gap:16px; }
+  :global(.cmp-vs-badge) { margin:0 auto; }
+  :global(.cmp-cols) { grid-template-columns:1fr; }
+  :global(.cmp-col-sep) { display:none; }
+  :global(.cmp-col:first-child) { border-bottom:0.5px solid rgba(255,255,255,0.06); }
+  :global(.cmp-facts-cell) { padding:10px 8px; font-size:11.5px; }
+  :global(.cmp-facts-cell--metric) { font-size:7px; padding:10px 3px; }
+  :global(.cmp-facts-header) { display:none; }
+  :global(.cmp-cta-row) { grid-template-columns:1fr; }
+}
+</style>
+
+<script>
+const allData:   Record<string,any>           = JSON.parse(document.getElementById('cmp-all-data')!.textContent!);
+const countries: {name:string; slug:string}[] = JSON.parse(document.getElementById('cmp-country-list')!.textContent!);
+const UI: Record<string,string>               = JSON.parse(document.getElementById('cmp-ui-labels')!.textContent!);
+
+// Force dropdown text white regardless of inherited styles
+const _forceStyle = document.createElement('style');
+_forceStyle.textContent = '.cmp-dropdown,.cmp-dropdown *{color:#fff!important}';
+document.head.appendChild(_forceStyle);
+
+let slugA = '', slugB = '';
+
+// ── Read URL params ────────────────────────────────────────────────
+function readParams() {
+  const p = new URLSearchParams(window.location.search);
+  slugA = p.get('a') || '';
+  slugB = p.get('b') || '';
+}
+
+// ── Autocomplete ────────────────────────────────────────────────────
+function buildAutocomplete(
+  inputEl: HTMLInputElement,
+  dropdownEl: HTMLElement,
+  onSelect: (c:{name:string;slug:string}) => void
+) {
+  let activeIdx = -1;
+
+  function render(q: string) {
+    dropdownEl.innerHTML = ''; activeIdx = -1;
+    if (!q.trim()) { dropdownEl.hidden = true; return; }
+    const lo = q.toLowerCase();
+    const hits = countries
+      .filter(c => c.name.toLowerCase().includes(lo))
+      .sort((a,b) => {
+        const as = a.name.toLowerCase().startsWith(lo);
+        const bs = b.name.toLowerCase().startsWith(lo);
+        return as === bs ? a.name.localeCompare(b.name) : as ? -1 : 1;
+      }).slice(0,8);
+    if (!hits.length) { dropdownEl.hidden = true; return; }
+    hits.forEach(c => {
+      const d = document.createElement('div');
+      d.className='ac-option'; d.dataset.slug=c.slug; d.textContent=c.name; d.style.setProperty('color','#fff','important');
+      d.addEventListener('mousedown', e => { e.preventDefault(); pick(c); });
+      dropdownEl.appendChild(d);
+    });
+    dropdownEl.hidden = false;
+  }
+
+  function pick(c:{name:string;slug:string}) {
+    inputEl.value = c.name; dropdownEl.hidden = true; activeIdx = -1;
+    onSelect(c);
+  }
+
+  function setActive(i:number) {
+    const opts = dropdownEl.querySelectorAll<HTMLElement>('.ac-option');
+    opts.forEach((o,j) => o.classList.toggle('ac-option--active', j===i));
+    activeIdx = i;
+  }
+
+  inputEl.addEventListener('input',  () => render(inputEl.value));
+  inputEl.addEventListener('focus',  () => { if(inputEl.value) render(inputEl.value); });
+  inputEl.addEventListener('blur',   () => setTimeout(() => { dropdownEl.hidden=true; }, 200));
+  inputEl.addEventListener('keydown', e => {
+    const opts = dropdownEl.querySelectorAll<HTMLElement>('.ac-option');
+    if      (e.key==='ArrowDown')            { e.preventDefault(); setActive(Math.min(activeIdx+1,opts.length-1)); }
+    else if (e.key==='ArrowUp')              { e.preventDefault(); setActive(Math.max(activeIdx-1,-1)); }
+    else if (e.key==='Enter' && activeIdx>=0){ e.preventDefault(); const c=countries.find(x=>x.slug===opts[activeIdx].dataset.slug); if(c) pick(c); }
+    else if (e.key==='Escape')               { dropdownEl.hidden=true; inputEl.blur(); }
+  });
+
+  return { setValue: (name:string) => { inputEl.value = name; } };
+}
+
+// ── Rendering helpers ─────────────────────────────────────────────
+function esc(s:string) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function row(labelA:string, metric:string, labelB:string, winA=false, winB=false) {
+  const ca = winA ? ' cmp-facts-cell--winner' : '';
+  const cb = winB ? ' cmp-facts-cell--winner' : '';
+  return `<div class="cmp-facts-row">
+    <div class="cmp-facts-cell cmp-facts-cell--a${ca}">${esc(labelA)}</div>
+    <div class="cmp-facts-cell cmp-facts-cell--metric">${esc(metric)}</div>
+    <div class="cmp-facts-cell cmp-facts-cell--b${cb}">${esc(labelB)}</div>
+  </div>`;
+}
+
+function cols(icon:string, titleA:string, textA:string, titleB:string, textB:string) {
+  return `<div class="cmp-cols">
+    <div class="cmp-col">
+      <div class="cmp-col-header" style="color:var(--accent-a)">${esc(icon)} ${esc(titleA)}</div>
+      <p class="cmp-col-text">${textA}</p>
+    </div>
+    <div class="cmp-col-sep"></div>
+    <div class="cmp-col">
+      <div class="cmp-col-header" style="color:var(--accent-b)">${esc(icon)} ${esc(titleB)}</div>
+      <p class="cmp-col-text">${textB}</p>
+    </div>
+  </div>`;
+}
+
+function parseNum(s:string):number {
+  if (!s || s==='—') return 0;
+  const m = s.match(/([\d.]+)\s*([BbMmKk]?)/);
+  if (!m) return 0;
+  const n=parseFloat(m[1]), u=m[2].toUpperCase();
+  return u==='B'?n*1e9:u==='M'?n*1e6:u==='K'?n*1e3:n;
+}
+
+function editorial(a:any, b:any):string {
+  const parts:string[]=[];
+  const popA=parseNum(a.population), popB=parseNum(b.population);
+  if(popA>0&&popB>0) {
+    const bigger=popA>popB?a:b, ratio=Math.round(Math.max(popA,popB)/Math.min(popA,popB));
+    if(ratio>=3) parts.push(`${bigger.name} has roughly ${ratio}× the population of the other.`);
+  }
+  if(a.region&&b.region&&a.region!==b.region)
+    parts.push(`${a.name} (${a.region}) and ${b.name} (${b.region}) offer contrasting continental experiences.`);
+  else if(a.region)
+    parts.push(`Both countries share the ${a.region} continent, yet each has a distinct character shaped by history.`);
+  if(a.sport!=='—'&&b.sport!=='—'&&a.sport!==b.sport)
+    parts.push(`Sports fans will note: ${a.name} is passionate about ${a.sport}, while ${b.name} rallies around ${b.sport}.`);
+  if(a.dish&&b.dish&&a.dish!==b.dish)
+    parts.push(`At the table, ${a.name} is famous for ${a.dish} while ${b.name} celebrates ${b.dish}.`);
+  const vA=a.vibe.split('·')[0].trim().toLowerCase();
+  const vB=b.vibe.split('·')[0].trim().toLowerCase();
+  parts.push(`Choose ${a.name} for a ${vA} experience, or ${b.name} for a ${vB} adventure — both reward the curious traveller.`);
+  return parts.join(' ');
+}
+
+// ── Main render ───────────────────────────────────────────────────
+function renderComparison(a:any, b:any) {
+  const page = document.getElementById('cmp-page')!;
+  page.style.setProperty('--accent-a', a.accent);
+  page.style.setProperty('--accent-b', b.accent);
+
+  const popA=parseNum(a.population), popB=parseNum(b.population);
+  const peakElA = a.peak?.elevation||0, peakElB = b.peak?.elevation||0;
+
+  let factRows = '';
+  if(a.capital!=='—'||b.capital!=='—')     factRows += row(a.capital,     UI.capital,      b.capital);
+  if(a.population!=='—'||b.population!=='—') factRows += row(a.population, UI.population,   b.population, popA>=popB&&popA>0, popB>popA);
+  if(a.language!=='—'||b.language!=='—')   factRows += row(a.language,    UI.language,     b.language);
+  if(a.sport!=='—'||b.sport!=='—')         factRows += row(a.sport,       UI.sport,        b.sport);
+  if(a.dish||b.dish)                        factRows += row(a.dish||'—',   UI.dish,         b.dish||'—');
+  if(a.peak||b.peak) {
+    const pA = a.peak ? `${a.peak.name} (${a.peak.elevation.toLocaleString()} m)` : '—';
+    const pB = b.peak ? `${b.peak.name} (${b.peak.elevation.toLocaleString()} m)` : '—';
+    factRows += row(pA, UI.peak, pB, peakElA>=peakElB&&peakElA>0, peakElB>peakElA);
+  }
+
+  const ciA = a.insights, ciB = b.insights;
+
+  const natA = `${a.peak?`<strong>${esc(a.peak.name)}</strong> rises to ${a.peak.elevation.toLocaleString()} m. `:''}${ciA.nature ? esc(ciA.nature) : `${esc(a.name)} offers diverse natural landscapes shaped by its location in ${esc(a.region||'the world')}.`}`;
+  const natB = `${b.peak?`<strong>${esc(b.peak.name)}</strong> rises to ${b.peak.elevation.toLocaleString()} m. `:''}${ciB.nature ? esc(ciB.nature) : `${esc(b.name)} offers diverse natural landscapes shaped by its location in ${esc(b.region||'the world')}.`}`;
+  const pepA = ciA.people ? esc(ciA.people) : `With a population of ${esc(a.population)}, ${esc(a.name)} is a vibrant society with rich traditions.`;
+  const pepB = ciB.people ? esc(ciB.people) : `With a population of ${esc(b.population)}, ${esc(b.name)} is a vibrant society with rich traditions.`;
+  const fooA = `${a.dish?`<strong>${esc(a.dish)}</strong> is the emblematic dish. `:''}${ciA.food?esc(ciA.food):`Food culture in ${esc(a.name)} is deeply tied to local identity.`}`;
+  const fooB = `${b.dish?`<strong>${esc(b.dish)}</strong> is the emblematic dish. `:''}${ciB.food?esc(ciB.food):`Food culture in ${esc(b.name)} is deeply tied to local identity.`}`;
+  const spA  = `${a.sport!=='—'?`<strong>${esc(a.sport)}</strong> holds a special place in ${esc(a.name)}'s identity. `:''}${ciA.sport?esc(ciA.sport):`Sport in ${esc(a.name)} unites communities and fuels local pride.`}`;
+  const spB  = `${b.sport!=='—'?`<strong>${esc(b.sport)}</strong> holds a special place in ${esc(b.name)}'s identity. `:''}${ciB.sport?esc(ciB.sport):`Sport in ${esc(b.name)} unites communities and fuels local pride.`}`;
+
+  document.getElementById('cmp-content')!.innerHTML = `
+    <div class="cmp-hero">
+      <div class="cmp-hero-country">
+        <span class="cmp-hero-flag">${a.flag}</span>
+        <h1 class="cmp-hero-name cmp-hero-name--a">${esc(a.name)}</h1>
+        <span class="cmp-region-badge" style="color:${a.accent};border:0.5px solid color-mix(in srgb,${a.accent} 30%,transparent);background:color-mix(in srgb,${a.accent} 8%,transparent)">${esc(a.region||'World')}</span>
+        <span class="cmp-vibe">${esc(a.vibe)}</span>
+      </div>
+      <div class="cmp-vs-badge" aria-hidden="true">VS</div>
+      <div class="cmp-hero-country">
+        <span class="cmp-hero-flag">${b.flag}</span>
+        <h1 class="cmp-hero-name cmp-hero-name--b">${esc(b.name)}</h1>
+        <span class="cmp-region-badge" style="color:${b.accent};border:0.5px solid color-mix(in srgb,${b.accent} 30%,transparent);background:color-mix(in srgb,${b.accent} 8%,transparent)">${esc(b.region||'World')}</span>
+        <span class="cmp-vibe">${esc(b.vibe)}</span>
+      </div>
+    </div>
+
+    <hr class="cmp-divider">
+
+    <div class="cmp-section">
+      <h2 class="cmp-section-label">${esc(UI.keyFacts)}</h2>
+      <div class="cmp-facts-table">
+        <div class="cmp-facts-header">
+          <div class="cmp-facts-cell cmp-facts-cell--a" style="padding-right:18px;color:${a.accent}">${esc(a.name)}</div>
+          <div class="cmp-facts-cell cmp-facts-cell--metric"></div>
+          <div class="cmp-facts-cell cmp-facts-cell--b" style="padding-left:18px;color:${b.accent}">${esc(b.name)}</div>
+        </div>
+        ${factRows}
+      </div>
+    </div>
+
+    <div class="cmp-section">
+      <h2 class="cmp-section-label">${esc(UI.geographyNature)}</h2>
+      ${cols('', `${a.flag} ${a.name}`, natA, `${b.flag} ${b.name}`, natB)}
+    </div>
+
+    <div class="cmp-section">
+      <h2 class="cmp-section-label">${esc(UI.peopleCulture)}</h2>
+      ${cols('', `${a.flag} ${a.name}`, pepA, `${b.flag} ${b.name}`, pepB)}
+    </div>
+
+    <div class="cmp-section">
+      <h2 class="cmp-section-label">${esc(UI.foodCuisine)}</h2>
+      ${cols('', `${a.flag} ${a.name}`, fooA, `${b.flag} ${b.name}`, fooB)}
+    </div>
+
+    <div class="cmp-section">
+      <h2 class="cmp-section-label">${esc(UI.sportSection)}</h2>
+      ${cols('', `${a.flag} ${a.name}`, spA, `${b.flag} ${b.name}`, spB)}
+    </div>
+
+    <div class="cmp-section">
+      <h2 class="cmp-section-label">${esc(UI.whichVisit)}</h2>
+      <blockquote class="cmp-editorial">${esc(editorial(a,b))}</blockquote>
+    </div>
+
+    <div class="cmp-section">
+      <h2 class="cmp-section-label">${esc(UI.exploreEach)}</h2>
+      <div class="cmp-cta-row">
+        <a href="/country/${a.slug}/" class="cmp-cta-card" style="border:0.5px solid color-mix(in srgb,${a.accent} 22%,rgba(255,255,255,0.06));background:color-mix(in srgb,${a.accent} 5%,rgba(255,255,255,0.02))">
+          <span class="cmp-cta-flag">${a.flag}</span>
+          <span class="cmp-cta-name">${esc(a.name)}</span>
+          <span class="cmp-cta-sub" style="color:${a.accent}">${esc(a.region)}</span>
+          <span class="cmp-cta-arrow" style="color:${a.accent}">→</span>
+        </a>
+        <a href="/country/${b.slug}/" class="cmp-cta-card" style="border:0.5px solid color-mix(in srgb,${b.accent} 22%,rgba(255,255,255,0.06));background:color-mix(in srgb,${b.accent} 5%,rgba(255,255,255,0.02))">
+          <span class="cmp-cta-flag">${b.flag}</span>
+          <span class="cmp-cta-name">${esc(b.name)}</span>
+          <span class="cmp-cta-sub" style="color:${b.accent}">${esc(b.region)}</span>
+          <span class="cmp-cta-arrow" style="color:${b.accent}">→</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="cmp-map-cta">
+      <a href="/map" class="cmp-map-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        ${esc(UI.exploreMap)}
+      </a>
+    </div>
+  `;
+}
+
+// ── Init ──────────────────────────────────────────────────────────
+const inputA    = document.getElementById('cmp-input-a')    as HTMLInputElement;
+const inputB    = document.getElementById('cmp-input-b')    as HTMLInputElement;
+const dropdownA = document.getElementById('cmp-dropdown-a') as HTMLElement;
+const dropdownB = document.getElementById('cmp-dropdown-b') as HTMLElement;
+const swapBtn   = document.getElementById('cmp-swap')       as HTMLButtonElement;
+
+const acA = buildAutocomplete(inputA, dropdownA, c => { slugA=c.slug; tryRender(); });
+const acB = buildAutocomplete(inputB, dropdownB, c => { slugB=c.slug; tryRender(); });
+
+function tryRender() {
+  const a = allData[slugA], b = allData[slugB];
+  if (!a || !b || slugA===slugB) return;
+  const url = new URL(window.location.href);
+  url.searchParams.set('a', slugA);
+  url.searchParams.set('b', slugB);
+  history.replaceState(null, '', url.toString());
+  renderComparison(a, b);
+}
+
+swapBtn.addEventListener('click', () => {
+  [slugA, slugB] = [slugB, slugA];
+  const cA = allData[slugA], cB = allData[slugB];
+  if (cA) acA.setValue(cA.name);
+  if (cB) acB.setValue(cB.name);
+  tryRender();
+});
+
+// Pre-fill from URL params
+readParams();
+if (slugA && allData[slugA]) acA.setValue(allData[slugA].name);
+if (slugB && allData[slugB]) acB.setValue(allData[slugB].name);
+if (slugA && slugB && allData[slugA] && allData[slugB]) renderComparison(allData[slugA], allData[slugB]);
+</script>

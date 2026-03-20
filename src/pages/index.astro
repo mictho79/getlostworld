@@ -1,0 +1,1076 @@
+---
+export const prerender = false;
+import { COUNTRY_VIBES as VIBES_EN, COUNTRY_DATA as DATA_EN, slugify } from '../lib/countryData.js';
+import { getT } from '../i18n/translations';
+import { detectLang } from '../i18n/detect';
+
+const lang = detectLang(Astro.request.headers.get('accept-language') ?? 'en');
+const t    = getT(lang);
+
+let vibesSrc: typeof VIBES_EN = VIBES_EN;
+let dataSrc:  typeof DATA_EN  = DATA_EN;
+if (lang === 'fr') {
+  const fr = await import('../lib/countryData.fr.js');
+  vibesSrc = (fr as any).COUNTRY_VIBES;
+  dataSrc  = (fr as any).COUNTRY_DATA;
+}
+
+// Build enriched country payload for the globe — always iterate EN keys so new nations are included
+const globeData: Record<string, { vibe: string; fact: string; slug: string }> = {};
+for (const [name, _vibe] of Object.entries(VIBES_EN as Record<string, string>)) {
+  const vibe = (vibesSrc as any)[name] ?? _vibe;
+  const d    = (dataSrc  as any)[name] ?? (DATA_EN as any)[name];
+  globeData[name] = { vibe, fact: d?.fact ?? '', slug: slugify(name) };
+}
+
+// Sorted list for autocomplete
+const countryList = Object.keys(globeData).sort().map(n => ({
+  name: n,
+  slug: globeData[n].slug,
+  vibe: globeData[n].vibe,
+}));
+---
+<!DOCTYPE html>
+<html lang={lang}>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>World Explorer — Get lost in the world</title>
+  <meta name="description" content="Explore interactive facts, insights, and comparisons for every country on Earth. Powered by a beautiful 3D globe." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      background: #060d1a;
+      color: #fff;
+    }
+
+    /* ── Globe canvas (full-screen background) ─────────────────── */
+    #globe-container {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+
+    /* ── Left panel ───────────────────────────────────────────── */
+    #panel {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: 370px;
+      z-index: 10;
+      background: rgba(6, 13, 26, 0.80);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border-right: 1px solid rgba(255, 255, 255, 0.055);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Panel header ─────────────────────────────────────────── */
+    #panel-header {
+      padding: 44px 36px 0;
+      flex-shrink: 0;
+    }
+
+    .site-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 12px 5px 9px;
+      background: rgba(59, 130, 246, 0.10);
+      border: 1px solid rgba(59, 130, 246, 0.22);
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 600;
+      color: rgba(147, 197, 253, 0.85);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+    .badge-dot {
+      width: 5px; height: 5px;
+      background: #60a5fa;
+      border-radius: 50%;
+      animation: blink 2.4s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.25; transform: scale(0.7); }
+    }
+
+    #site-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 40px;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.025em;
+      color: #fff;
+      margin-bottom: 14px;
+    }
+    #site-title em {
+      font-style: italic;
+      font-weight: 400;
+      color: rgba(147, 197, 253, 0.9);
+    }
+
+    #tagline {
+      font-size: 14px;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.38);
+      line-height: 1.65;
+      margin-bottom: 36px;
+    }
+
+    /* ── Search ───────────────────────────────────────────────── */
+    #search-wrapper {
+      padding: 0 36px;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    #search-box {
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.25);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+    }
+
+    #search {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 12px;
+      padding: 13px 16px 13px 42px;
+      font-size: 14px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+    #search::placeholder { color: rgba(255, 255, 255, 0.22); }
+    #search:focus {
+      border-color: rgba(59, 130, 246, 0.45);
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    #ac-list {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0; right: 0;
+      background: rgba(8, 18, 42, 0.97);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      overflow: hidden;
+      z-index: 50;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .ac-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      transition: background 0.12s;
+    }
+    .ac-item:last-child { border-bottom: none; }
+    .ac-item:hover { background: rgba(59, 130, 246, 0.12); }
+    .ac-name { font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.88); }
+    .ac-vibe { font-size: 11px; color: rgba(255, 255, 255, 0.25); text-align: right; max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ── CTA button ───────────────────────────────────────────── */
+    #cta-wrap {
+      padding: 14px 36px 0;
+      flex-shrink: 0;
+    }
+
+    #cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      width: 100%;
+      padding: 14px 20px;
+      background: linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%);
+      border: 1px solid rgba(96, 165, 250, 0.25);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      letter-spacing: 0.01em;
+      transition: all 0.22s;
+      box-shadow: 0 4px 24px rgba(37, 99, 235, 0.35), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    #cta:hover {
+      background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+      box-shadow: 0 8px 32px rgba(37, 99, 235, 0.55), inset 0 1px 0 rgba(255,255,255,0.15);
+      transform: translateY(-1px);
+    }
+    #cta:active { transform: translateY(0); }
+
+    /* ── Stats row ────────────────────────────────────────────── */
+    #stats {
+      display: flex;
+      padding: 28px 36px 0;
+      flex-shrink: 0;
+    }
+    .stat {
+      flex: 1;
+      text-align: center;
+    }
+    .stat + .stat {
+      border-left: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: rgba(147, 197, 253, 0.9);
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+    .stat-lbl {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.22);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+    }
+
+    /* ── Divider ──────────────────────────────────────────────── */
+    .sep {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.055), transparent);
+      margin: 28px 36px 0;
+      flex-shrink: 0;
+    }
+
+    /* ── Spacer ───────────────────────────────────────────────── */
+    #spacer { flex: 1; min-height: 16px; }
+
+    /* ── Country card (slides up from bottom) ─────────────────── */
+    #country-card {
+      margin: 0 20px 24px;
+      padding: 20px 22px 18px;
+      background: rgba(10, 24, 58, 0.72);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(96, 165, 250, 0.14);
+      border-radius: 18px;
+      flex-shrink: 0;
+      opacity: 0;
+      transform: translateY(10px) scale(0.98);
+      transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.34, 1.5, 0.64, 1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+    #country-card.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    #card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+    #card-flag {
+      font-size: 38px;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    #card-info { min-width: 0; flex: 1; }
+    #card-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 19px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #card-vibe {
+      font-size: 11px;
+      color: rgba(147, 197, 253, 0.65);
+      letter-spacing: 0.03em;
+    }
+
+    #card-fact {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.38);
+      line-height: 1.65;
+      border-left: 2px solid rgba(59, 130, 246, 0.35);
+      padding-left: 12px;
+      margin-bottom: 14px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    #card-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #f0a500;
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      transition: color 0.18s;
+    }
+    #card-link:hover { color: #fbbf24; }
+    #card-link::after { content: '→'; display: inline-block; transition: transform 0.2s; }
+    #card-link:hover::after { transform: translateX(3px); }
+
+    /* ── Globe hint (bottom-right) ────────────────────────────── */
+    #globe-hint {
+      position: fixed;
+      bottom: 20px; right: 20px;
+      z-index: 20;
+      background: rgba(6, 13, 26, 0.65);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.28);
+      pointer-events: none;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── Loading overlay ──────────────────────────────────────── */
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: #060d1a;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      transition: opacity 0.7s ease;
+    }
+    #loading.fade { opacity: 0; pointer-events: none; }
+
+    .ld-ring {
+      width: 44px; height: 44px;
+      border: 3px solid rgba(59, 130, 246, 0.15);
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .ld-text {
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.2);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    /* ── Responsive ───────────────────────────────────────────── */
+    @media (max-width: 700px) {
+      #panel {
+        width: 100%;
+        top: auto;
+        border-right: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        max-height: 48vh;
+        overflow-y: auto;
+      }
+      #panel-header { padding: 20px 24px 0; }
+      #site-title { font-size: 28px; margin-bottom: 10px; }
+      #tagline { margin-bottom: 22px; }
+      #search-wrapper, #cta-wrap { padding-left: 24px; padding-right: 24px; }
+      #stats { padding: 20px 24px 0; }
+      .sep { margin: 20px 24px 0; }
+      #spacer, #country-card { display: none; }
+      #globe-container { bottom: 48vh; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading -->
+  <div id="loading">
+    <div class="ld-ring"></div>
+    <div class="ld-text">Loading&hellip;</div>
+  </div>
+
+  <!-- Globe (fills full screen as background layer) -->
+  <div id="globe-container"></div>
+
+  <!-- Left panel -->
+  <aside id="panel">
+    <div id="panel-header">
+      <div class="site-badge">
+        <div class="badge-dot"></div>
+        World Explorer
+      </div>
+      <h1 id="site-title">Get lost<br>in <em>the world</em></h1>
+      <p id="tagline">Explore 195 countries — cultures, landscapes, facts, and comparisons.</p>
+    </div>
+
+    <!-- Search -->
+    <div id="search-wrapper">
+      <div id="search-box">
+        <span class="search-icon">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="8.5" cy="8.5" r="5.5"/><path d="M14 14l3.5 3.5"/>
+          </svg>
+        </span>
+        <input id="search" type="text" placeholder="Search for a country…" autocomplete="off" spellcheck="false" />
+        <div id="ac-list"></div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div id="cta-wrap">
+      <a href="/map" id="cta">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        Explore the map
+      </a>
+    </div>
+
+    <!-- Stats -->
+    <div id="stats">
+      <div class="stat"><div class="stat-num">195</div><div class="stat-lbl">Countries</div></div>
+      <div class="stat"><div class="stat-num">7</div><div class="stat-lbl">Continents</div></div>
+      <div class="stat"><div class="stat-num">8B+</div><div class="stat-lbl">People</div></div>
+    </div>
+
+    <div class="sep"></div>
+    <div id="spacer"></div>
+
+    <!-- Country card -->
+    <div id="country-card">
+      <div id="card-header">
+        <span id="card-flag">🌍</span>
+        <div id="card-info">
+          <div id="card-name">—</div>
+          <div id="card-vibe">—</div>
+        </div>
+      </div>
+      <div id="card-fact"></div>
+      <a id="card-link" href="#"> </a>
+    </div>
+  </aside>
+
+  <!-- Globe hint -->
+  <div id="globe-hint">Click any country to explore</div>
+
+  <!-- Data injected from server -->
+  <script set:html={`window._GD=${JSON.stringify(globeData)};window._CL=${JSON.stringify(countryList)};`}></script>
+
+  <!-- Static deps loaded synchronously before paint -->
+  <script is:inline src="/topojson.min.js"></script>
+  <script is:inline src="/countries.js"></script>
+
+  <script is:inline>
+  (function () {
+    'use strict';
+
+    var GD = window._GD || {};
+    var CL = window._CL || [];
+
+    /* ── Search autocomplete ─────────────────────────────────── */
+    var searchEl = document.getElementById('search');
+    var acList   = document.getElementById('ac-list');
+
+    function renderAC(matches) {
+      if (!matches.length) { acList.innerHTML = ''; return; }
+      acList.innerHTML = matches.map(function(c) {
+        return '<div class="ac-item" data-slug="' + c.slug + '">' +
+               '<span class="ac-name">' + c.name + '</span>' +
+               '</div>';
+      }).join('');
+    }
+
+    searchEl.addEventListener('input', function() {
+      var q = searchEl.value.toLowerCase().trim();
+      if (!q) { acList.innerHTML = ''; return; }
+      renderAC(CL.filter(function(c) {
+        return c.name.toLowerCase().indexOf(q) !== -1;
+      }).slice(0, 7));
+    });
+
+    acList.addEventListener('click', function(e) {
+      var item = e.target.closest('.ac-item');
+      if (item) window.location.href = '/country/' + item.dataset.slug;
+    });
+
+    searchEl.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        var first = acList.querySelector('.ac-item');
+        if (first) window.location.href = '/country/' + first.dataset.slug;
+      }
+      if (e.key === 'Escape') { acList.innerHTML = ''; }
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('#search-box')) acList.innerHTML = '';
+    });
+
+    /* ── Lazy-load Three.js after first paint ────────────────── */
+    var container = document.getElementById('globe-container');
+    var loading   = document.getElementById('loading');
+
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        var s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+        s.onload = initGlobe;
+        s.onerror = function() { loading.classList.add('fade'); };
+        document.head.appendChild(s);
+      });
+    });
+
+    /* ── Three.js globe ──────────────────────────────────────── */
+    function initGlobe() {
+      var W = container.clientWidth;
+      var H = container.clientHeight;
+
+      var scene  = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 200);
+      camera.position.z = 2.6;
+
+      var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(W, H);
+      renderer.domElement.style.cssText = 'position:absolute;inset:0;display:block;';
+      container.appendChild(renderer.domElement);
+
+      /* ── Globe sphere — custom shader: ocean gradient + specular ── */
+      /* At globe.rotation.y = 0, lng = -90° faces the camera (+Z).   */
+      /* tgtRotY formula: -(lng * π/180) - π/2                         */
+      var globeMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(1, 64, 64),
+        new THREE.ShaderMaterial({
+          vertexShader: [
+            'varying vec3 vN;',
+            'varying vec3 vV;',
+            'void main(){',
+            '  vec4 mv=modelViewMatrix*vec4(position,1.0);',
+            '  vN=normalize(normalMatrix*normal);',
+            '  vV=normalize(-mv.xyz);',
+            '  gl_Position=projectionMatrix*mv;',
+            '}'
+          ].join('\n'),
+          fragmentShader: [
+            'varying vec3 vN;',
+            'varying vec3 vV;',
+            'void main(){',
+            /* Fresnel: 0 at centre, 1 at limb — drives edge darkening */
+            '  float f=pow(1.0-max(0.0,dot(vN,vV)),2.8);',
+            /* Ocean: #0a1628 at centre → #050d1e at edges */
+            '  vec3 col=mix(vec3(0.039,0.086,0.157),vec3(0.020,0.051,0.118),f);',
+            /* Subtle diffuse fill */
+            '  vec3 L=normalize(vec3(-0.65,0.70,0.40));',
+            '  col+=vec3(0.015,0.030,0.060)*max(0.0,dot(vN,L));',
+            /* Soft specular highlight — upper left */
+            '  vec3 H=normalize(L+vV);',
+            '  col+=vec3(0.10,0.14,0.22)*pow(max(0.0,dot(vN,H)),110.0);',
+            '  gl_FragColor=vec4(col,1.0);',
+            '}'
+          ].join('\n'),
+        })
+      );
+      var globe = new THREE.Object3D();
+      globe.add(globeMesh);
+      globe.rotation.z = 23.5 * Math.PI / 180;
+      scene.add(globe);
+
+      /* ── Atmosphere — thin blue halo, barely visible ── */
+      globe.add(new THREE.Mesh(
+        new THREE.SphereGeometry(1.016, 32, 32),
+        new THREE.MeshBasicMaterial({ color: 0x64a0ff, transparent: true, opacity: 0.12, side: THREE.BackSide })
+      ));
+
+      /* Lights for atmosphere spheres (globe itself uses the shader above) */
+      scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+      var sun = new THREE.DirectionalLight(0x88aaff, 0.9);
+      sun.position.set(5, 3, 5);
+      scene.add(sun);
+
+      /* ── Stars ── */
+      (function() {
+        var pos = [];
+        for (var i = 0; i < 2500; i++) {
+          var th = Math.random() * Math.PI * 2;
+          var ph = Math.acos(2 * Math.random() - 1);
+          var r  = 45 + Math.random() * 8;
+          pos.push(r * Math.sin(ph) * Math.cos(th),
+                   r * Math.cos(ph),
+                   r * Math.sin(ph) * Math.sin(th));
+        }
+        var sg = new THREE.BufferGeometry();
+        sg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+        scene.add(new THREE.Points(sg,
+          new THREE.PointsMaterial({ color: 0xffffff, size: 0.07, transparent: true, opacity: 0.65 })
+        ));
+      })();
+
+      /* ── Coordinate helpers ── */
+      function ll3(lat, lng, r) {
+        r = r || 1.002;
+        var phi   = (90 - lat)  * Math.PI / 180;
+        var theta = (lng + 180) * Math.PI / 180;
+        return new THREE.Vector3(
+          -r * Math.sin(phi) * Math.cos(theta),
+           r * Math.cos(phi),
+           r * Math.sin(phi) * Math.sin(theta)
+        );
+      }
+
+      function v3ll(v) {
+        var lat = 90 - Math.acos(Math.max(-1, Math.min(1, v.y))) * 180 / Math.PI;
+        var th  = Math.atan2(v.z, -v.x);
+        if (th < 0) th += 2 * Math.PI;
+        return { lat: lat, lng: th * 180 / Math.PI - 180 };
+      }
+
+      /* ── Lat/lng grid — every 30° ── */
+      (function() {
+        var pos   = [];
+        var steps = 64;
+        for (var lat = -60; lat <= 60; lat += 30) {
+          for (var i = 0; i < steps; i++) {
+            var lng1 = (i / steps) * 360 - 180;
+            var lng2 = ((i + 1) / steps) * 360 - 180;
+            var a = ll3(lat, lng1, 1.003); var b = ll3(lat, lng2, 1.003);
+            pos.push(a.x, a.y, a.z, b.x, b.y, b.z);
+          }
+        }
+        for (var lng = -180; lng < 180; lng += 30) {
+          for (var i = 0; i < steps; i++) {
+            var lat1 = (i / steps) * 180 - 90;
+            var lat2 = ((i + 1) / steps) * 180 - 90;
+            var a = ll3(lat1, lng, 1.003); var b = ll3(lat2, lng, 1.003);
+            pos.push(a.x, a.y, a.z, b.x, b.y, b.z);
+          }
+        }
+        var gg = new THREE.BufferGeometry();
+        gg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+        globe.add(new THREE.LineSegments(gg, new THREE.LineBasicMaterial({
+          color: 0xffffff, transparent: true, opacity: 0.04, depthWrite: false
+        })));
+      })();
+
+      /* ── Cloud layer — canvas texture, separate node drifts slower ── */
+      var cloudNode = new THREE.Object3D();
+      var cloudLag  = 0;
+      (function() {
+        var cv = document.createElement('canvas');
+        cv.width = 512; cv.height = 256;
+        var cx = cv.getContext('2d');
+        cx.clearRect(0, 0, 512, 256);
+        var seed = 42;
+        function rand() { seed = (seed * 1664525 + 1013904223) & 0xffffffff; return (seed >>> 0) / 4294967296; }
+        cx.fillStyle = 'rgba(255,255,255,0.14)';
+        for (var ci = 0; ci < 70; ci++) {
+          var x = rand() * 512, y = rand() * 256;
+          cx.beginPath();
+          cx.ellipse(x, y, 18 + rand() * 55, 6 + rand() * 16, rand() * Math.PI, 0, Math.PI * 2);
+          cx.fill();
+        }
+        var tex = new THREE.CanvasTexture(cv);
+        cloudNode.add(new THREE.Mesh(
+          new THREE.SphereGeometry(1.013, 32, 32),
+          new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0.18, depthWrite: false })
+        ));
+        scene.add(cloudNode);
+      })();
+
+      /* ── State ── */
+      var bboxes    = {};
+      var features  = [];
+      var hlObjects = []; /* [border, innerGlow, outerGlow] */
+      var autoTimer = null;
+      var tgtRotY   = 0;
+      var tgtRotX   = 0;
+      var flying    = false;
+      var raycaster = new THREE.Raycaster();
+      var mouse     = new THREE.Vector2();
+
+      /* ── Point-in-polygon ── */
+      function ptInRing(lng, lat, ring) {
+        var inside = false;
+        for (var i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+          var xi = ring[i][0], yi = ring[i][1], xj = ring[j][0], yj = ring[j][1];
+          if (Math.abs(xi - xj) > 180) continue;
+          if (((yi > lat) !== (yj > lat)) && (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi))
+            inside = !inside;
+        }
+        return inside;
+      }
+
+      function findFeature(lat, lng) {
+        var best = null, bestArea = Infinity;
+        for (var i = 0; i < features.length; i++) {
+          var f  = features[i];
+          var bb = bboxes[f.id];
+          if (!bb || lng < bb[0]-1 || lng > bb[2]+1 || lat < bb[1]-1 || lat > bb[3]+1) continue;
+          var g = f.geometry;
+          if (!g) continue;
+          var polys = g.type === 'MultiPolygon' ? g.coordinates : [g.coordinates];
+          for (var p = 0; p < polys.length; p++) {
+            if (ptInRing(lng, lat, polys[p][0])) {
+              var area = (bb[2]-bb[0]) * (bb[3]-bb[1]);
+              if (area < bestArea) { best = f; bestArea = area; }
+              break;
+            }
+          }
+        }
+        return best;
+      }
+
+      /* ── Line geometry helpers ── */
+      function ringToPos(ring, r) {
+        var pos = [];
+        for (var j = 0; j < ring.length - 1; j++) {
+          var a = ll3(ring[j][1],     ring[j][0],     r);
+          var b = ll3(ring[j+1][1],   ring[j+1][0],   r);
+          pos.push(a.x, a.y, a.z, b.x, b.y, b.z);
+        }
+        return pos;
+      }
+
+      function ringToLines(rings, r) {
+        var pos = [];
+        for (var i = 0; i < rings.length; i++) pos = pos.concat(ringToPos(rings[i], r));
+        return pos;
+      }
+
+      function featureAllRings(f) {
+        var g = f.geometry;
+        if (!g) return [];
+        var polys = g.type === 'MultiPolygon' ? g.coordinates : [g.coordinates];
+        var out = [];
+        for (var i = 0; i < polys.length; i++)
+          for (var r = 0; r < polys[i].length; r++) out.push(polys[i][r]);
+        return out;
+      }
+
+      /* ── Grid-sampled highlight — correct for concave + antimeridian polygons ── */
+      function setHighlight(f) {
+        for (var k = 0; k < hlObjects.length; k++) globe.remove(hlObjects[k]);
+        hlObjects = [];
+        if (!f) return;
+        var g = f.geometry;
+        if (!g) return;
+        var polys = g.type === 'MultiPolygon' ? g.coordinates : [g.coordinates];
+
+        /* Unwrap ring: adjust each lng so no consecutive jump exceeds ±180° */
+        function unwrap(ring) {
+          var out = [[ring[0][0], ring[0][1]]];
+          for (var i = 1; i < ring.length; i++) {
+            var prev = out[i - 1][0], cur = ring[i][0];
+            var d = cur - prev;
+            if (d >  180) cur -= 360;
+            else if (d < -180) cur += 360;
+            out.push([cur, ring[i][1]]);
+          }
+          return out;
+        }
+
+        /* Point-in-ring on unwrapped coordinates (no antimeridian skip needed) */
+        function pip(lo, la, ring) {
+          var inside = false;
+          for (var i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+            var xi = ring[i][0], yi = ring[i][1], xj = ring[j][0], yj = ring[j][1];
+            if (((yi > la) !== (yj > la)) &&
+                (lo < (xj - xi) * (la - yi) / (yj - yi) + xi))
+              inside = !inside;
+          }
+          return inside;
+        }
+
+        /* Normalise any longitude value to [-180, 180] */
+        function norm(l) { return ((l % 360) + 540) % 360 - 180; }
+
+        var STEP = 0.5; /* degrees — finer than 110m TopoJSON resolution */
+        var fillVerts = [], fillIdx = [], vIdx = 0;
+
+        for (var pi = 0; pi < polys.length; pi++) {
+          var poly   = polys[pi];
+          var outer  = unwrap(poly[0]);
+
+          /* Bbox of unwrapped outer ring */
+          var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+          for (var j = 0; j < outer.length; j++) {
+            if (outer[j][0] < x0) x0 = outer[j][0];
+            if (outer[j][0] > x1) x1 = outer[j][0];
+            if (outer[j][1] < y0) y0 = outer[j][1];
+            if (outer[j][1] > y1) y1 = outer[j][1];
+          }
+          y0 = Math.max(y0, -89); y1 = Math.min(y1, 89);
+
+          /* Unwrap holes */
+          var holes = [];
+          for (var h = 1; h < poly.length; h++) holes.push(unwrap(poly[h]));
+
+          /* Scan grid — every cell whose centre falls inside the polygon */
+          for (var la = y0; la < y1; la += STEP) {
+            var cLa = la + STEP * 0.5;
+            for (var lo = x0; lo < x1; lo += STEP) {
+              var cLo = lo + STEP * 0.5;
+              if (!pip(cLo, cLa, outer)) continue;
+              var inHole = false;
+              for (var h = 0; h < holes.length; h++) {
+                if (pip(cLo, cLa, holes[h])) { inHole = true; break; }
+              }
+              if (inHole) continue;
+
+              /* Map quad corners to sphere at r = 1.001 */
+              var va = ll3(la,        norm(lo),        1.001);
+              var vb = ll3(la,        norm(lo + STEP), 1.001);
+              var vc = ll3(la + STEP, norm(lo + STEP), 1.001);
+              var vd = ll3(la + STEP, norm(lo),        1.001);
+              fillVerts.push(va.x, va.y, va.z, vb.x, vb.y, vb.z,
+                             vc.x, vc.y, vc.z, vd.x, vd.y, vd.z);
+              fillIdx.push(vIdx, vIdx+1, vIdx+2, vIdx, vIdx+2, vIdx+3);
+              vIdx += 4;
+            }
+          }
+        }
+
+        if (fillVerts.length > 0) {
+          var fg = new THREE.BufferGeometry();
+          fg.setAttribute('position', new THREE.Float32BufferAttribute(fillVerts, 3));
+          fg.setIndex(fillIdx);
+          var fillMesh = new THREE.Mesh(fg, new THREE.MeshBasicMaterial({
+            color: 0xf0a500, transparent: true, opacity: 0.35,
+            side: THREE.DoubleSide, depthWrite: false
+          }));
+          globe.add(fillMesh);
+          hlObjects.push(fillMesh);
+        }
+
+        /* Line border layers */
+        var rings  = featureAllRings(f);
+        var layers = [
+          [1.003, 0xf0a500, 0.95],
+          [1.010, 0xf59e0b, 0.28],
+          [1.022, 0xfbbf24, 0.10],
+        ];
+        for (var l = 0; l < layers.length; l++) {
+          var rr = layers[l][0], col = layers[l][1], op = layers[l][2];
+          var pos = [];
+          for (var ri = 0; ri < rings.length; ri++) pos = pos.concat(ringToPos(rings[ri], rr));
+          var geom = new THREE.BufferGeometry();
+          geom.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+          var ls = new THREE.LineSegments(geom, new THREE.LineBasicMaterial({
+            color: col, transparent: true, opacity: op,
+            blending: THREE.AdditiveBlending, depthWrite: false
+          }));
+          globe.add(ls);
+          hlObjects.push(ls);
+        }
+      }
+
+      /* ── Centroid of largest ring ── */
+      function centroid(f) {
+        var g     = f.geometry;
+        var polys = g.type === 'MultiPolygon' ? g.coordinates : [g.coordinates];
+        var best  = polys[0][0];
+        for (var i = 0; i < polys.length; i++)
+          if (polys[i][0].length > best.length) best = polys[i][0];
+        var lo = 0, la = 0;
+        for (var j = 0; j < best.length; j++) { lo += best[j][0]; la += best[j][1]; }
+        return { lat: la / best.length, lng: lo / best.length };
+      }
+
+      /* ── Card update ── */
+      function showCard(f, fly) {
+        setHighlight(f);
+        var p = f.properties;
+        document.getElementById('card-flag').textContent = p.flag;
+        document.getElementById('card-name').textContent = p.name;
+        document.getElementById('card-vibe').textContent = p.vibe;
+        document.getElementById('card-fact').textContent = p.fact;
+        var lnk = document.getElementById('card-link');
+        lnk.href        = '/country/' + p.slug;
+        lnk.textContent = 'Discover ' + p.name + ' ';
+        document.getElementById('country-card').classList.add('visible');
+
+        if (fly) {
+          var c  = centroid(f);
+          /* Globe rotation needed to bring c.lng to face the camera.
+             At rotation.y = 0, lng = -90° faces camera (+Z axis).
+             Formula: tgtY = -(lng * π/180) - π/2                    */
+          var tY = -(c.lng * Math.PI / 180) - Math.PI * 0.5;
+          /* Shortest path from current rotation */
+          var dY = tY - globe.rotation.y;
+          while (dY >  Math.PI) dY -= 2 * Math.PI;
+          while (dY < -Math.PI) dY += 2 * Math.PI;
+          tgtRotY = globe.rotation.y + dY;
+          tgtRotX = c.lat * Math.PI / 180;
+          flying  = true;
+        }
+      }
+
+      /* ── Auto-fly ── */
+      var vibeFeatures = [];
+
+      function flyRandom() {
+        if (!vibeFeatures.length) return;
+        showCard(vibeFeatures[Math.floor(Math.random() * vibeFeatures.length)], true);
+        scheduleAutoFly(6000);
+      }
+
+      function scheduleAutoFly(delay) {
+        clearTimeout(autoTimer);
+        autoTimer = setTimeout(flyRandom, delay);
+      }
+
+      /* ── Interaction ── */
+      renderer.domElement.addEventListener('click', function(e) {
+        var rect = renderer.domElement.getBoundingClientRect();
+        mouse.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1;
+        mouse.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        var hits = raycaster.intersectObject(globeMesh, false);
+        if (!hits.length) return;
+        var local = globe.worldToLocal(hits[0].point.clone());
+        var ll    = v3ll(local);
+        var f     = findFeature(ll.lat, ll.lng);
+        if (f && f.properties.slug) window.location.href = '/country/' + f.properties.slug;
+      });
+
+      renderer.domElement.addEventListener('mousemove', function(e) {
+        var rect = renderer.domElement.getBoundingClientRect();
+        mouse.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1;
+        mouse.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        renderer.domElement.style.cursor =
+          raycaster.intersectObject(globeMesh, false).length ? 'pointer' : 'default';
+      });
+
+      window.addEventListener('resize', function() {
+        W = container.clientWidth; H = container.clientHeight;
+        camera.aspect = W / H;
+        camera.updateProjectionMatrix();
+        renderer.setSize(W, H);
+      });
+
+      /* ── Render loop ── */
+      function animate() {
+        requestAnimationFrame(animate);
+
+        if (flying) {
+          var dY = tgtRotY - globe.rotation.y;
+          var dX = tgtRotX - globe.rotation.x;
+          globe.rotation.y += dY * 0.055;
+          globe.rotation.x += dX * 0.055;
+          if (Math.abs(dY) < 0.0008 && Math.abs(dX) < 0.0008) {
+            globe.rotation.y = tgtRotY;
+            globe.rotation.x = tgtRotX;
+            flying = false;
+          }
+        } else {
+          globe.rotation.y += 0.0012;
+          tgtRotY = globe.rotation.y;
+        }
+
+        /* Cloud node tracks globe rotation, drifts slightly in Y */
+        cloudNode.rotation.x = globe.rotation.x;
+        cloudNode.rotation.z = globe.rotation.z;
+        cloudNode.rotation.y = globe.rotation.y - cloudLag;
+        if (!flying) cloudLag += 0.00008;
+
+        /* Pulse the inner + outer glow layers */
+        if (hlObjects.length >= 3) {
+          var p = 0.5 + 0.5 * Math.sin(Date.now() * 0.003);
+          var off = hlObjects.length === 4 ? 1 : 0;
+          hlObjects[off + 1].material.opacity = 0.12 + 0.22 * p;
+          hlObjects[off + 2].material.opacity = 0.03 + 0.10 * p;
+        }
+
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      /* ── Fetch TopoJSON, build borders + feature data ── */
+      fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+        .then(function(r) { return r.json(); })
+        .then(function(world) {
+          var idMap = window.COUNTRY_ID_MAP || {};
+
+          /* All-borders — single LineSegments, white at low opacity */
+          var mesh   = topojson.mesh(world, world.objects.countries);
+          var allPos = ringToLines(mesh.coordinates, 1.002);
+          var bg     = new THREE.BufferGeometry();
+          bg.setAttribute('position', new THREE.Float32BufferAttribute(allPos, 3));
+          globe.add(new THREE.LineSegments(bg,
+            new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.25 })
+          ));
+
+          /* Per-feature: metadata + bbox for click detection */
+          var geojson = topojson.feature(world, world.objects.countries);
+          features = geojson.features.map(function(f) {
+            var info = idMap[+f.id];
+            if (!info) return null;
+            var gd = GD[info.name];
+            var g  = f.geometry;
+            if (g) {
+              var polys = g.type === 'MultiPolygon' ? g.coordinates : [g.coordinates];
+              var x0=180,x1=-180,y0=90,y1=-90;
+              for (var i = 0; i < polys.length; i++)
+                for (var j = 0; j < polys[i][0].length; j++) {
+                  var pt = polys[i][0][j];
+                  if(pt[0]<x0)x0=pt[0]; if(pt[0]>x1)x1=pt[0];
+                  if(pt[1]<y0)y0=pt[1]; if(pt[1]>y1)y1=pt[1];
+                }
+              bboxes[f.id] = [x0, y0, x1, y1];
+            }
+            return Object.assign({}, f, {
+              properties: {
+                name: info.name, flag: info.flag || '',
+                slug: gd ? gd.slug : '', vibe: gd ? gd.vibe : '', fact: gd ? gd.fact : ''
+              }
+            });
+          }).filter(function(f) { return f && f.properties.name; });
+
+          vibeFeatures = features.filter(function(f) { return f.properties.vibe; });
+
+          loading.classList.add('fade');
+          setTimeout(function() { if (loading.parentNode) loading.parentNode.removeChild(loading); }, 750);
+          scheduleAutoFly(1200);
+        })
+        .catch(function(err) {
+          console.error('Globe data failed:', err);
+          loading.classList.add('fade');
+        });
+    } /* end initGlobe */
+
+  })();
+  </script>
+
+</body>
+</html>

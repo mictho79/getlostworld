@@ -1,0 +1,46 @@
+- Marshall Islands: capital=Majuro, sport=Outrigger Canoe Racing / Volleyball
+- Mauritania: capital=Nouakchott, sport=Football
+- Mauritius: capital=Port Louis, sport=Football / Sailing
+- Micronesia: capital=Palikir, sport=Baseball / Football
+- Moldova: capital=Chișinău, sport=Football / Wrestling
+- Monaco: capital=Monaco, sport=Football / Formula One
+- Mongolia: capital=Ulaanbaatar, sport=Wrestling / Archery / Horse Racing
+- Montenegro: capital=Podgorica, sport=Football / Water Polo
+- Myanmar: capital=Naypyidaw, sport=Football / Chinlone
+- Namibia: capital=Windhoek, sport=Football / Rugby
+- Nauru: capital=Yaren (de facto), sport=Australian Rules Football / Weightlifting
+- Nicaragua: capital=Managua, sport=Baseball / Football
+- Niger: capital=Niamey, sport=Football
+- North Macedonia: capital=Skopje, sport=Football / Basketball
+- Oman: capital=Muscat, sport=Football
+- Palestine: capital=Ramallah (admin.) / Jerusalem (claimed), sport=Football
+- Panama: capital=Panama City, sport=Baseball / Football
+- Papua New Guinea: capital=Port Moresby, sport=Rugby League / Football
+- Paraguay: capital=Asunción, sport=Football
+- Qatar: capital=Doha, sport=Football
+- Republic of the Congo: capital=Brazzaville, sport=Football
+- Rwanda: capital=Kigali, sport=Football / Cycling
+- Saint Lucia: capital=Castries, sport=Cricket / Football
+- Samoa: capital=Apia, sport=Rugby Union / American Football
+- San Marino: capital=San Marino City, sport=Football
+- São Tomé and Príncipe: capital=São Tomé, sport=Football
+- Seychelles: capital=Victoria, sport=Football / Sailing
+- Sierra Leone: capital=Freetown, sport=Football
+- Slovakia: capital=Bratislava, sport=Ice Hockey / Football
+- Slovenia: capital=Ljubljana, sport=Football / Skiing
+- Solomon Islands: capital=Honiara, sport=Football / Rugby
+- Somalia: capital=Mogadishu, sport=Football
+- South Sudan: capital=Juba, sport=Football
+- Suriname: capital=Paramaribo, sport=Football / Cricket
+- Tajikistan: capital=Dushanbe, sport=Football / Wrestling
+- Timor-Leste: capital=Dili, sport=Football / Martial Arts
+- Togo: capital=Lomé, sport=Football
+- Tonga: capital=Nukuʻalofa, sport=Rugby Union
+- Trinidad and Tobago: capital=Port of Spain, sport=Cricket / Football
+- Tunisia: capital=Tunis, sport=Football
+- Turkmenistan: capital=Ashgabat, sport=Football / Horse Racing
+- Tuvalu: capital=Funafuti, sport=Football / Volleyball
+- United Arab Emirates: capital=Abu Dhabi, sport=Football / Camel Racing
+- Vanuatu: capital=Port Vila, sport=Football / Rugby
+- Andorra: capital=Andorra la Vella, sport=Football / Skiing
+- Antigua and Barbuda: capital=Saint John's, sport=Cricket

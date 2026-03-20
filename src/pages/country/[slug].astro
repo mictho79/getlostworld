@@ -1,0 +1,1119 @@
+---
+export const prerender = false;
+import Base from '../../layouts/Base.astro';
+import { COUNTRY_DATA as DATA_EN, COUNTRY_VIBES as VIBES_EN, COUNTRY_PEAKS, COUNTRY_DISHES, COUNTRY_CITIES, COUNTRY_INSIGHTS as INSIGHTS_EN, slugify } from '../../lib/countryData.js';
+import { COUNTRY_CCN3 } from '../../lib/countryCodes.js';
+import { TRAVEL_ADVISORY } from '../../lib/travelScores.js';
+import { geojsonToSvgPath } from '../../lib/geojsonSvg.js';
+import { getT, translateRegion } from '../../i18n/translations';
+import { detectLang } from '../../i18n/detect';
+
+// ─── Slug aliases ──────────────────────────────────────────────────────────────
+const SLUG_ALIASES: Record<string,string> = {
+  'united-states':   '/country/united-states-of-america/',
+  'usa':             '/country/united-states-of-america/',
+  'uk':              '/country/england/',
+  'united-kingdom':  '/country/england/',
+  'czechia':         '/country/czech-republic/',
+  'dr-congo':        '/country/democratic-republic-of-the-congo/',
+  'ivory-coast':     '/country/cote-divoire/',
+  'cape-verde':      '/country/cabo-verde/',
+};
+
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect('/');
+if (SLUG_ALIASES[slug as string]) return Astro.redirect(SLUG_ALIASES[slug as string], 301);
+
+// ─── Language detection ────────────────────────────────────────────────────────
+const lang = detectLang(Astro.request.headers.get('accept-language') ?? 'en');
+const t = getT(lang);
+const tr = (r: string) => translateRegion(r, lang);
+
+let countryVibes:    typeof VIBES_EN    = VIBES_EN;
+let countryDataSrc:  typeof DATA_EN     = DATA_EN;
+let countryInsights: typeof INSIGHTS_EN = INSIGHTS_EN;
+
+if (lang === 'fr') {
+  const fr = await import('../../lib/countryData.fr.js');
+  // Merge EN as base so nations missing from the FR translation (e.g. England, Scotland,
+  // Wales, Northern Ireland) fall back to English rather than returning undefined.
+  countryVibes    = { ...(VIBES_EN    as any), ...(fr.COUNTRY_VIBES    as any) };
+  countryDataSrc  = { ...(DATA_EN     as any), ...(fr.COUNTRY_DATA     as any) };
+  countryInsights = { ...(INSIGHTS_EN as any), ...(fr.COUNTRY_INSIGHTS as any) };
+}
+
+// ─── Helpers ───────────────────────────────────────────────────────────────────
+function formatPop(n: number): string {
+  if (!n) return '—';
+  if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(0) + 'K';
+  return String(n);
+}
+function formatCurrency(c: any): string {
+  if (!c) return '—';
+  const vals = Object.values(c) as any[];
+  if (!vals.length) return '—';
+  return vals.map((v: any) => `${v.name}${v.symbol ? ' (' + v.symbol + ')' : ''}`).join(', ');
+}
+
+// ─── REST name mapping ─────────────────────────────────────────────────────────
+const LOCAL_TO_REST: Record<string,string> = {
+  'Czech Republic':                   'Czechia',
+  'United States of America':         'United States',
+  'Democratic Republic of the Congo': 'DR Congo',
+  'Cabo Verde':                       'Cape Verde',
+  "Côte d'Ivoire":                    'Ivory Coast',
+};
+const REST_TO_LOCAL: Record<string,string> = {
+  'Czechia':       'Czech Republic',
+  'United States': 'United States of America',
+  'DR Congo':      'Democratic Republic of the Congo',
+  'Cape Verde':    'Cabo Verde',
+  'Ivory Coast':   "Côte d'Ivoire",
+};
+
+// ─── Find local name by slug — fall back to EN keys for untranslated nations ──
+const localName =
+  Object.keys(countryDataSrc as any).find(k => slugify(k) === slug) ||
+  (lang !== 'en' ? Object.keys(DATA_EN as any).find(k => slugify(k) === slug) : undefined);
+if (!localName) return Astro.redirect('/');
+const localData = (countryDataSrc as any)[localName] || (DATA_EN as any)[localName] || {};
+const restName  = LOCAL_TO_REST[localName] || localName;
+
+// ─── Fetch REST data for this country ─────────────────────────────────────────
+const RF = 'name,capital,population,languages,flags,area,cca2,cca3,ccn3,latlng,region,subregion,currencies,timezones,idd,borders,car';
+let rc: any = null;
+try {
+  const res  = await fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(restName)}?fullText=true&fields=${RF}`);
+  const data = await res.json();
+  rc = Array.isArray(data) ? data[0] : null;
+} catch { /* fall back to local data */ }
+
+// ─── Build SVG shape ───────────────────────────────────────────────────────────
+let svgShape   = '';
+let svgViewBox = '0 0 400 300';
+try {
+  const topojson = await import('topojson-client');
+  const { createRequire } = await import('node:module');
+  const req      = createRequire(import.meta.url);
+  const worldTopo = req('world-atlas/countries-10m.json');
+  const geojson  = topojson.feature(worldTopo, worldTopo.objects.countries);
+  const ccn3     = rc?.ccn3 || (COUNTRY_CCN3 as any)[localName] || '';
+  if (ccn3) {
+    const numId = String(+ccn3).padStart(3, '0');
+    const feat  = (geojson as any).features.find((f: any) => String(f.id) === numId);
+    if (feat) {
+      const result = geojsonToSvgPath(feat);
+      if (result) { svgShape = result.path; svgViewBox = result.viewBox; }
+    }
+  }
+} catch { /* no shape */ }
+
+// ─── Resolve border countries ──────────────────────────────────────────────────
+const borderCodes: string[] = rc?.borders || [];
+let borderCountries: { name: string; slug: string }[] = [];
+if (borderCodes.length > 0) {
+  try {
+    const bRes  = await fetch(`https://restcountries.com/v3.1/alpha?codes=${borderCodes.join(',')}&fields=name,cca3`);
+    const bData = await bRes.json();
+    if (Array.isArray(bData)) {
+      borderCountries = bData
+        .map((b: any) => { const n = REST_TO_LOCAL[b.name?.common] || b.name?.common || ''; return { name: n, slug: slugify(n) }; })
+        .filter((b: any) => b.name);
+    }
+  } catch { /* no borders */ }
+}
+
+// ─── Build country object ──────────────────────────────────────────────────────
+const country = {
+  name:            localName,
+  officialName:    rc?.name?.official || localName,
+  slug:            slug as string,
+  flag:            localData.flag || rc?.flags?.emoji || '🌍',
+  capital:         localData.capital || rc?.capital?.[0] || '—',
+  population:      localData.population || formatPop(rc?.population),
+  language:        localData.language || Object.values(rc?.languages || {}).join(', ') || '—',
+  sport:           localData.sport || '—',
+  fact:            localData.fact  || '',
+  vibe:            (countryVibes as any)[localName] || 'Fascinating · Historic · Unique',
+  area:            rc?.area ? Math.round(rc.area).toLocaleString('en-US') : '—',
+  region:          rc?.region    || '',
+  subregion:       rc?.subregion || '',
+  latlng:          (rc?.latlng   || [0, 0]) as [number, number],
+  currency:        formatCurrency(rc?.currencies),
+  timezone:        rc?.timezones?.[0] || '—',
+  callingCode:     rc?.idd?.root ? rc.idd.root + (rc.idd.suffixes?.length === 1 ? rc.idd.suffixes[0] : '') : '—',
+  drivingSide:     rc?.car?.side === 'left' ? 'Left' : rc?.car?.side === 'right' ? 'Right' : '—',
+  borderCountries,
+  dish:            (COUNTRY_DISHES  as any)[localName] || null,
+  peak:            (COUNTRY_PEAKS   as any)[localName] || null,
+  cities:          (COUNTRY_CITIES  as any)[localName] || [],
+  svgShape,
+  svgViewBox,
+};
+
+const ci = (countryInsights as Record<string, Record<string, string>>)[country.name] || {};
+const advisory = (TRAVEL_ADVISORY as Record<string,string>)[country.name] ?? null;
+const isDNT     = advisory === 'do-not-travel';
+const isRecon   = advisory === 'reconsider';
+
+const REGION_ACCENT: Record<string, string> = {
+  'Europe':   '#5b8fff',
+  'Asia':     '#ff7043',
+  'Africa':   '#ffb74d',
+  'Americas': '#69d89a',
+  'Oceania':  '#26c6da',
+  'Antarctic':'#b0c4de',
+};
+const accent = REGION_ACCENT[country.region] || '#aaaaaa';
+
+const countriesList = [...new Set([
+  ...Object.keys(countryDataSrc as Record<string, unknown>),
+  ...Object.keys(countryVibes as Record<string, unknown>),
+])].sort().map(name => ({ name, slug: slugify(name) }));
+
+const siteBase = Astro.site?.href ?? 'https://world-explorer.com/';
+const pageUrl  = new URL(`country/${country.slug}/`, siteBase).href;
+
+const title       = `${country.name} – Facts, Capital & Geography | World Explorer`;
+const description = [
+  `${country.name} is a country in ${country.subregion || country.region}.`,
+  country.capital    !== '—' ? `Capital: ${country.capital}.`       : '',
+  country.population !== '—' ? `Population: ${country.population}.` : '',
+  country.language   !== '—' ? `Language: ${country.language}.`     : '',
+  country.fact ? country.fact.slice(0, 110) + '…' : country.vibe,
+].filter(Boolean).join(' ');
+
+// ── SEO insight paragraphs ──────────────────────────────────────────
+const insights: {icon:string; title:string; text:string}[] = [];
+
+if (country.capital !== '—') {
+  const otherCities = country.cities.slice(0, 3).map((c: {name:string}) => c.name);
+  const cityLine = otherCities.length
+    ? `${t.capBeyond}${otherCities.join(', ')}${t.capCitiesHub}`
+    : '';
+  insights.push({ icon: '🏛', title: t.insightCapital,
+    text: `${country.capital}${t.capServes}${country.name}${country.subregion ? `${t.capPositionedIn}${tr(country.subregion)}` : ''}${t.capSeat}${cityLine}${ci.capital ? ' ' + ci.capital : ''}` });
+}
+
+if (country.population !== '—') {
+  const langs = country.language !== '—' ? country.language : null;
+  const plural = langs?.includes(',');
+  const langNote = langs
+    ? ` ${plural ? t.popLangsAre : t.popLangIs}${langs}${plural ? t.popLangReflect : t.popLangReflects}`
+    : '';
+  const callNote = country.callingCode !== '—' ? `${t.popInternationally}${country.name}${t.popDialCode}${country.callingCode}${t.popDialCodeEnd}` : '';
+  insights.push({ icon: '👥', title: t.insightPeople,
+    text: `${t.aboutPopApprox.trimStart()}${country.population}, ${country.name}${t.popVibrant}${langNote}${callNote}${ci.people ? ' ' + ci.people : ''}` });
+}
+
+if (country.area !== '—') {
+  const loc = country.subregion
+    ? `${t.geoInThe}${tr(country.subregion)}${t.geoSubregionOf}${tr(country.region)}`
+    : country.region ? `${t.geoIn}${tr(country.region)}` : '';
+  const coords = country.latlng[0] !== 0 || country.latlng[1] !== 0
+    ? `${t.geoGeoCentred}${Math.abs(country.latlng[0]).toFixed(1)}°${country.latlng[0] >= 0 ? 'N' : 'S'}, ${Math.abs(country.latlng[1]).toFixed(1)}°${country.latlng[1] >= 0 ? 'E' : 'W'},`
+    : '';
+  const drive = country.drivingSide !== '—'
+    ? `${country.drivingSide === 'Left' ? t.geoLeftHandRule : t.geoRightHandRule}${tr(country.region) || 'regional'}${t.geoConvention}`
+    : '';
+  insights.push({ icon: '🗺', title: t.insightGeography,
+    text: `${country.name}${t.geoSpans}${country.area} km²${loc ? `, ${loc}` : ''}.${coords}${t.geoDiverseLandscapes}${drive}` });
+}
+
+if (country.currency !== '—') {
+  const tzNote = country.timezone !== '—'
+    ? `${t.econBusiness}${country.timezone}${t.econAligning}`
+    : '';
+  insights.push({ icon: '💱', title: t.insightEconomy,
+    text: `${t.econCurrencyIs}${country.currency}${t.econUsedFor}${t.econShapedPre}${country.name}${t.econShapedPost}${tzNote}` });
+}
+
+if (country.dish) {
+  insights.push({ icon: '🍽', title: t.insightFood,
+    text: `${t.foodEmblem}${country.name}${t.foodIs}${country.dish}. ${ci.food ? ci.food : `${t.foodCulture}${country.name}${t.foodTied}`}` });
+}
+
+if (country.sport !== '—') {
+  insights.push({ icon: '🏅', title: t.insightSport,
+    text: `${country.sport}${t.sportHolds}${country.name}${t.sportNatId}${ci.sport ? ci.sport : `${t.sportIn}${country.name}${t.sportBeyond}`}` });
+}
+
+if (country.peak) {
+  const elev = country.peak.elevation.toLocaleString('en-US');
+  insights.push({ icon: '⛰', title: t.insightNature,
+    text: `${t.natureHighest}${country.name}${t.natureIs}${country.peak.name}${t.natureRising}${elev}${t.natureMetres}${ci.nature ? ci.nature : t.natureEmbodies}` });
+}
+
+const jsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "World Explorer", "item": siteBase },
+        { "@type": "ListItem", "position": 2, "name": country.name,     "item": pageUrl  }
+      ]
+    },
+    {
+      "@type": "Place",
+      "name": country.name,
+      ...(country.officialName !== country.name ? { "alternateName": country.officialName } : {}),
+      "description": description,
+      "url": pageUrl,
+      ...(country.latlng[0] !== 0 || country.latlng[1] !== 0 ? {
+        "geo": { "@type": "GeoCoordinates", "latitude": country.latlng[0], "longitude": country.latlng[1] }
+      } : {}),
+      ...(country.region ? { "containedInPlace": { "@type": "Continent", "name": country.region } } : {})
+    }
+  ]
+});
+---
+
+<Base title={title} description={description} countryName={country.name}>
+
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={jsonLd} />
+  </Fragment>
+
+  <div class="cp-page" style={`--accent:${accent};`}>
+
+  <!-- ── Decorative background (always visible) ── -->
+  <div class="cp-bg-deco" aria-hidden="true">
+    <div class="cp-bg-ring cp-bg-ring-1"></div>
+    <div class="cp-bg-ring cp-bg-ring-2"></div>
+    <div class="cp-bg-ring cp-bg-ring-3"></div>
+    {country.svgShape && (
+      <svg class="cp-shape-svg" viewBox={country.svgViewBox} xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+        <path d={country.svgShape} />
+      </svg>
+    )}
+  </div>
+
+  <div class="cp-wrap">
+
+    <!-- Back -->
+    <a href="/map" class="cp-back">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12L6 8l4-4"/></svg>
+      {t.backToMap}
+    </a>
+
+    <!-- Hero -->
+    <header class="cp-hero">
+      {country.svgShape ? (
+        <div class="cp-hero-shape" aria-hidden="true">
+          <svg viewBox={country.svgViewBox} xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+            <path d={country.svgShape} />
+          </svg>
+        </div>
+      ) : (
+        <span class="cp-flag" role="img" aria-label={`Flag of ${country.name}`}>{country.flag}</span>
+      )}
+      <h1 class="cp-title">{country.name}</h1>
+      {country.officialName !== country.name && <p class="cp-official">{country.officialName}</p>}
+      <p class="cp-region">{tr(country.subregion || country.region)}</p>
+      <p class="cp-vibe">{country.vibe}</p>
+    </header>
+
+    <hr class="cp-divider" />
+
+    <!-- Advisory banner -->
+    {isRecon && (
+      <div class="cp-advisory cp-advisory--reconsider" role="alert">
+        <span>⚠️</span>
+        <span>{t.advisoryReconsiderPre}<strong>{country.name}</strong>{t.advisoryReconsiderPost}</span>
+      </div>
+    )}
+    {isDNT && (
+      <div class="cp-advisory cp-advisory--dnt" role="alert">
+        <span>⛔</span>
+        <span>{t.advisoryDntPre}<strong>{country.name}</strong>{t.advisoryDntPost}</span>
+      </div>
+    )}
+
+    <!-- Key facts -->
+    <section class="cp-section" aria-label="Key facts">
+      <h2 class="cp-section-label">{t.keyFacts}</h2>
+      <div class="cp-stats-grid">
+        {country.capital    !== '—' && <div class="cp-stat"><span class="cp-stat-label">{t.capitalLabel}</span><span class="cp-stat-val">{country.capital}</span></div>}
+        {country.population !== '—' && <div class="cp-stat"><span class="cp-stat-label">{t.populationLabel}</span><span class="cp-stat-val">{country.population}</span></div>}
+        {country.language   !== '—' && <div class="cp-stat"><span class="cp-stat-label">{country.language.includes(',') ? t.languagesLabel : t.languageLabel}</span><span class="cp-stat-val">{country.language}</span></div>}
+        {country.area       !== '—' && <div class="cp-stat"><span class="cp-stat-label">{t.areaLabel}</span><span class="cp-stat-val">{country.area} km²</span></div>}
+        {country.currency   !== '—' && <div class="cp-stat"><span class="cp-stat-label">{t.currencyLabel}</span><span class="cp-stat-val">{country.currency}</span></div>}
+        {country.timezone   !== '—' && <div class="cp-stat"><span class="cp-stat-label">{t.timezoneLabel}</span><span class="cp-stat-val">{country.timezone}</span></div>}
+        {country.callingCode !== '—' && <div class="cp-stat"><span class="cp-stat-label">{t.callingCodeLabel}</span><span class="cp-stat-val">{country.callingCode}</span></div>}
+        {country.drivingSide !== '—' && <div class="cp-stat"><span class="cp-stat-label">{t.drivesOnLabel}</span><span class="cp-stat-val">{country.drivingSide === 'Left' ? t.driveLeft : t.driveRight}</span></div>}
+        {country.sport       !== '—' && <div class="cp-stat"><span class="cp-stat-label">{t.nationalSportLabel}</span><span class="cp-stat-val">{country.sport}</span></div>}
+        {country.dish                && <div class="cp-stat"><span class="cp-stat-label">{t.nationalDishLabel}</span><span class="cp-stat-val">{country.dish}</span></div>}
+      </div>
+    </section>
+
+    <!-- Compare button -->
+    <div class="cp-compare-wrap">
+      <button class="cp-compare-btn" id="cp-compare-open" data-slug={country.slug} data-name={country.name}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="18"/><rect x="14" y="3" width="7" height="18"/>
+        </svg>
+        {t.compareWithAnother}
+      </button>
+    </div>
+
+    <!-- About -->
+    <section class="cp-section">
+      <h2 class="cp-section-label">{t.aboutSection} {country.name}</h2>
+      <p class="cp-about">
+        <strong>{country.name}</strong>{country.officialName !== country.name ? ` (${t.aboutOfficially} ${country.officialName})` : ''}{country.subregion ? `${t.aboutIsCountryLocatedIn}${tr(country.subregion)}.` : country.region ? `${t.aboutIsCountryIn}${tr(country.region)}.` : t.aboutIsCountry}
+        {country.capital !== '—' && <>{t.aboutCapitalIs}<strong>{country.capital}</strong>{`${country.cities.length > 0 ? `${t.aboutWithOtherCities}${country.cities.slice(0, 2).map((c: {name:string}) => c.name).join(` ${t.andConj} `)}` : ''}.`}</>}
+        {country.population !== '—' && <>{t.aboutPopApprox}<strong>{country.population}</strong>{country.language !== '—' ? <>{country.language.includes(',') ? t.aboutMainLangsAre : t.aboutMainLangIs}<strong>{country.language}</strong>{'.'}</> : '.'}</>}
+        {country.area !== '—' && <>{t.aboutCoversArea}<strong>{country.area} km²</strong>{'.'}</>}
+        {country.currency !== '—' && <>{t.aboutOfficialCurrency}<strong>{country.currency}</strong>{'.'}</>}
+        {country.drivingSide !== '—' && (country.drivingSide === 'Left' ? t.aboutDrivesLeft : t.aboutDrivesRight)}
+      </p>
+    </section>
+
+    <!-- Did you know -->
+    {country.fact && (
+      <section class="cp-section">
+        <h2 class="cp-section-label">{t.didYouKnow}</h2>
+        <blockquote class="cp-fact">{country.fact}</blockquote>
+      </section>
+    )}
+
+    <!-- SEO Insight paragraphs -->
+    {insights.length > 0 && (
+      <section class="cp-section">
+        <h2 class="cp-section-label">{t.exploreSection} {country.name}</h2>
+        <div class="cp-insights">
+          {insights.map(ins => (
+            <div class="cp-insight">
+              <div class="cp-insight-head">
+                <span class="cp-insight-icon">{ins.icon}</span>
+                <h3 class="cp-insight-title">{ins.title}</h3>
+              </div>
+              <p class="cp-insight-text">{ins.text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- Cities -->
+    {country.cities.length > 0 && (
+      <section class="cp-section">
+        <h2 class="cp-section-label">{t.majorCities}</h2>
+        <div class="cp-cities">
+          <div class="cp-city cp-city--capital">
+            <span class="cp-city-dot cp-city-dot--capital"></span>
+            <span class="cp-city-name">{country.capital}</span>
+            <span class="cp-city-tag">{t.capitalTag}</span>
+          </div>
+          {country.cities.map(city => (
+            <div class="cp-city">
+              <span class="cp-city-dot"></span>
+              <span class="cp-city-name">{city.name}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- Neighbouring countries -->
+    {country.borderCountries.length > 0 && (
+      <nav class="cp-section" aria-label="Neighbouring countries">
+        <h2 class="cp-section-label">{t.neighbouringCountries}</h2>
+        <div class="cp-neighbours">
+          {country.borderCountries.map(b => (
+            <a href={`/country/${b.slug}/`} class="cp-neighbour">{b.name}</a>
+          ))}
+        </div>
+      </nav>
+    )}
+
+    <!-- CTA map -->
+    {!isDNT && (
+      <div class="cp-map-cta">
+        <a href="/map" class="cp-map-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+          {isRecon ? `${t.viewOnMapPre}${country.name}${t.viewOnMapPost}` : t.exploreOnMap}
+        </a>
+      </div>
+    )}
+
+  </div>
+  <!-- Countries data for modal autocomplete -->
+  <script type="application/json" id="cp-countries-data" set:html={JSON.stringify(countriesList)} />
+
+  <!-- Compare modal -->
+  <div class="cp-modal-overlay" id="cp-modal" hidden aria-modal="true" role="dialog" aria-label="Compare countries">
+    <div class="cp-modal-box">
+      <div class="cp-modal-header">
+        <p class="cp-modal-title">{t.compareModalPre}<strong>{country.name}</strong>{t.compareModalPost}</p>
+        <button class="cp-modal-close" id="cp-modal-close" aria-label="Close">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 2l12 12M14 2L2 14"/></svg>
+        </button>
+      </div>
+      <div class="cp-modal-search-wrap">
+        <input id="cp-modal-input" type="text" class="cp-modal-input" placeholder={t.typeCountryName} autocomplete="off" spellcheck="false" />
+        <div class="cp-modal-dropdown" id="cp-modal-dropdown" role="listbox" hidden></div>
+      </div>
+    </div>
+  </div>
+
+  </div>{/* cp-page */}
+</Base>
+
+<style is:global>
+  /* Override the overflow:hidden from style.css on country pages */
+  html, body { overflow: auto !important; height: auto !important; background: #0d0d10 !important; }
+  .ac-option { color: rgba(255,255,255,0.85) !important; }
+</style>
+
+<style>
+  /* ── Page root ── */
+  .cp-page {
+    position: relative;
+    min-height: 100vh;
+  }
+  /* ── Page glow backdrop ── */
+  .cp-page::before {
+    content: '';
+    position: fixed;
+    top: -20vh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 900px;
+    height: 600px;
+    background: radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent, #5b8fff) 16%, transparent), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Decorative background ── */
+  .cp-bg-deco {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+  }
+  /* Concentric accent rings — always visible */
+  .cp-bg-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 0.5px solid color-mix(in srgb, var(--accent, #5b8fff) 18%, transparent);
+  }
+  .cp-bg-ring-1 {
+    width: 70vmax; height: 70vmax;
+    top: 50%; left: 60%;
+    transform: translate(-50%, -50%);
+    border-color: color-mix(in srgb, var(--accent, #5b8fff) 12%, transparent);
+  }
+  .cp-bg-ring-2 {
+    width: 48vmax; height: 48vmax;
+    top: 50%; left: 60%;
+    transform: translate(-50%, -50%);
+    border-color: color-mix(in srgb, var(--accent, #5b8fff) 9%, transparent);
+  }
+  .cp-bg-ring-3 {
+    width: 28vmax; height: 28vmax;
+    top: 50%; left: 60%;
+    transform: translate(-50%, -50%);
+    border-color: color-mix(in srgb, var(--accent, #5b8fff) 14%, transparent);
+  }
+  /* Country SVG shape — shown on top of rings when available */
+  .cp-shape-svg {
+    position: absolute;
+    top: 50%; left: 60%;
+    transform: translate(-50%, -50%);
+    width: min(80vw, 780px);
+    height: auto;
+    opacity: 0.18;
+  }
+  .cp-shape-svg path {
+    fill: color-mix(in srgb, var(--accent, #5b8fff) 22%, rgba(255,255,255,0.06));
+    stroke: color-mix(in srgb, var(--accent, #5b8fff) 70%, #ffffff);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .cp-wrap {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 36px 24px 96px;
+    animation: cp-in 0.5s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  @keyframes cp-in {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Back link ── */
+  .cp-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    margin-bottom: 64px;
+  }
+  .cp-back:hover { color: rgba(255,255,255,0.6); }
+
+  /* ── Hero ── */
+  .cp-hero {
+    text-align: center;
+    margin-bottom: 64px;
+  }
+  .cp-flag {
+    font-size: 88px;
+    line-height: 1;
+    display: block;
+    margin-bottom: 28px;
+    filter: drop-shadow(0 12px 40px rgba(0,0,0,0.55));
+  }
+  .cp-hero-shape {
+    width: 180px;
+    height: 130px;
+    margin: 0 auto 32px;
+    filter:
+      drop-shadow(0 0 24px color-mix(in srgb, var(--accent, #5b8fff) 55%, transparent))
+      drop-shadow(0 0 6px color-mix(in srgb, var(--accent, #5b8fff) 30%, transparent));
+  }
+  .cp-hero-shape svg { width: 100%; height: 100%; }
+  .cp-hero-shape path {
+    fill: color-mix(in srgb, var(--accent, #5b8fff) 28%, rgba(255,255,255,0.08));
+    stroke: rgba(255,255,255,0.75);
+    stroke-width: 1.2;
+    vector-effect: non-scaling-stroke;
+  }
+  h1.cp-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 7vw, 58px);
+    font-weight: 700;
+    color: #f0ede8;
+    letter-spacing: -0.015em;
+    line-height: 1.08;
+    margin: 0 0 12px;
+  }
+  .cp-official {
+    font-size: 13px;
+    color: rgba(255,255,255,0.2);
+    font-style: italic;
+    margin: 0 0 14px;
+  }
+  .cp-region {
+    display: inline-block;
+    font-size: 10px;
+    color: var(--accent, #aaa);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin: 0 0 12px;
+    padding: 3px 12px;
+    border: 0.5px solid color-mix(in srgb, var(--accent, #aaa) 30%, transparent);
+    border-radius: 20px;
+    background: color-mix(in srgb, var(--accent, #aaa) 8%, transparent);
+  }
+  .cp-vibe {
+    display: block;
+    font-size: 11px;
+    color: rgba(255,255,255,0.32);
+    letter-spacing: 0.18em;
+    font-variant: small-caps;
+    margin: 8px 0 0;
+  }
+
+  /* ── Advisory banners ── */
+  .cp-advisory {
+    display: flex; align-items: flex-start; gap: 10px;
+    border-radius: 10px; padding: 14px 18px;
+    font-size: 13px; line-height: 1.6;
+    margin-bottom: 28px;
+  }
+  .cp-advisory--reconsider {
+    background: rgba(255,180,0,0.10);
+    border: 1px solid rgba(255,180,0,0.30);
+    color: #ffd166;
+  }
+  .cp-advisory--dnt {
+    background: rgba(255,80,80,0.08);
+    border: 1px solid rgba(255,80,80,0.25);
+    color: rgba(255,255,255,0.72);
+  }
+  .cp-advisory strong { font-weight: 600; }
+
+  /* ── Divider ── */
+  .cp-divider {
+    width: 32px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent, rgba(255,255,255,0.25)), transparent);
+    margin: 0 auto 48px;
+    border: none;
+  }
+
+  /* ── Sections ── */
+  .cp-section {
+    margin-bottom: 48px;
+  }
+  .cp-section-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent, rgba(255,255,255,0.5));
+    opacity: 0.9;
+    margin: 0 0 16px;
+  }
+
+  /* ── Stats grid ── */
+  .cp-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+    gap: 8px;
+  }
+  .cp-stat {
+    background: rgba(255,255,255,0.04);
+    border: 0.5px solid rgba(255,255,255,0.09);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: background 0.18s, border-color 0.18s;
+  }
+  .cp-stat:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: color-mix(in srgb, var(--accent, #fff) 30%, transparent);
+  }
+  .cp-stat-label {
+    font-size: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent, rgba(255,255,255,0.4));
+    opacity: 0.8;
+    font-weight: 700;
+  }
+  .cp-stat-val {
+    font-size: 14px;
+    color: rgba(255,255,255,0.92);
+    line-height: 1.3;
+    font-weight: 400;
+  }
+
+  /* ── About ── */
+  .cp-about {
+    font-size: 15px;
+    line-height: 1.9;
+    color: rgba(255,255,255,0.6);
+    margin: 0;
+  }
+  .cp-about strong {
+    color: rgba(255,255,255,0.95);
+    font-weight: 500;
+  }
+
+  /* ── Fact blockquote ── */
+  .cp-fact {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.85;
+    color: rgba(255,255,255,0.75);
+    padding: 22px 26px;
+    margin: 0;
+    background: color-mix(in srgb, var(--accent, #5b8fff) 8%, rgba(255,255,255,0.02));
+    border-left: 2px solid color-mix(in srgb, var(--accent, #5b8fff) 60%, transparent);
+    border-radius: 0 12px 12px 0;
+  }
+
+  /* ── Cards ── */
+  .cp-cards-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+    margin-bottom: 48px;
+  }
+  .cp-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 18px;
+    border-radius: 12px;
+    border: 0.5px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.02);
+  }
+  .cp-card-peak {
+    border-color: color-mix(in srgb, var(--accent, #78c8ff) 20%, transparent);
+    background: color-mix(in srgb, var(--accent, #78c8ff) 4%, transparent);
+  }
+  .cp-card-icon { font-size: 28px; line-height: 1; flex-shrink: 0; padding-top: 2px; }
+  .cp-card-body { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .cp-card-label {
+    font-size: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.2);
+    font-weight: 600;
+  }
+  .cp-card-title { font-size: 14px; color: rgba(255,255,255,0.84); font-weight: 500; }
+  .cp-card-sub   { font-size: 11.5px; color: rgba(255,255,255,0.32); }
+
+  /* ── Insights ── */
+  .cp-insights {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .cp-insight {
+    padding: 20px 22px;
+    border-radius: 12px;
+    border: 0.5px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+    transition: background 0.18s, border-color 0.18s;
+  }
+  .cp-insight:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: color-mix(in srgb, var(--accent, #fff) 35%, transparent);
+  }
+  .cp-insight-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .cp-insight-icon { font-size: 15px; line-height: 1; flex-shrink: 0; }
+  .cp-insight-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent, rgba(255,255,255,0.9));
+    margin: 0;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .cp-insight-text {
+    font-size: 14px;
+    line-height: 1.85;
+    color: rgba(255,255,255,0.62);
+    margin: 0;
+    padding-left: 25px;
+  }
+  .cp-insight-text strong { color: rgba(255,255,255,0.9); font-weight: 500; }
+
+  /* ── Cities ── */
+  .cp-cities {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 0.5px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .cp-city {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 16px;
+    border-bottom: 0.5px solid rgba(255,255,255,0.04);
+    transition: background 0.16s;
+  }
+  .cp-city:last-child { border-bottom: none; }
+  .cp-city:hover { background: rgba(255,255,255,0.03); }
+  .cp-city--capital { background: rgba(255,255,255,0.025); }
+  .cp-city-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    flex-shrink: 0;
+  }
+  .cp-city-dot--capital {
+    background: var(--accent, #5b8fff);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--accent, #5b8fff) 60%, transparent);
+  }
+  .cp-city-name {
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.75);
+    flex: 1;
+  }
+  .cp-city--capital .cp-city-name { color: rgba(255,255,255,0.9); font-weight: 500; }
+  .cp-city-tag {
+    font-size: 8.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent, #5b8fff);
+    opacity: 0.8;
+    font-weight: 600;
+  }
+
+  /* ── Neighbours ── */
+  .cp-neighbours {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .cp-neighbour {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    text-decoration: none;
+    padding: 5px 15px;
+    border: 0.5px solid rgba(255,255,255,0.09);
+    border-radius: 20px;
+    background: rgba(255,255,255,0.025);
+    transition: color 0.18s, border-color 0.18s, background 0.18s;
+    white-space: nowrap;
+  }
+  .cp-neighbour:hover {
+    color: rgba(255,255,255,0.92);
+    border-color: color-mix(in srgb, var(--accent, #fff) 40%, transparent);
+    background: color-mix(in srgb, var(--accent, #fff) 8%, transparent);
+  }
+
+  /* ── Map CTA ── */
+  .cp-map-cta {
+    margin-top: 52px;
+    padding-top: 32px;
+    border-top: 0.5px solid rgba(255,255,255,0.05);
+    text-align: center;
+  }
+  .cp-map-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 13px 28px;
+    background: rgba(255,255,255,0.04);
+    border: 0.5px solid rgba(255,255,255,0.1);
+    border-radius: 28px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    letter-spacing: 0.04em;
+  }
+  .cp-map-btn:hover {
+    background: color-mix(in srgb, var(--accent, #fff) 10%, transparent);
+    border-color: color-mix(in srgb, var(--accent, #fff) 30%, transparent);
+    color: rgba(255,255,255,0.95);
+  }
+
+  /* ── Compare button ── */
+  .cp-compare-wrap {
+    margin-bottom: 48px;
+  }
+  .cp-compare-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(255,255,255,0.03);
+    border: 0.5px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    font-size: 12.5px;
+    font-family: 'DM Sans', sans-serif;
+    color: rgba(255,255,255,0.45);
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s, color 0.18s;
+    letter-spacing: 0.03em;
+  }
+  .cp-compare-btn:hover {
+    background: color-mix(in srgb, var(--accent, #5b8fff) 10%, transparent);
+    border-color: color-mix(in srgb, var(--accent, #5b8fff) 35%, transparent);
+    color: rgba(255,255,255,0.9);
+  }
+
+  /* ── Compare modal ── */
+  .cp-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: modal-in 0.18s ease both;
+  }
+  .cp-modal-overlay[hidden] { display: none; }
+  @keyframes modal-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  .cp-modal-box {
+    background: #14141a;
+    border: 0.5px solid rgba(255,255,255,0.12);
+    border-radius: 18px;
+    padding: 28px 28px 24px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+    animation: modal-box-in 0.22s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  @keyframes modal-box-in {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .cp-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .cp-modal-title {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    margin: 0;
+  }
+  .cp-modal-title strong { color: rgba(255,255,255,0.85); font-weight: 500; }
+  .cp-modal-close {
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.05);
+    border: 0.5px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    color: rgba(255,255,255,0.4);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .cp-modal-close:hover { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.9); }
+  .cp-modal-search-wrap { position: relative; }
+  .cp-modal-input {
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(255,255,255,0.05);
+    border: 0.5px solid rgba(255,255,255,0.14);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 14.5px;
+    font-family: 'DM Sans', sans-serif;
+    color: #fff;
+    outline: none;
+    color-scheme: dark;
+    transition: border-color 0.18s, background 0.18s;
+    caret-color: var(--accent, #5b8fff);
+  }
+  .cp-modal-input:focus {
+    border-color: color-mix(in srgb, var(--accent, #5b8fff) 50%, rgba(255,255,255,0.2));
+    background: rgba(255,255,255,0.07);
+  }
+  .cp-modal-input::placeholder { color: rgba(255,255,255,0.2); }
+  .cp-modal-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0; right: 0;
+    z-index: 10;
+    background: #18181f;
+    border: 0.5px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+  }
+  .cp-modal-dropdown[hidden] { display: none; }
+  .cp-modal-dropdown .ac-option {
+    padding: 11px 16px;
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.65);
+    cursor: pointer;
+    border-bottom: 0.5px solid rgba(255,255,255,0.04);
+    transition: background 0.12s, color 0.12s;
+  }
+  .cp-modal-dropdown .ac-option:last-child { border-bottom: none; }
+  .cp-modal-dropdown .ac-option:hover,
+  .cp-modal-dropdown .ac-option.ac-option--active {
+    background: rgba(255,255,255,0.07);
+    color: rgba(255,255,255,0.95);
+  }
+</style>
+
+<script>
+  const countries: {name:string; slug:string}[] =
+    JSON.parse(document.getElementById('cp-countries-data')!.textContent!);
+
+  const openBtn    = document.getElementById('cp-compare-open')    as HTMLButtonElement;
+  const modal      = document.getElementById('cp-modal')           as HTMLElement;
+  const closeBtn   = document.getElementById('cp-modal-close')     as HTMLButtonElement;
+  const searchInput = document.getElementById('cp-modal-input')    as HTMLInputElement;
+  const dropdown   = document.getElementById('cp-modal-dropdown')  as HTMLElement;
+
+  const currentSlug = openBtn.dataset.slug ?? '';
+  let activeIdx = -1;
+
+  function openModal() {
+    modal.hidden = false;
+    searchInput.value = '';
+    dropdown.hidden = true;
+    activeIdx = -1;
+    setTimeout(() => searchInput.focus(), 50);
+    document.addEventListener('keydown', onEsc);
+  }
+
+  function closeModal() {
+    modal.hidden = true;
+    document.removeEventListener('keydown', onEsc);
+  }
+
+  function onEsc(e: KeyboardEvent) {
+    if (e.key === 'Escape') closeModal();
+  }
+
+  openBtn.addEventListener('click', openModal);
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+  function renderDropdown(q: string) {
+    dropdown.innerHTML = '';
+    activeIdx = -1;
+    if (!q.trim()) { dropdown.hidden = true; return; }
+    const lower = q.toLowerCase();
+    const matches = countries
+      .filter(c => c.slug !== currentSlug && c.name.toLowerCase().includes(lower))
+      .sort((a, b) => {
+        const as = a.name.toLowerCase().startsWith(lower);
+        const bs = b.name.toLowerCase().startsWith(lower);
+        return as === bs ? a.name.localeCompare(b.name) : as ? -1 : 1;
+      })
+      .slice(0, 8);
+    if (!matches.length) { dropdown.hidden = true; return; }
+    matches.forEach(c => {
+      const div = document.createElement('div');
+      div.className = 'ac-option';
+      div.setAttribute('role', 'option');
+      div.dataset.slug = c.slug;
+      div.textContent = c.name;
+      div.addEventListener('mousedown', e => { e.preventDefault(); pick(c); });
+      dropdown.appendChild(div);
+    });
+    dropdown.hidden = false;
+  }
+
+  function pick(c: {name:string; slug:string}) {
+    window.location.href = `/compare/${currentSlug}-vs-${c.slug}/`;
+  }
+
+  function setActive(idx: number) {
+    const opts = dropdown.querySelectorAll<HTMLElement>('.ac-option');
+    opts.forEach((o, i) => o.classList.toggle('ac-option--active', i === idx));
+    activeIdx = idx;
+  }
+
+  searchInput.addEventListener('input', () => renderDropdown(searchInput.value));
+  searchInput.addEventListener('blur',  () => setTimeout(() => { dropdown.hidden = true; }, 200));
+  searchInput.addEventListener('focus', () => { if (searchInput.value) renderDropdown(searchInput.value); });
+  searchInput.addEventListener('keydown', e => {
+    const opts = dropdown.querySelectorAll<HTMLElement>('.ac-option');
+    if (e.key === 'ArrowDown') { e.preventDefault(); setActive(Math.min(activeIdx + 1, opts.length - 1)); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(Math.max(activeIdx - 1, -1)); }
+    else if (e.key === 'Enter' && activeIdx >= 0) {
+      e.preventDefault();
+      const c = countries.find(c2 => c2.slug === opts[activeIdx].dataset.slug);
+      if (c) pick(c);
+    } else if (e.key === 'Escape') { closeModal(); }
+  });
+</script>

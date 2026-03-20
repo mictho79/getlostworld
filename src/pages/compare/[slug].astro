@@ -1,0 +1,1289 @@
+---
+export const prerender = false;
+
+import Base from '../../layouts/Base.astro';
+import {
+  COUNTRY_DATA as DATA_EN, COUNTRY_VIBES as VIBES_EN, COUNTRY_PEAKS, COUNTRY_DISHES,
+  COUNTRY_CITIES, COUNTRY_INSIGHTS as INSIGHTS_EN, slugify
+} from '../../lib/countryData.js';
+import { TRAVEL_SCORES, TRAVEL_ADVISORY } from '../../lib/travelScores.js';
+import { COUNTRY_REGION, COUNTRY_EXTRAS } from '../../lib/countryExtras.js';
+import { getT, translateRegion } from '../../i18n/translations';
+import { detectLang } from '../../i18n/detect';
+
+const lang = detectLang(Astro.request.headers.get('accept-language') ?? 'en');
+const t = getT(lang);
+const tr = (r: string) => translateRegion(r, lang);
+
+let countryVibes:    typeof VIBES_EN    = VIBES_EN;
+let countryDataSrc:  typeof DATA_EN     = DATA_EN;
+let countryInsights: typeof INSIGHTS_EN = INSIGHTS_EN;
+
+if (lang === 'fr') {
+  const fr = await import('../../lib/countryData.fr.js');
+  countryVibes    = fr.COUNTRY_VIBES;
+  countryDataSrc  = fr.COUNTRY_DATA;
+  countryInsights = fr.COUNTRY_INSIGHTS;
+}
+
+// ─── Build country from local data only (no REST API) ─────────────────────────
+function buildCountryFromLocal(name: string) {
+  const local = (countryDataSrc as any)[name] || {};
+  return {
+    name,
+    officialName:    name,
+    slug:            slugify(name),
+    cca2:            '',
+    flag:            local.flag || '🌍',
+    capital:         local.capital || '—',
+    population:      local.population || '—',
+    populationRaw:   0,
+    language:        local.language || '—',
+    sport:           local.sport || '—',
+    fact:            local.fact  || '',
+    vibe:            (countryVibes as any)[name]    || 'Fascinating · Historic · Unique',
+    area:            '—',
+    areaRaw:         0,
+    region:          (COUNTRY_REGION as any)[name]   || '',
+    subregion:       '',
+    latlng:          [0, 0] as [number, number],
+    currency:        '—',
+    timezone:        '—',
+    callingCode:     '—',
+    drivingSide:     '—',
+    dish:            (COUNTRY_DISHES   as any)[name] || null,
+    peak:            (COUNTRY_PEAKS    as any)[name] || null,
+    cities:          (COUNTRY_CITIES   as any)[name] || [],
+    insights:        (countryInsights as any)[name] || {},
+    borderCountries: [] as any[],
+    neighborSlugs:   [] as string[],
+  };
+}
+
+// ─── Parse slug from URL ───────────────────────────────────────────────────────
+const { slug } = Astro.params;
+const vsIdx = (slug as string).indexOf('-vs-');
+if (vsIdx === -1) return Astro.redirect('/');
+
+const slugA = (slug as string).slice(0, vsIdx);
+const slugB = (slug as string).slice(vsIdx + 4);
+
+const findCountry = (s: string) => {
+  const name = Object.keys(countryDataSrc as any).find(k => slugify(k) === s);
+  if (!name) return null;
+  return buildCountryFromLocal(name);
+};
+
+const countryA = findCountry(slugA);
+const countryB = findCountry(slugB);
+if (!countryA || !countryB) return Astro.redirect('/');
+
+const ciA = countryA.insights as Record<string,string>;
+const ciB = countryB.insights as Record<string,string>;
+
+const REGION_ACCENT: Record<string,string> = {
+  Europe: '#5b8fff', Asia: '#ff7043', Africa: '#ffb74d',
+  Americas: '#69d89a', Oceania: '#26c6da', Antarctic: '#b0c4de',
+};
+// Use REST API region when available, fall back to local COUNTRY_REGION map
+const regionA  = countryA.region || (COUNTRY_REGION as any)[countryA.name] || '';
+const regionB  = countryB.region || (COUNTRY_REGION as any)[countryB.name] || '';
+const accentA  = REGION_ACCENT[regionA] || '#667eea';
+const accentBRaw = REGION_ACCENT[regionB] || '#f093fb';
+// When both countries are in the same region the bars would be identical colours.
+// Rotate B to a complementary accent so A and B remain visually distinct.
+const ACCENT_CONTRAST: Record<string,string> = {
+  '#5b8fff':'#ff7043', '#ff7043':'#5b8fff',
+  '#ffb74d':'#26c6da', '#26c6da':'#ffb74d',
+  '#69d89a':'#ff7043', '#667eea':'#f093fb', '#f093fb':'#667eea',
+};
+const accentB  = accentA === accentBRaw ? (ACCENT_CONTRAST[accentA] ?? '#f093fb') : accentBRaw;
+// Normalise subregion display label (falls back to region from local map)
+const labelA   = tr(countryA.subregion || regionA);
+const labelB   = tr(countryB.subregion || regionB);
+
+// ─── Travel scores ─────────────────────────────────────────────────────────────
+const SCORE_OVERRIDES: Record<string,Record<string,number>> = {
+  France:         {food:5,culture:5,tourism:5,budget:2},
+  Italy:          {food:5,culture:5,tourism:5},
+  Japan:          {food:5,culture:5,langEase:1,tourism:5},
+  China:          {food:5,culture:5,budget:4},
+  India:          {food:5,culture:5,budget:5,nature:4},
+  Mexico:         {food:5,culture:4,budget:4},
+  Thailand:       {food:5,budget:5,nature:4,tourism:4},
+  Vietnam:        {food:4,budget:5,nature:4},
+  Spain:          {food:4,culture:5,tourism:5},
+  Greece:         {culture:5,food:4,tourism:4},
+  Turkey:         {culture:5,food:4,budget:4},
+  Morocco:        {culture:4,food:4,budget:4,nature:4},
+  Egypt:          {culture:5,budget:3},
+  Peru:           {culture:5,nature:5,food:5,budget:4},
+  Brazil:         {nature:5,culture:3,budget:3},
+  Argentina:      {food:4,nature:4,culture:3},
+  Colombia:       {nature:4,food:4,budget:4},
+  'New Zealand':  {nature:5,tourism:4,budget:2},
+  Australia:      {nature:5,tourism:4,budget:2},
+  Norway:         {nature:5,budget:1,tourism:4},
+  Iceland:        {nature:5,budget:1},
+  Switzerland:    {nature:4,budget:1,tourism:5},
+  Germany:        {culture:5,food:3,tourism:5},
+  Netherlands:    {culture:4,tourism:5,langEase:5},
+  'United Kingdom':{culture:5,tourism:5,langEase:5},
+  'United States':{nature:4,tourism:5,langEase:5,food:4},
+  Canada:         {nature:5,tourism:4,langEase:5},
+  'South Africa': {nature:5,culture:3,budget:4},
+  Kenya:          {nature:5,budget:3},
+  Ethiopia:       {culture:5,budget:5,nature:4},
+  Nigeria:        {food:4,culture:3,budget:4},
+  Ghana:          {culture:3,budget:4,langEase:5},
+  Indonesia:      {nature:5,food:4,budget:4},
+  Nepal:          {nature:5,budget:5,culture:4},
+  Iran:           {culture:5,food:4,budget:4},
+  Portugal:       {food:4,culture:4,tourism:5},
+  'South Korea':  {food:5,culture:4,tourism:5},
+  Singapore:      {food:5,tourism:5,langEase:5,budget:2},
+  Jordan:         {culture:5,food:4,budget:3},
+  Lebanon:        {food:5,culture:4,budget:3},
+  Georgia:        {food:4,culture:4,budget:5,nature:4},
+  Uzbekistan:     {culture:5,budget:5},
+  'Saudi Arabia': {culture:3,tourism:3,budget:2},
+};
+
+function getTravelScores(c: any): Record<string,number> {
+  const r  = c.region    || '';
+  const lg = (c.language || '').toLowerCase();
+  const pk = c.peak;
+  const o  = SCORE_OVERRIDES[c.name] || {};
+  const ts = (TRAVEL_SCORES as any)[c.name] || {};
+
+  const tourism  = o.tourism  ?? ts.tourism  ?? ({ Europe:5, Americas:4, Asia:4, Africa:3, Oceania:3 }[r] ?? 3);
+  const budget   = o.budget   ?? ts.budget   ?? ({ Africa:5, Asia:4, Americas:3, Europe:2, Oceania:3 }[r] ?? 3);
+  const nature   = o.nature   ?? ts.nature   ?? (pk ? (pk.elevation>=6000?5:pk.elevation>=3000?4:3) : 3);
+  const food     = o.food     ?? ts.food     ?? (c.dish ? 4 : 3);
+  const culture  = o.culture  ?? ts.culture  ?? ({ Europe:4, Asia:4, Africa:3, Americas:3, Oceania:3 }[r] ?? 3);
+  const langEase = o.langEase ?? ts.langEase ?? (
+    lg.includes('english') ? 5 :
+    (lg.includes('french')||lg.includes('spanish')||lg.includes('portuguese')||lg.includes('german')||lg.includes('dutch')) ? 4 :
+    (lg.includes('arabic')||lg.includes('chinese')||lg.includes('japanese')||lg.includes('korean')||lg.includes('thai')) ? 2 : 3
+  );
+  return { tourism, budget, nature, food, culture, langEase };
+}
+
+const scoresA = getTravelScores(countryA);
+const scoresB = getTravelScores(countryB);
+
+// ─── Travel advisories ─────────────────────────────────────────────────────
+const advisoryA = (TRAVEL_ADVISORY as any)[countryA.name] ?? null;
+const advisoryB = (TRAVEL_ADVISORY as any)[countryB.name] ?? null;
+const dntA = advisoryA === 'do-not-travel';
+const dntB = advisoryB === 'do-not-travel';
+const hasReconsider = advisoryA === 'reconsider' || advisoryB === 'reconsider';
+const reconsiderNames = [
+  advisoryA === 'reconsider' ? countryA.name : null,
+  advisoryB === 'reconsider' ? countryB.name : null,
+].filter(Boolean) as string[];
+
+const SCORE_META: {key:string; label:string; icon:string}[] = [
+  { key:'tourism',  label: t.tourismAccess,  icon:'✈️' },
+  { key:'budget',   label: t.budgetTravel,   icon:'💰' },
+  { key:'nature',   label: t.natureOutdoors, icon:'🏔' },
+  { key:'food',     label: t.foodScene,      icon:'🍽' },
+  { key:'culture',  label: t.culturalDepth,  icon:'🏛' },
+  { key:'langEase', label: t.languageEase,   icon:'💬' },
+];
+
+const SCORE_LABELS: Record<string,string> = {
+  tourism: t.scoreTourism, budget: t.scoreBudget,
+  nature:  t.scoreNature,  food:   t.scoreFood,
+  culture: t.scoreCulture, langEase: t.scoreLangEase,
+};
+
+// Best-for verdicts
+const topA = Object.entries(scoresA).sort(([,x],[,y])=>y-x)[0][0];
+const topB = Object.entries(scoresB).sort(([,x],[,y])=>y-x)[0][0];
+const top2A = Object.entries(scoresA).sort(([,x],[,y])=>y-x).slice(0,2).map(([k])=>SCORE_META.find(m=>m.key===k)!.label);
+const top2B = Object.entries(scoresB).sort(([,x],[,y])=>y-x).slice(0,2).map(([k])=>SCORE_META.find(m=>m.key===k)!.label);
+
+// Pre-compute rows so template uses a simple expression map
+const travelRows = SCORE_META.map(m => ({
+  key:   m.key,
+  label: m.label,
+  icon:  m.icon,
+  sA:    (scoresA as Record<string,number>)[m.key] ?? 3,
+  sB:    (scoresB as Record<string,number>)[m.key] ?? 3,
+}));
+
+// ─── Country extras (structured rows) ─────────────────────────────────────────
+const exA = (COUNTRY_EXTRAS as any)[countryA.name] || {};
+const exB = (COUNTRY_EXTRAS as any)[countryB.name] || {};
+
+function density(pop: number, area: number): string {
+  if (!pop || !area) return '—';
+  const d = pop / area;
+  return d < 1 ? '<1 /km²' : `${Math.round(d).toLocaleString('en-US')} /km²`;
+}
+
+// ─── Editorial ─────────────────────────────────────────────────────────────────
+function buildEditorial(a: any, b: any): string {
+  const parts: string[] = [];
+  const vA = a.vibe.split('·').map((s:string)=>s.trim());
+  const vB = b.vibe.split('·').map((s:string)=>s.trim());
+
+  if (a.region !== b.region)
+    parts.push(`${a.name} ${t.andConj} ${b.name}${t.editOccupyOpposite}${tr(a.region)} ${t.andConj} ${tr(b.region)}${t.editMakingComparison}`);
+  else if (a.subregion && b.subregion && a.subregion !== b.subregion)
+    parts.push(`${t.editBothSitWithin}${tr(a.region)}${t.editYet}${a.name} (${tr(a.subregion)}) ${t.andConj} ${b.name} (${tr(b.subregion)})${t.editRepresentDistinct}`);
+  else
+    parts.push(`${a.name} ${t.andConj} ${b.name}${t.editNearNeighboursIn}${tr(a.region)}${t.editButEach}`);
+
+  parts.push(`${a.name} — ${vA[0]}, ${(vA[1]||'').toLowerCase()}${t.editExcelsIn}${SCORE_LABELS[topA]}.`);
+  parts.push(`${b.name} — ${vB[0]}, ${(vB[1]||'').toLowerCase()}${t.editStrongerPickFor}${SCORE_LABELS[topB]}.`);
+
+  if (a.sport !== '—' && b.sport !== '—' && a.sport !== b.sport)
+    parts.push(`${t.editSportsTell}${a.name}${t.editLivesBreathes}${a.sport}${t.editWhile}${b.name}${t.editRalliesAround}${b.sport}.`);
+
+  if (a.dish && b.dish && a.dish !== b.dish)
+    parts.push(`${t.editAtTable}${a.dish}${t.editInCountry}${a.name} ${t.andConj} ${b.dish}${t.editInCountry}${b.name}${t.editTwoPlates}`);
+
+  return parts.join(' ');
+}
+const editorial = buildEditorial(countryA, countryB);
+
+// ─── More comparisons ──────────────────────────────────────────────────────────
+const moreSet = new Set<string>();
+const moreComparisons: {label:string; href:string}[] = [];
+const addMore = (a:{name:string,slug:string}, b:{name:string,slug:string}) => {
+  const key = [a.slug,b.slug].sort().join('::');
+  if (!moreSet.has(key) && a.slug !== b.slug) {
+    moreSet.add(key);
+    moreComparisons.push({ label: `${a.name} vs ${b.name}`, href: `/compare/${a.slug}-vs-${b.slug}/` });
+  }
+};
+for (const n of (countryA.borderCountries||[]).slice(0,3)) {
+  if (n.slug !== countryB.slug) addMore({name:countryA.name,slug:countryA.slug}, n);
+}
+for (const n of (countryB.borderCountries||[]).slice(0,3)) {
+  if (n.slug !== countryA.slug) addMore({name:countryB.name,slug:countryB.slug}, n);
+}
+const moreSlice = moreComparisons.slice(0,4);
+
+// ─── Countries list for switcher autocomplete ─────────────────────────────────
+const countriesList = [...new Set([
+  ...Object.keys(countryDataSrc as any),
+  ...Object.keys(countryVibes as any),
+])].sort().map((name:string) => ({ name, slug: slugify(name) }));
+
+// ─── SEO ───────────────────────────────────────────────────────────────────────
+const siteBase  = Astro.site?.href ?? 'https://world-explorer.com/';
+const pageUrl   = new URL(`compare/${countryA.slug}-vs-${countryB.slug}/`, siteBase).href;
+const title     = `${countryA.name} vs ${countryB.name}: Country Comparison — Facts, Culture & Travel | World Explorer`;
+const description = `Compare ${countryA.name} and ${countryB.name} side by side: key facts, travel scores, food, culture, sport and nature. Discover the differences and decide where to go next.`;
+
+const jsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type":"ListItem","position":1,"name":"World Explorer","item":siteBase },
+        { "@type":"ListItem","position":2,"name":"Compare","item": new URL('compare/', siteBase).href },
+        { "@type":"ListItem","position":3,"name":`${countryA.name} vs ${countryB.name}`,"item":pageUrl },
+      ]
+    },
+    {
+      "@type":"WebPage","name":title,"description":description,"url":pageUrl,
+      "about":[ {"@type":"Country","name":countryA.name}, {"@type":"Country","name":countryB.name} ]
+    }
+  ]
+});
+---
+
+<Base title={title} description={description}>
+
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={jsonLd} />
+    <meta property="og:title"       content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url"         content={pageUrl} />
+    <meta property="og:type"        content="website" />
+  </Fragment>
+
+  <!-- Countries data for switcher -->
+  <script type="application/json" id="cmp-countries" set:html={JSON.stringify(countriesList)} />
+
+  <div class="pg" style={`--ca:${accentA};--cb:${accentB};`}>
+
+    <!-- ── Decorative background ── -->
+    <div class="pg-deco" aria-hidden="true">
+      <div class="pg-ring pg-ring-1"></div>
+      <div class="pg-ring pg-ring-2"></div>
+      <div class="pg-ring pg-ring-3"></div>
+    </div>
+
+    <div class="pg-wrap">
+
+      <!-- 1 ── Breadcrumb ──────────────────────────────────────────── -->
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">{t.home}</a><span aria-hidden="true">›</span>
+        <span>{t.compare}</span><span aria-hidden="true">›</span>
+        <span>{countryA.name} vs {countryB.name}</span>
+      </nav>
+
+      <!-- ── Advisory banners ─────────────────────────────────────── -->
+      {hasReconsider && (
+        <div class="advisory advisory--reconsider" role="alert">
+          <span class="advisory-icon">⚠️</span>
+          <span>{t.advisoryReconsiderComparePre}<strong>{reconsiderNames.join(' and ')}</strong>{t.advisoryReconsiderComparePost}</span>
+        </div>
+      )}
+
+      <!-- 2 ── Hero ────────────────────────────────────────────────── -->
+      <header class="hero">
+        <div class="hero-globe hero-globe--a" aria-hidden="true"></div>
+        <div class="hero-globe hero-globe--b" aria-hidden="true"></div>
+
+        <div class="hero-side hero-side--a">
+          <div class="hero-code" aria-hidden="true">{countryA.cca2}</div>
+          <span class="hero-flag">{countryA.flag}</span>
+          <h1 class="hero-name hero-name--a">{countryA.name}</h1>
+          <p class="hero-vibe">{countryA.vibe}</p>
+          <span class="hero-tag" style={`--t:${accentA};`}>{labelA}</span>
+        </div>
+
+        <div class="hero-vs" aria-hidden="true">
+          <span class="hero-vs-text">VS</span>
+        </div>
+
+        <div class="hero-side hero-side--b">
+          <div class="hero-code" aria-hidden="true">{countryB.cca2}</div>
+          <span class="hero-flag">{countryB.flag}</span>
+          <h1 class="hero-name hero-name--b">{countryB.name}</h1>
+          <p class="hero-vibe">{countryB.vibe}</p>
+          <span class="hero-tag" style={`--t:${accentB};`}>{labelB}</span>
+        </div>
+      </header>
+
+      <!-- 3 ── Country switcher ────────────────────────────────────── -->
+      <div class="switcher" role="search" aria-label="Switch countries">
+        <div class="sw-field">
+          <label class="sw-label" for="sw-a">{t.countryA}</label>
+          <div class="sw-wrap">
+            <input id="sw-a" type="text" class="sw-input" autocomplete="off" spellcheck="false" />
+            <div class="sw-drop" id="sw-drop-a" role="listbox" hidden></div>
+          </div>
+        </div>
+        <button class="sw-swap" id="sw-swap" title="Swap" aria-label="Swap countries">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 16V4m0 0L3 8m4-4l4 4"/><path d="M17 8v12m0 0l4-4m-4 4l-4-4"/>
+          </svg>
+        </button>
+        <div class="sw-field">
+          <label class="sw-label" for="sw-b">{t.countryB}</label>
+          <div class="sw-wrap">
+            <input id="sw-b" type="text" class="sw-input" autocomplete="off" spellcheck="false" />
+            <div class="sw-drop" id="sw-drop-b" role="listbox" hidden></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 ── Key facts ────────────────────────────────────────────── -->
+      <section class="section">
+        <h2 class="sh">{t.keyFacts}</h2>
+        <div class="facts">
+          <div class="facts-head">
+            <span class="facts-a" style={`color:${accentA};`}>{countryA.flag} {countryA.name}</span>
+            <span class="facts-m"></span>
+            <span class="facts-b" style={`color:${accentB};`}>{countryB.flag} {countryB.name}</span>
+          </div>
+          {countryA.capital !== '—' || countryB.capital !== '—' ? (
+            <div class="facts-row">
+              <span class="facts-a">{countryA.capital}</span>
+              <span class="facts-m">{t.capitalLabel}</span>
+              <span class="facts-b">{countryB.capital}</span>
+            </div>
+          ) : null}
+          {countryA.population !== '—' || countryB.population !== '—' ? (
+            <div class="facts-row">
+              <span class={`facts-a${countryA.populationRaw >= countryB.populationRaw && countryA.populationRaw > 0 ? ' facts-win' : ''}`}>{countryA.population}</span>
+              <span class="facts-m">{t.populationLabel}</span>
+              <span class={`facts-b${countryB.populationRaw > countryA.populationRaw ? ' facts-win' : ''}`}>{countryB.population}</span>
+            </div>
+          ) : null}
+          {countryA.area !== '—' || countryB.area !== '—' ? (
+            <div class="facts-row">
+              <span class={`facts-a${countryA.areaRaw >= countryB.areaRaw && countryA.areaRaw > 0 ? ' facts-win' : ''}`}>{countryA.area !== '—' ? `${countryA.area} km²` : '—'}</span>
+              <span class="facts-m">{t.areaLabel}</span>
+              <span class={`facts-b${countryB.areaRaw > countryA.areaRaw ? ' facts-win' : ''}`}>{countryB.area !== '—' ? `${countryB.area} km²` : '—'}</span>
+            </div>
+          ) : null}
+          {countryA.language !== '—' || countryB.language !== '—' ? (
+            <div class="facts-row">
+              <span class="facts-a">{countryA.language}</span>
+              <span class="facts-m">{t.languageLabel}</span>
+              <span class="facts-b">{countryB.language}</span>
+            </div>
+          ) : null}
+          {countryA.currency !== '—' || countryB.currency !== '—' ? (
+            <div class="facts-row">
+              <span class="facts-a">{countryA.currency}</span>
+              <span class="facts-m">{t.currencyLabel}</span>
+              <span class="facts-b">{countryB.currency}</span>
+            </div>
+          ) : null}
+          {countryA.sport !== '—' || countryB.sport !== '—' ? (
+            <div class="facts-row">
+              <span class="facts-a">{countryA.sport}</span>
+              <span class="facts-m">{t.nationalSportLabel}</span>
+              <span class="facts-b">{countryB.sport}</span>
+            </div>
+          ) : null}
+          {(countryA.dish || countryB.dish) ? (
+            <div class="facts-row">
+              <span class="facts-a">{countryA.dish || '—'}</span>
+              <span class="facts-m">{t.nationalDishLabel}</span>
+              <span class="facts-b">{countryB.dish || '—'}</span>
+            </div>
+          ) : null}
+          {(countryA.peak || countryB.peak) ? (
+            <div class="facts-row">
+              <span class={`facts-a${countryA.peak && countryB.peak && countryA.peak.elevation >= countryB.peak.elevation ? ' facts-win' : ''}`}>
+                {countryA.peak ? `${countryA.peak.name} · ${countryA.peak.elevation.toLocaleString('en-US')} m` : '—'}
+              </span>
+              <span class="facts-m">{t.highestPeakLabel}</span>
+              <span class={`facts-b${countryA.peak && countryB.peak && countryB.peak.elevation > countryA.peak.elevation ? ' facts-win' : ''}`}>
+                {countryB.peak ? `${countryB.peak.name} · ${countryB.peak.elevation.toLocaleString('en-US')} m` : '—'}
+              </span>
+            </div>
+          ) : null}
+        </div>
+      </section>
+
+      <!-- 5 ── Travel Index ────────────────────────────────────────── -->
+      <section class="section">
+        <h2 class="sh">{t.travelIndex}</h2>
+        <div class="ti">
+          <!-- Header row -->
+          <div class="ti-head">
+            <span></span>
+            <span class="ti-country-label" style={`color:${accentA};`}>{countryA.flag} {countryA.name}</span>
+            <span class="ti-country-label" style={`color:${accentB};`}>{countryB.flag} {countryB.name}</span>
+          </div>
+          <!-- Score rows — computed in frontmatter to avoid TS cast issues in JSX -->
+          {travelRows.map(row => (
+            <div class="ti-row">
+              <span class="ti-label">{row.icon} {row.label}</span>
+              <div class="ti-bar-wrap">
+                <div class="ti-bar" style={`--pct:${row.sA / 5 * 100}%;--col:${accentA};`}></div>
+                <span class={row.sA > row.sB ? 'ti-score ti-score--win' : 'ti-score'} style={row.sA > row.sB ? `color:${accentA};` : ''}>{row.sA}/5</span>
+              </div>
+              <div class="ti-bar-wrap">
+                <div class="ti-bar" style={`--pct:${row.sB / 5 * 100}%;--col:${accentB};`}></div>
+                <span class={row.sB > row.sA ? 'ti-score ti-score--win' : 'ti-score'} style={row.sB > row.sA ? `color:${accentB};` : ''}>{row.sB}/5</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <!-- Best for verdict cards -->
+        <div class="ti-verdicts">
+          <div class="ti-verdict" style={`--vc:${accentA};`}>
+            <span class="ti-verdict-flag">{countryA.flag}</span>
+            <div>
+              <p class="ti-verdict-kicker">{t.bestFor}</p>
+              <p class="ti-verdict-value">{top2A.join(' & ')}</p>
+            </div>
+          </div>
+          <div class="ti-verdict" style={`--vc:${accentB};`}>
+            <span class="ti-verdict-flag">{countryB.flag}</span>
+            <div>
+              <p class="ti-verdict-kicker">{t.bestFor}</p>
+              <p class="ti-verdict-value">{top2B.join(' & ')}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6 ── Geography & Nature ──────────────────────────────────── -->
+      <section class="section">
+        <h2 class="sh">{t.geographyNature}</h2>
+        <div class="duo">
+          <div class="duo-card">
+            <div class="duo-head" style={`--dh:${accentA};`}>{countryA.flag} {countryA.name}</div>
+            <div class="dr-list">
+              {countryA.area !== '—' && <div class="dr"><span class="dr-l">{t.areaLabel}</span><span class="dr-v">{countryA.area} km²</span></div>}
+              {exA.climate && <div class="dr"><span class="dr-l">{t.climateLabel}</span><span class="dr-v">{exA.climate}</span></div>}
+              {countryA.peak && <div class="dr"><span class="dr-l">{t.highestPeakLabel}</span><span class="dr-v">{countryA.peak.name} · {countryA.peak.elevation.toLocaleString('en-US')} m</span></div>}
+              <div class="dr"><span class="dr-l">{t.coastlineLabel}</span><span class="dr-v">{exA.landlocked ? t.landlocked : t.coastal}</span></div>
+            </div>
+          </div>
+          <div class="duo-card">
+            <div class="duo-head" style={`--dh:${accentB};`}>{countryB.flag} {countryB.name}</div>
+            <div class="dr-list">
+              {countryB.area !== '—' && <div class="dr"><span class="dr-l">{t.areaLabel}</span><span class="dr-v">{countryB.area} km²</span></div>}
+              {exB.climate && <div class="dr"><span class="dr-l">{t.climateLabel}</span><span class="dr-v">{exB.climate}</span></div>}
+              {countryB.peak && <div class="dr"><span class="dr-l">{t.highestPeakLabel}</span><span class="dr-v">{countryB.peak.name} · {countryB.peak.elevation.toLocaleString('en-US')} m</span></div>}
+              <div class="dr"><span class="dr-l">{t.coastlineLabel}</span><span class="dr-v">{exB.landlocked ? t.landlocked : t.coastal}</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7 ── People & Culture ────────────────────────────────────── -->
+      <section class="section">
+        <h2 class="sh">{t.peopleCulture}</h2>
+        <div class="duo">
+          <div class="duo-card">
+            <div class="duo-head" style={`--dh:${accentA};`}>{countryA.flag} {countryA.name}</div>
+            <div class="dr-list">
+              {countryA.population !== '—' && <div class="dr"><span class="dr-l">{t.populationLabel}</span><span class="dr-v">{countryA.population}</span></div>}
+              {(countryA.populationRaw && countryA.areaRaw) ? <div class="dr"><span class="dr-l">{t.densityLabel}</span><span class="dr-v">{density(countryA.populationRaw, countryA.areaRaw)}</span></div> : null}
+              {countryA.language !== '—' && <div class="dr"><span class="dr-l">{countryA.language.includes(',') ? t.languagesLabel : t.languageLabel}</span><span class="dr-v">{countryA.language}</span></div>}
+              {exA.religion && <div class="dr"><span class="dr-l">{t.religionLabel}</span><span class="dr-v">{exA.religion}</span></div>}
+              {exA.hdi && <div class="dr"><span class="dr-l">{t.hdiTierLabel}</span><span class={`dr-v dr-hdi dr-hdi--${exA.hdi}`}>{exA.hdi.charAt(0).toUpperCase() + exA.hdi.slice(1)}</span></div>}
+            </div>
+          </div>
+          <div class="duo-card">
+            <div class="duo-head" style={`--dh:${accentB};`}>{countryB.flag} {countryB.name}</div>
+            <div class="dr-list">
+              {countryB.population !== '—' && <div class="dr"><span class="dr-l">{t.populationLabel}</span><span class="dr-v">{countryB.population}</span></div>}
+              {(countryB.populationRaw && countryB.areaRaw) ? <div class="dr"><span class="dr-l">{t.densityLabel}</span><span class="dr-v">{density(countryB.populationRaw, countryB.areaRaw)}</span></div> : null}
+              {countryB.language !== '—' && <div class="dr"><span class="dr-l">{countryB.language.includes(',') ? t.languagesLabel : t.languageLabel}</span><span class="dr-v">{countryB.language}</span></div>}
+              {exB.religion && <div class="dr"><span class="dr-l">{t.religionLabel}</span><span class="dr-v">{exB.religion}</span></div>}
+              {exB.hdi && <div class="dr"><span class="dr-l">{t.hdiTierLabel}</span><span class={`dr-v dr-hdi dr-hdi--${exB.hdi}`}>{exB.hdi.charAt(0).toUpperCase() + exB.hdi.slice(1)}</span></div>}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8 ── Food & Cuisine ──────────────────────────────────────── -->
+      <section class="section">
+        <h2 class="sh">{t.foodCuisine}</h2>
+        <div class="duo">
+          <div class="duo-card">
+            <div class="duo-head" style={`--dh:${accentA};`}>{countryA.flag} {countryA.name}</div>
+            <div class="dr-list">
+              {countryA.dish && <div class="dr"><span class="dr-l">{t.nationalDishLabel}</span><span class="dr-v">{countryA.dish}</span></div>}
+              {exA.dishes?.length > 0 && (
+                <div class="dr dr--wrap">
+                  <span class="dr-l">{t.alsoKnownFor}</span>
+                  <span class="dr-v dr-pills">
+                    {(exA.dishes as string[]).map((d: string) => <span class="pill-sm">{d}</span>)}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+          <div class="duo-card">
+            <div class="duo-head" style={`--dh:${accentB};`}>{countryB.flag} {countryB.name}</div>
+            <div class="dr-list">
+              {countryB.dish && <div class="dr"><span class="dr-l">{t.nationalDishLabel}</span><span class="dr-v">{countryB.dish}</span></div>}
+              {exB.dishes?.length > 0 && (
+                <div class="dr dr--wrap">
+                  <span class="dr-l">Also known for</span>
+                  <span class="dr-v dr-pills">
+                    {(exB.dishes as string[]).map((d: string) => <span class="pill-sm">{d}</span>)}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9 ── Sport ───────────────────────────────────────────────── -->
+      <section class="section">
+        <h2 class="sh">{t.sportSection}</h2>
+        <div class="duo">
+          <div class="duo-card">
+            <div class="duo-head" style={`--dh:${accentA};`}>{countryA.flag} {countryA.name}</div>
+            <div class="dr-list">
+              {countryA.sport !== '—' && <div class="dr"><span class="dr-l">{t.nationalSportLabel}</span><span class="dr-v">{countryA.sport}</span></div>}
+              {exA.athletes?.length > 0 && (exA.athletes as string[]).map((a: string) => (
+                <div class="dr"><span class="dr-l dr-l--ath">★</span><span class="dr-v">{a}</span></div>
+              ))}
+            </div>
+          </div>
+          <div class="duo-card">
+            <div class="duo-head" style={`--dh:${accentB};`}>{countryB.flag} {countryB.name}</div>
+            <div class="dr-list">
+              {countryB.sport !== '—' && <div class="dr"><span class="dr-l">{t.nationalSportLabel}</span><span class="dr-v">{countryB.sport}</span></div>}
+              {exB.athletes?.length > 0 && (exB.athletes as string[]).map((a: string) => (
+                <div class="dr"><span class="dr-l dr-l--ath">★</span><span class="dr-v">{a}</span></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10 ── Which should you visit? ────────────────────────────── -->
+      <section class="section">
+        {(dntA || dntB) ? (
+          <div class="advisory-info-block">
+            {dntA && (
+              <p class="advisory-info-msg">
+                <strong>⛔ {countryA.name}:</strong>{t.advisoryDntInfoPost}
+              </p>
+            )}
+            {dntB && (
+              <p class="advisory-info-msg">
+                <strong>⛔ {countryB.name}:</strong>{t.advisoryDntInfoPost}
+              </p>
+            )}
+            {(!dntA || !dntB) && (
+              <>
+                <h2 class="sh">{dntA ? countryB.name : countryA.name} — {t.keyContext}</h2>
+                <blockquote class="editorial">{editorial}</blockquote>
+              </>
+            )}
+          </div>
+        ) : (
+          <>
+            <h2 class="sh">{t.whichVisit}</h2>
+            <blockquote class="editorial">{editorial}</blockquote>
+          </>
+        )}
+      </section>
+
+      <!-- 11 ── Explore each country ───────────────────────────────── -->
+      <section class="section">
+        <h2 class="sh">{t.countryProfiles}</h2>
+        <div class="cta-row">
+          {dntA ? (
+            <div class="cta-card cta-card--dnt" style={`--cc:${accentA};`}>
+              <span class="cta-flag">{countryA.flag}</span>
+              <span class="cta-name">{countryA.name}</span>
+              <span class="cta-sub cta-sub--dnt">{t.informationalOnly}</span>
+            </div>
+          ) : (
+            <a href={`/country/${countryA.slug}/`} class="cta-card" style={`--cc:${accentA};`}>
+              <span class="cta-flag">{countryA.flag}</span>
+              <span class="cta-name">{countryA.name}</span>
+              <span class="cta-sub">{labelA}</span>
+              <span class="cta-arr">→</span>
+            </a>
+          )}
+          {dntB ? (
+            <div class="cta-card cta-card--dnt" style={`--cc:${accentB};`}>
+              <span class="cta-flag">{countryB.flag}</span>
+              <span class="cta-name">{countryB.name}</span>
+              <span class="cta-sub cta-sub--dnt">{t.informationalOnly}</span>
+            </div>
+          ) : (
+            <a href={`/country/${countryB.slug}/`} class="cta-card" style={`--cc:${accentB};`}>
+              <span class="cta-flag">{countryB.flag}</span>
+              <span class="cta-name">{countryB.name}</span>
+              <span class="cta-sub">{labelB}</span>
+              <span class="cta-arr">→</span>
+            </a>
+          )}
+        </div>
+      </section>
+
+      <!-- 12 ── More comparisons ────────────────────────────────────── -->
+      {moreSlice.length > 0 && (
+        <section class="section">
+          <h2 class="sh">{t.moreComparisons}</h2>
+          <div class="pills">
+            {moreSlice.map(m => <a href={m.href} class="pill">{m.label}</a>)}
+          </div>
+        </section>
+      )}
+
+      <!-- 13 ── Neighbouring countries ─────────────────────────────── -->
+      {(countryA.borderCountries.length > 0 || countryB.borderCountries.length > 0) && (
+        <section class="section neighbours-section">
+          {countryA.borderCountries.length > 0 && (
+            <div>
+              <h2 class="sh sh--inline">{countryA.flag} {countryA.name} {t.borders}</h2>
+              <div class="pills">
+                {countryA.borderCountries.map((b:any) => (
+                  <a href={`/country/${b.slug}/`} class="pill pill--sm">{b.name}</a>
+                ))}
+              </div>
+            </div>
+          )}
+          {countryB.borderCountries.length > 0 && (
+            <div>
+              <h2 class="sh sh--inline">{countryB.flag} {countryB.name} {t.borders}</h2>
+              <div class="pills">
+                {countryB.borderCountries.map((b:any) => (
+                  <a href={`/country/${b.slug}/`} class="pill pill--sm">{b.name}</a>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      <!-- World map CTA -->
+      <div class="map-cta">
+        <a href="/map" class="map-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+          {t.backToWorldMap}
+        </a>
+      </div>
+
+    </div>{/* pg-wrap */}
+  </div>{/* pg */}
+
+</Base>
+
+<style is:global>
+  html, body { overflow: auto !important; height: auto !important; background: #0d1117 !important; }
+.sw-drop { background:#18181f !important; }
+.ac-opt { color:rgba(255,255,255,0.75) !important; background:transparent; }
+.ac-opt:hover, .ac-opt--on { background:rgba(255,255,255,0.07) !important; color:#fff !important; }
+</style>
+
+<style>
+/* ── Tokens & reset ── */
+:root {
+  --bg:  #0d1117;
+  --bg2: #13161e;
+  --bg3: #1a1d28;
+  --bd:  rgba(255,255,255,0.07);
+  --bd2: rgba(255,255,255,0.12);
+  --t1:  rgba(255,255,255,0.92);
+  --t2:  rgba(255,255,255,0.62);
+  --t3:  rgba(255,255,255,0.28);
+  --t4:  rgba(255,255,255,0.14);
+  --r:   14px;
+}
+
+/* ── Page ── */
+.pg {
+  position: relative;
+  min-height: 100vh;
+  background: var(--bg);
+}
+.pg::before {
+  content: '';
+  position: fixed; top: -25vh; left: 50%;
+  transform: translateX(-50%);
+  width: 1200px; height: 700px;
+  background:
+    radial-gradient(ellipse at 28% 0%, color-mix(in srgb, var(--ca) 14%, transparent), transparent 55%),
+    radial-gradient(ellipse at 72% 0%, color-mix(in srgb, var(--cb) 14%, transparent), transparent 55%);
+  pointer-events: none; z-index: 0;
+}
+.pg-deco { position:fixed; inset:0; pointer-events:none; z-index:1; overflow:hidden; }
+.pg-ring {
+  position:absolute; border-radius:50%;
+}
+.pg-ring-1 { width:90vmax;height:90vmax;top:50%;left:25%;transform:translate(-50%,-50%); border:0.5px solid color-mix(in srgb,var(--ca) 9%,transparent); }
+.pg-ring-2 { width:80vmax;height:80vmax;top:50%;left:75%;transform:translate(-50%,-50%); border:0.5px solid color-mix(in srgb,var(--cb) 7%,transparent); }
+.pg-ring-3 { width:55vmax;height:55vmax;top:50%;left:50%;transform:translate(-50%,-50%); border:0.5px solid rgba(255,255,255,0.04); }
+
+.pg-wrap {
+  position: relative; z-index: 2;
+  max-width: 980px; margin: 0 auto;
+  padding: 40px 24px 100px;
+  animation: pg-in .5s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes pg-in { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+
+/* ── Advisory banners ── */
+.advisory {
+  display: flex; align-items: flex-start; gap: 10px;
+  border-radius: 10px; padding: 14px 18px;
+  font-size: 13px; line-height: 1.55;
+  margin-bottom: 28px;
+}
+.advisory--reconsider {
+  background: rgba(255,180,0,0.10);
+  border: 1px solid rgba(255,180,0,0.30);
+  color: #ffd166;
+}
+.advisory-icon { flex-shrink: 0; font-size: 15px; line-height: 1.4; }
+.advisory-info-block { display: flex; flex-direction: column; gap: 14px; }
+.advisory-info-msg {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: rgba(255,80,80,0.08);
+  border: 1px solid rgba(255,80,80,0.22);
+  border-radius: 10px; padding: 14px 18px;
+  font-size: 13px; line-height: 1.55; color: rgba(255,255,255,0.72);
+  margin: 0;
+}
+.cta-card--dnt { cursor: default; opacity: 0.6; pointer-events: none; }
+.cta-sub--dnt { color: rgba(255,100,100,0.7) !important; font-size: 11px !important; }
+
+/* ── Breadcrumb ── */
+.breadcrumb {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+  font-size: 11px; color: var(--t3);
+  margin-bottom: 52px;
+}
+.breadcrumb a { color: var(--t3); text-decoration: none; transition: color .18s; }
+.breadcrumb a:hover { color: var(--t2); }
+
+/* ── Hero ── */
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 72px 1fr;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 56px;
+  text-align: center;
+  padding: 48px 32px 52px;
+  border-radius: 20px;
+  border: 0.5px solid var(--bd);
+  background: var(--bg2);
+  overflow: hidden;
+}
+
+/* Globe decorative circles */
+.hero-globe {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hero-globe--a {
+  width: 380px; height: 380px;
+  top: 50%; left: -60px;
+  transform: translateY(-50%);
+  background: radial-gradient(circle at center, color-mix(in srgb,var(--ca) 7%,transparent), transparent 70%);
+  border: 0.5px solid color-mix(in srgb,var(--ca) 12%,transparent);
+}
+.hero-globe--b {
+  width: 380px; height: 380px;
+  top: 50%; right: -60px;
+  transform: translateY(-50%);
+  background: radial-gradient(circle at center, color-mix(in srgb,var(--cb) 7%,transparent), transparent 70%);
+  border: 0.5px solid color-mix(in srgb,var(--cb) 12%,transparent);
+}
+
+.hero-side {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  z-index: 1;
+}
+
+/* Large country code behind flag */
+.hero-code {
+  position: absolute;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(72px, 14vw, 130px);
+  font-weight: 700;
+  color: rgba(255,255,255,0.028);
+  letter-spacing: 0.05em;
+  line-height: 1;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.hero-flag {
+  font-size: 64px; line-height: 1;
+  filter: drop-shadow(0 6px 24px rgba(0,0,0,0.5));
+}
+.hero-name {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(22px, 3.5vw, 36px);
+  font-weight: 700; line-height: 1.1; margin: 0;
+}
+.hero-name--a { color: color-mix(in srgb,var(--ca) 75%,var(--t1)); }
+.hero-name--b { color: color-mix(in srgb,var(--cb) 75%,var(--t1)); }
+.hero-vibe {
+  font-size: 10px; color: var(--t3);
+  letter-spacing: 0.18em; font-variant: small-caps; margin: 0;
+}
+.hero-tag {
+  display: inline-block; font-size: 9px; letter-spacing: 0.18em;
+  text-transform: uppercase; padding: 3px 10px; border-radius: 20px;
+  color: var(--t); border: 0.5px solid color-mix(in srgb,var(--t) 30%,transparent);
+  background: color-mix(in srgb,var(--t) 8%,transparent);
+}
+.hero-vs {
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1;
+}
+.hero-vs-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.25em;
+  color: var(--t4);
+  width: 46px; height: 46px;
+  display: flex; align-items: center; justify-content: center;
+  border: 0.5px solid var(--bd);
+  border-radius: 50%;
+  background: var(--bg3);
+}
+
+/* ── Switcher ── */
+.switcher {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  align-items: flex-end; gap: 12px;
+  padding: 18px 20px;
+  background: var(--bg2); border: 0.5px solid var(--bd);
+  border-radius: var(--r); margin-bottom: 52px;
+}
+.sw-label {
+  display: block; font-size: 8px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--t3); margin-bottom: 7px;
+}
+.sw-wrap { position: relative; }
+.sw-input {
+  width: 100%; box-sizing: border-box;
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid var(--bd2); border-radius: 9px;
+  padding: 10px 13px; font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--t1); outline: none;
+  transition: border-color .18s, background .18s;
+}
+.sw-input:focus { border-color: rgba(255,255,255,0.28); background: rgba(255,255,255,0.07); }
+.sw-input::placeholder { color: var(--t3); }
+.sw-drop {
+  position: absolute; top: calc(100% + 5px); left: 0; right: 0; z-index: 200;
+  background: #141820; border: 0.5px solid var(--bd2);
+  border-radius: 9px; overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.65);
+}
+.sw-drop[hidden] { display: none; }
+.ac-opt {
+  padding: 10px 13px; font-size: 13px; color: var(--t2); cursor: pointer;
+  border-bottom: 0.5px solid rgba(255,255,255,0.04);
+  transition: background .1s, color .1s;
+}
+.ac-opt:last-child { border-bottom: none; }
+.ac-opt:hover, .ac-opt--on { background: rgba(255,255,255,0.07); color: var(--t1); }
+.sw-swap {
+  width: 38px; height: 38px; flex-shrink: 0; margin-bottom: 1px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04); border: 0.5px solid var(--bd2);
+  color: var(--t3); cursor: pointer;
+  transition: background .18s, color .18s, transform .3s;
+}
+.sw-swap:hover { background: rgba(255,255,255,0.09); color: var(--t1); transform: rotate(180deg); }
+
+/* ── Sections ── */
+.section { margin-bottom: 56px; }
+.sh {
+  font-size: 9px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--t3); margin: 0 0 18px;
+}
+.sh--inline { display: inline-block; margin-bottom: 10px; }
+
+/* ── Key facts ── */
+.facts {
+  border: 0.5px solid var(--bd); border-radius: var(--r); overflow: hidden;
+}
+.facts-head, .facts-row {
+  display: grid; grid-template-columns: 1fr 130px 1fr; align-items: center;
+}
+.facts-head {
+  background: rgba(255,255,255,0.03);
+  border-bottom: 0.5px solid var(--bd);
+  padding: 10px 0;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.facts-row {
+  border-bottom: 0.5px solid rgba(255,255,255,0.04);
+  transition: background .14s;
+}
+.facts-row:last-child { border-bottom: none; }
+.facts-row:hover { background: rgba(255,255,255,0.02); }
+.facts-a, .facts-b, .facts-m { padding: 12px 16px; font-size: 13px; color: var(--t2); line-height: 1.4; }
+.facts-a { text-align: right; }
+.facts-b { text-align: left; }
+.facts-head .facts-a { padding-right: 20px; }
+.facts-head .facts-b { padding-left: 20px; }
+.facts-m {
+  text-align: center; font-size: 8px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.14em; color: var(--t3);
+}
+.facts-win { color: var(--t1) !important; font-weight: 500; }
+
+/* ── Travel Index ── */
+.ti {
+  border: 0.5px solid var(--bd); border-radius: var(--r); overflow: hidden;
+  margin-bottom: 14px;
+}
+.ti-head {
+  display: grid; grid-template-columns: 200px 1fr 1fr;
+  gap: 0; background: rgba(255,255,255,0.03);
+  border-bottom: 0.5px solid var(--bd); padding: 10px 16px;
+}
+.ti-country-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  text-align: center; padding: 0 8px;
+}
+.ti-row {
+  display: grid; grid-template-columns: 200px 1fr 1fr;
+  align-items: center;
+  border-bottom: 0.5px solid rgba(255,255,255,0.04);
+  padding: 12px 16px; gap: 12px;
+  transition: background .14s;
+}
+.ti-row:last-child { border-bottom: none; }
+.ti-row:hover { background: rgba(255,255,255,0.02); }
+.ti-label { font-size: 12px; color: var(--t2); }
+.ti-bar-wrap {
+  display: flex; align-items: center; gap: 8px;
+}
+.ti-bar {
+  flex: 1; height: 6px; border-radius: 3px;
+  background: rgba(255,255,255,0.06);
+  position: relative; overflow: hidden;
+}
+.ti-bar::after {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 0;
+  width: var(--pct); background: var(--col);
+  border-radius: 3px;
+  transition: width .6s cubic-bezier(.22,1,.36,1);
+}
+.ti-score {
+  font-size: 11px; font-weight: 600; color: var(--t3);
+  min-width: 26px; text-align: right;
+  transition: color .18s;
+}
+.ti-score--win { font-weight: 700; }
+
+/* Verdict cards */
+.ti-verdicts {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+.ti-verdict {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 18px;
+  background: color-mix(in srgb,var(--vc) 5%,var(--bg2));
+  border: 0.5px solid color-mix(in srgb,var(--vc) 22%,transparent);
+  border-radius: var(--r);
+}
+.ti-verdict-flag { font-size: 28px; line-height: 1; flex-shrink: 0; }
+.ti-verdict-kicker {
+  font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--vc); margin: 0 0 4px; opacity: 0.85;
+}
+.ti-verdict-value {
+  font-size: 13px; color: var(--t1); font-weight: 500; margin: 0; line-height: 1.3;
+}
+
+/* ── Data rows (dr) — label/value inside duo-cards ── */
+.dr-list { display: flex; flex-direction: column; gap: 0; }
+.dr {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 8px; padding: 8px 0;
+  border-bottom: 0.5px solid rgba(255,255,255,0.05);
+  font-size: 12.5px;
+}
+.dr:last-child { border-bottom: none; padding-bottom: 0; }
+.dr--wrap { align-items: flex-start; flex-wrap: wrap; }
+.dr-l {
+  flex-shrink: 0; color: var(--t3); font-size: 11px;
+  text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;
+  min-width: 80px;
+}
+.dr-l--ath { color: rgba(255,200,50,0.6); min-width: 16px; text-align: center; letter-spacing: 0; }
+.dr-v { color: var(--t1); text-align: right; line-height: 1.4; }
+.dr-pills { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
+.pill-sm {
+  font-size: 10.5px; padding: 2px 8px; border-radius: 20px;
+  background: rgba(255,255,255,0.07); color: var(--t2);
+  border: 0.5px solid rgba(255,255,255,0.10);
+}
+.dr-hdi { font-weight: 700; }
+.dr-hdi--high   { color: #69d89a; }
+.dr-hdi--medium { color: #ffb74d; }
+.dr-hdi--low    { color: #ff7373; }
+
+/* ── Duo cards (Geography, People, Food, Sport) ── */
+.duo {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+.duo-card {
+  padding: 22px 22px 18px;
+  background: var(--bg2); border: 0.5px solid var(--bd);
+  border-radius: var(--r);
+  display: flex; flex-direction: column; gap: 12px;
+  transition: border-color .18s;
+}
+.duo-card:hover { border-color: var(--bd2); }
+.duo-head {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--dh);
+}
+.duo-text {
+  font-size: 13.5px; line-height: 1.85;
+  color: var(--t2); margin: 0; flex: 1;
+}
+.duo-text strong { color: var(--t1); font-weight: 500; }
+.duo-link {
+  display: inline-block; font-size: 11.5px;
+  color: var(--dl); text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: opacity .18s;
+  margin-top: auto;
+  padding-top: 4px;
+}
+.duo-link:hover { opacity: 0.7; }
+
+/* ── Editorial ── */
+.editorial {
+  font-family: 'Playfair Display', serif; font-style: italic;
+  font-size: 15.5px; line-height: 1.95; color: var(--t2);
+  padding: 24px 30px; margin: 0;
+  background: var(--bg2);
+  border-left: 2px solid;
+  border-image: linear-gradient(to bottom, var(--ca), var(--cb)) 1;
+  border-radius: 0 var(--r) var(--r) 0;
+}
+
+/* ── CTA row ── */
+.cta-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.cta-card {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 26px 18px; border-radius: var(--r); text-decoration: none;
+  text-align: center;
+  background: color-mix(in srgb,var(--cc) 5%,var(--bg2));
+  border: 0.5px solid color-mix(in srgb,var(--cc) 20%,var(--bd));
+  transition: background .2s, border-color .2s, transform .2s;
+}
+.cta-card:hover {
+  background: color-mix(in srgb,var(--cc) 10%,var(--bg2));
+  border-color: color-mix(in srgb,var(--cc) 40%,transparent);
+  transform: translateY(-2px);
+}
+.cta-flag { font-size: 44px; line-height: 1; }
+.cta-name { font-size: 17px; font-weight: 600; color: var(--t1); font-family: 'Playfair Display', serif; }
+.cta-sub  { font-size: 9px; text-transform: uppercase; letter-spacing: 0.16em; color: var(--cc); opacity: 0.8; }
+.cta-arr  { font-size: 14px; color: var(--cc); opacity: 0.55; }
+
+/* ── Pills ── */
+.pills { display: flex; flex-wrap: wrap; gap: 7px; }
+.pill {
+  font-size: 12px; color: var(--t3); text-decoration: none;
+  padding: 5px 14px; border: 0.5px solid var(--bd);
+  border-radius: 20px; background: rgba(255,255,255,0.025);
+  white-space: nowrap;
+  transition: color .18s, border-color .18s, background .18s;
+}
+.pill:hover {
+  color: var(--t1); border-color: var(--bd2);
+  background: rgba(255,255,255,0.06);
+}
+.pill--sm { font-size: 11px; padding: 4px 11px; }
+
+/* ── Neighbours ── */
+.neighbours-section { display: flex; flex-direction: column; gap: 20px; }
+
+/* ── Map CTA ── */
+.map-cta { margin-top: 48px; padding-top: 28px; border-top: 0.5px solid rgba(255,255,255,0.05); text-align: center; }
+.map-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 26px; border-radius: 28px;
+  background: rgba(255,255,255,0.04); border: 0.5px solid var(--bd2);
+  font-size: 12.5px; color: var(--t3); text-decoration: none; letter-spacing: 0.04em;
+  transition: background .2s, color .2s;
+}
+.map-btn:hover { background: rgba(255,255,255,0.08); color: var(--t1); }
+
+/* ── Mobile ── */
+@media (max-width: 640px) {
+  .hero { grid-template-columns: 1fr; gap: 16px; padding: 32px 20px 36px; }
+  .hero-vs { order: -1; }
+  .hero-globe { display: none; }
+  .switcher { grid-template-columns: 1fr; gap: 10px; }
+  .sw-swap { margin: 0 auto; }
+  .facts-head { display: none; }
+  .facts-a, .facts-b, .facts-m { padding: 9px 8px; font-size: 12px; }
+  .facts-m { font-size: 7px; }
+  .ti-head { display: none; }
+  .ti-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ti-label { grid-column: 1 / -1; font-size: 11px; }
+  .ti-verdicts, .duo, .cta-row { grid-template-columns: 1fr; }
+}
+</style>
+
+<script>
+  const countries: {name:string;slug:string}[] = JSON.parse(document.getElementById('cmp-countries')!.textContent!);
+
+  let slugA = (document.querySelector('.hero-name--a') as HTMLElement)?.closest('.hero-side')?.querySelector<HTMLElement>('.hero-name')?.dataset.slug ?? '';
+  let slugB = (document.querySelector('.hero-name--b') as HTMLElement)?.closest('.hero-side')?.querySelector<HTMLElement>('.hero-name')?.dataset.slug ?? '';
+
+  // Read current slugs from URL path: /compare/france-vs-germany/
+  const path = window.location.pathname.replace(/\/$/, '');
+  const seg  = path.split('/').pop() || '';
+  const vsIdx = seg.indexOf('-vs-');
+  if (vsIdx > -1) {
+    slugA = seg.slice(0, vsIdx);
+    slugB = seg.slice(vsIdx + 4);
+  }
+
+  function autocomplete(inputEl: HTMLInputElement, dropEl: HTMLElement, onPick: (c:{name:string;slug:string})=>void) {
+    let ai = -1;
+
+    const render = (q: string) => {
+      dropEl.innerHTML = ''; ai = -1;
+      if (!q.trim()) { dropEl.hidden = true; return; }
+      const lo = q.toLowerCase();
+      const hits = countries
+        .filter(c => c.name.toLowerCase().includes(lo))
+        .sort((a,b) => {
+          const as = a.name.toLowerCase().startsWith(lo), bs = b.name.toLowerCase().startsWith(lo);
+          return as === bs ? a.name.localeCompare(b.name) : as ? -1 : 1;
+        }).slice(0,8);
+      if (!hits.length) { dropEl.hidden = true; return; }
+      hits.forEach(c => {
+        const d = document.createElement('div');
+        d.className = 'ac-opt'; d.dataset.slug = c.slug; d.textContent = c.name;
+        d.addEventListener('mousedown', e => { e.preventDefault(); pick(c); });
+        dropEl.appendChild(d);
+      });
+      dropEl.hidden = false;
+    };
+
+    const pick = (c:{name:string;slug:string}) => {
+      inputEl.value = c.name; dropEl.hidden = true; ai = -1; onPick(c);
+    };
+
+    const setActive = (i:number) => {
+      dropEl.querySelectorAll<HTMLElement>('.ac-opt').forEach((o,j) => o.classList.toggle('ac-opt--on', j===i));
+      ai = i;
+    };
+
+    inputEl.addEventListener('input',  () => render(inputEl.value));
+    inputEl.addEventListener('focus',  () => { if(inputEl.value) render(inputEl.value); });
+    inputEl.addEventListener('blur',   () => setTimeout(() => { dropEl.hidden=true; }, 200));
+    inputEl.addEventListener('keydown', e => {
+      const opts = dropEl.querySelectorAll<HTMLElement>('.ac-opt');
+      if      (e.key==='ArrowDown')            { e.preventDefault(); setActive(Math.min(ai+1,opts.length-1)); }
+      else if (e.key==='ArrowUp')              { e.preventDefault(); setActive(Math.max(ai-1,-1)); }
+      else if (e.key==='Enter' && ai>=0)       { e.preventDefault(); const c=countries.find(x=>x.slug===opts[ai].dataset.slug); if(c) pick(c); }
+      else if (e.key==='Escape')               { dropEl.hidden=true; inputEl.blur(); }
+    });
+
+    return { setValue: (name:string) => { inputEl.value = name; } };
+  }
+
+  function go() {
+    if (slugA && slugB && slugA !== slugB)
+      window.location.href = `/compare/${slugA}-vs-${slugB}/`;
+  }
+
+  const inputA = document.getElementById('sw-a')      as HTMLInputElement;
+  const inputB = document.getElementById('sw-b')      as HTMLInputElement;
+  const dropA  = document.getElementById('sw-drop-a') as HTMLElement;
+  const dropB  = document.getElementById('sw-drop-b') as HTMLElement;
+  const swap   = document.getElementById('sw-swap')   as HTMLButtonElement;
+
+  const acA = autocomplete(inputA, dropA, c => { slugA = c.slug; go(); });
+  const acB = autocomplete(inputB, dropB, c => { slugB = c.slug; go(); });
+
+  const cA = countries.find(c=>c.slug===slugA), cB = countries.find(c=>c.slug===slugB);
+  if (cA) acA.setValue(cA.name);
+  if (cB) acB.setValue(cB.name);
+
+  swap.addEventListener('click', () => {
+    [slugA, slugB] = [slugB, slugA];
+    const a = countries.find(c=>c.slug===slugA), b = countries.find(c=>c.slug===slugB);
+    if(a) acA.setValue(a.name); if(b) acB.setValue(b.name);
+    go();
+  });
+</script>

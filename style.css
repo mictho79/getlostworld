@@ -1,0 +1,536 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  background: #0a0a0f;
+  font-family: 'DM Sans', sans-serif;
+  overflow: hidden;
+}
+
+/* ── Left sidebar ───────────────────────────────────────── */
+#sidebar {
+  position: fixed;
+  top: 0; left: 0;
+  width: 320px; height: 100%;
+  z-index: 9500;
+  background: rgba(10, 15, 26, 0.92);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border-right: 0.5px solid rgba(255,255,255,0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Welcome state */
+#sb-welcome {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 40px 32px;
+  text-align: center;
+  transition: opacity 0.3s ease;
+}
+
+.sb-globe {
+  font-size: 52px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 16px rgba(80,140,255,0.3));
+}
+
+.sb-welcome-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.88);
+  letter-spacing: 0.02em;
+}
+
+.sb-welcome-hint {
+  font-size: 13px;
+  color: rgba(255,255,255,0.28);
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  max-width: 200px;
+}
+
+.sb-welcome-divider {
+  width: 32px; height: 1px;
+  background: rgba(255,255,255,0.1);
+  margin: 4px auto;
+}
+
+/* Country state */
+#sb-country {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  padding: 36px 26px 28px;
+  min-height: 0;
+}
+
+@keyframes sb-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+#sb-country.sb-animate {
+  animation: sb-in 0.22s ease forwards;
+}
+
+#sb-flag {
+  font-size: 48px;
+  line-height: 1;
+  margin-bottom: 14px;
+  display: block;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+}
+
+#sb-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #f0ede8;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+
+#sb-vibe {
+  font-size: 10px;
+  font-variant: small-caps;
+  letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.28);
+  margin-bottom: 18px;
+}
+
+.sb-divider {
+  width: 100%; height: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+  margin-bottom: 18px;
+}
+
+/* 2×2 fact grid */
+.sb-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.sb-cell {
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  border: 0.5px solid rgba(255,255,255,0.06);
+  padding: 10px 12px;
+}
+
+.sb-cell-label {
+  display: block;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.3);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.sb-cell-val {
+  display: block;
+  font-size: 12.5px;
+  color: rgba(255,255,255,0.82);
+  line-height: 1.35;
+  font-weight: 400;
+}
+
+/* Fun fact */
+.sb-fact-box {
+  padding: 11px 13px;
+  background: rgba(255,255,255,0.03);
+  border-left: 2px solid rgba(255,200,100,0.35);
+  border-radius: 0 7px 7px 0;
+  margin-bottom: 20px;
+  flex-shrink: 0;
+}
+
+.sb-fact-label {
+  display: block;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,200,100,0.45);
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+#sb-factval {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.55);
+}
+
+/* Explore hint — pushes to bottom via margin-top:auto */
+.sb-explore-hint {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.22);
+  letter-spacing: 0.03em;
+  animation: sb-pulse 2.4s ease-in-out infinite;
+}
+
+.sb-explore-hint strong {
+  color: rgba(255,255,255,0.5);
+  font-weight: 500;
+}
+
+@keyframes sb-pulse {
+  0%, 100% { opacity: 0.7; }
+  50%       { opacity: 1; }
+}
+
+/* ── Force pointer events on Leaflet GeoJSON layer ─────── */
+/* pointer-events is inherited in CSS; the overlayPane div has none from
+   .leaflet-pane, which can win over Leaflet's own .leaflet-overlay-pane svg
+   rule if the CDN stylesheet loads late or has specificity issues.
+   These !important rules guarantee events reach the SVG paths. */
+.leaflet-overlay-pane svg {
+  pointer-events: auto !important;
+}
+.leaflet-container path.leaflet-interactive,
+path.leaflet-interactive {
+  pointer-events: visiblePainted !important;
+}
+
+/* ── Full-screen maps ───────────────────────────────────── */
+#map {
+  position: fixed;
+  inset: 0;
+  width: 100%; height: 100%;
+  background: #0a0a0f;
+  z-index: 100;
+}
+
+
+/* ── Cinematic transition overlay ───────────────────────── */
+#transition-overlay {
+  position: fixed; inset: 0;
+  background: #060610;
+  z-index: 99990;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.38s ease;
+}
+#transition-overlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ── Lens SVG — tactical scope design ───────────────────── */
+#lens-svg {
+  position: fixed;
+  inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 9500;
+  overflow: visible;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  filter:
+    drop-shadow(0 0 14px rgba(255,150,40,0.3))
+    drop-shadow(0 0 4px  rgba(255,200,80,0.2));
+}
+
+/* Sweep line rotates around the lens center (origin of lens-group) */
+.lens-sweep {
+  transform-origin: 0px 0px;
+  animation: lens-sweep-rotate 5s linear infinite;
+}
+
+@keyframes lens-sweep-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Elevation strip in sidebar ─────────────────────────── */
+.sb-elev-strip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  margin-bottom: 14px;
+  background: rgba(255,200,80,0.04);
+  border: 0.5px solid rgba(255,200,80,0.1);
+  border-radius: 7px;
+}
+
+.sb-elev-icon {
+  width: 13px; height: 13px;
+  flex-shrink: 0;
+  color: rgba(255,200,80,0.5);
+}
+
+.sb-elev-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,200,80,0.4);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+#sb-elev-val {
+  margin-left: auto;
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+}
+
+/* ── Cursor hint — text below lens ─────────────────────── */
+#cursor-hint {
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9600;
+  font-size: 10.5px;
+  color: rgba(255,255,255,0.42);
+  letter-spacing: 0.07em;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.6);
+}
+#cursor-hint.visible { opacity: 1; }
+
+/* ── Language switcher ──────────────────────────────────── */
+#lang-switcher {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 9700;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  padding: 3px 5px;
+  background: rgba(10, 10, 18, 0.85);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  cursor: auto;
+}
+
+.lang-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: none;
+  background: transparent;
+  border-radius: 14px;
+  font-size: 10.5px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  color: rgba(255,255,255,0.42);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+}
+.lang-btn:hover {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.88);
+}
+.lang-btn.active {
+  background: rgba(255,255,255,0.13);
+  color: rgba(255,255,255,0.95);
+}
+.lang-flag { font-size: 13px; line-height: 1; }
+
+/* ── Lens controls ──────────────────────────────────────── */
+#lens-controls {
+  position: fixed;
+  top: 64px;   /* sits below the language switcher */
+  right: 18px;
+  z-index: 9700;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  cursor: auto;
+}
+
+.glass-panel {
+  background: rgba(10, 10, 18, 0.85);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.45);
+}
+
+#lens-toggle {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  border: none;
+  color: rgba(255,255,255,0.65);
+  transition: color 0.2s, background 0.2s;
+  padding: 0;
+  border-radius: 10px;
+}
+#lens-toggle:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.95); }
+#lens-toggle.active { color: rgba(120,180,255,0.9); }
+#lens-toggle svg { display: block; width: 17px; height: 17px; }
+
+#lens-slider-panel {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 12px;
+  opacity: 1;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  transform-origin: top right;
+}
+#lens-slider-panel.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.92);
+}
+
+#lens-slider-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  white-space: nowrap;
+}
+
+#lens-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 88px; height: 3px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+#lens-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.8);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+#lens-slider::-webkit-slider-thumb:hover { background: #fff; }
+#lens-slider::-moz-range-thumb {
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.8);
+  border: none; cursor: pointer;
+}
+
+#lens-size-label {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255,255,255,0.45);
+  min-width: 26px;
+  text-align: right;
+}
+
+/* ── Hover tooltip (kept in DOM, cursor hint replaces it visually) ── */
+#hover-tooltip {
+  position: fixed;
+  width: 272px;
+  background: rgba(6,6,14,0.88);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 14px 16px;
+  z-index: 9800;
+  pointer-events: none;
+  opacity: 0;        /* hidden — sidebar + cursor-hint replace it */
+  top: 0; left: 0;
+}
+
+.tt-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.tt-flag { font-size: 26px; line-height: 1; flex-shrink: 0; }
+.tt-name { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: #f0ede8; }
+.tt-divider { width: 100%; height: 1px; background: linear-gradient(90deg, rgba(255,255,255,0.1), transparent); margin-bottom: 10px; }
+.tt-loading { display: flex; flex-direction: column; gap: 7px; }
+.tt-skeleton {
+  height: 10px; border-radius: 5px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.11) 80px, rgba(255,255,255,0.05) 160px);
+  background-size: 320px 100%;
+  animation: tt-shimmer 1.3s ease-in-out infinite;
+}
+@keyframes tt-shimmer { 0% { background-position: -320px 0; } 100% { background-position: 320px 0; } }
+.tt-rows { display: flex; flex-direction: column; gap: 5px; }
+.tt-row { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; line-height: 1.45; }
+.tt-label { color: rgba(255,255,255,0.32); font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; font-size: 9.5px; min-width: 62px; padding-top: 1.5px; flex-shrink: 0; }
+.tt-val { color: rgba(255,255,255,0.8); font-weight: 400; }
+.tt-fact { margin-top: 10px; padding: 8px 10px; background: rgba(255,255,255,0.03); border-radius: 7px; border-left: 2px solid rgba(255,200,100,0.35); }
+.tt-fact-label { display: block; font-size: 9px; color: rgba(255,200,100,0.45); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; font-weight: 500; }
+.tt-fact-val { font-size: 11px; line-height: 1.5; color: rgba(255,255,255,0.58); }
+
+/* ── Loading overlay ───────────────────────────────────── */
+#loading-overlay {
+  position: fixed; inset: 0; background: #0a0a0f;
+  z-index: 99999;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 20px;
+  transition: opacity 0.6s ease;
+}
+#loading-overlay.fade-out { opacity: 0; pointer-events: none; }
+.loader-title { font-family: 'Playfair Display', serif; font-size: 28px; color: rgba(255,255,255,0.9); letter-spacing: 0.05em; }
+.loader-sub { font-size: 13px; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; text-transform: uppercase; }
+.loader-bar { width: 160px; height: 2px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+.loader-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0.2));
+  border-radius: 2px;
+  animation: loadfill 1.8s ease forwards;
+}
+@keyframes loadfill { to { width: 100%; } }
+
+/* ── Leaflet overrides ─────────────────────────────────── */
+.leaflet-control-attribution {
+  background: rgba(0,0,0,0.4) !important;
+  color: rgba(255,255,255,0.25) !important;
+  font-size: 9px !important;
+}
+.leaflet-control-attribution a { color: rgba(255,255,255,0.3) !important; }
+
+.leaflet-control-zoom {
+  border: none !important; border-radius: 10px !important;
+  overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important;
+}
+.leaflet-control-zoom a {
+  background: rgba(10,10,18,0.85) !important;
+  backdrop-filter: blur(10px);
+  color: rgba(255,255,255,0.7) !important;
+  border: none !important;
+  width: 34px !important; height: 34px !important; line-height: 34px !important;
+  font-size: 16px !important;
+  border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+  transition: background 0.2s;
+}
+.leaflet-control-zoom a:hover {
+  background: rgba(30,30,50,0.95) !important;
+  color: rgba(255,255,255,0.95) !important;
+}
