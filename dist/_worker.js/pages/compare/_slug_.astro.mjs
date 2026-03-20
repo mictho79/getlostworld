@@ -1,9 +1,8 @@
 globalThis.process ??= {}; globalThis.process.env ??= {};
-import { c as createComponent, f as renderComponent, r as renderTemplate, e as createAstro, F as Fragment, a as addAttribute, u as unescapeHTML, m as maybeRenderHead } from '../../chunks/astro/server_CzKrnJyY.mjs';
-import { $ as $$Base } from '../../chunks/Base_V3W5Uk2M.mjs';
-import { d as detectLang, C as COUNTRY_DATA, a as COUNTRY_VIBES, s as slugify, b as COUNTRY_INSIGHTS, f as COUNTRY_CITIES, c as COUNTRY_PEAKS, e as COUNTRY_DISHES } from '../../chunks/detect_Dmjs2yL7.mjs';
+import { c as createComponent, f as renderComponent, d as renderTemplate, e as createAstro, F as Fragment, a as addAttribute, u as unescapeHTML, m as maybeRenderHead } from '../../chunks/astro/server_C2HQGDfO.mjs';
+import { $ as $$Base } from '../../chunks/Base_DzHndBSy.mjs';
+import { d as detectLang, C as COUNTRY_DATA, a as COUNTRY_VIBES, s as slugify, g as getT, t as translateRegion, b as COUNTRY_INSIGHTS, f as COUNTRY_CITIES, c as COUNTRY_PEAKS, e as COUNTRY_DISHES } from '../../chunks/detect_CIgPMk7_.mjs';
 import { T as TRAVEL_ADVISORY, a as TRAVEL_SCORES } from '../../chunks/travelScores_CyA0wfgg.mjs';
-import { g as getT, t as translateRegion } from '../../chunks/translations_DBjSdkLy.mjs';
 /* empty css                                     */
 export { renderers } from '../../renderers.mjs';
 
@@ -563,9 +562,9 @@ const $$slug = createComponent(async ($$result, $$props, $$slots) => {
     ...Object.keys(countryDataSrc),
     ...Object.keys(countryVibes)
   ])].sort().map((name) => ({ name, slug: slugify(name) }));
-  const siteBase = Astro2.site?.href ?? "https://world-explorer.com/";
+  const siteBase = Astro2.site?.href ?? "https://terralenses.com/";
   const pageUrl = new URL(`compare/${countryA.slug}-vs-${countryB.slug}/`, siteBase).href;
-  const title = `${countryA.name} vs ${countryB.name}: Country Comparison \u2014 Facts, Culture & Travel | World Explorer`;
+  const title = `${countryA.name} vs ${countryB.name}: Country Comparison \u2014 Facts, Culture & Travel | TerraLenses`;
   const description = `Compare ${countryA.name} and ${countryB.name} side by side: key facts, travel scores, food, culture, sport and nature. Discover the differences and decide where to go next.`;
   const jsonLd = JSON.stringify({
     "@context": "https://schema.org",
@@ -573,7 +572,7 @@ const $$slug = createComponent(async ($$result, $$props, $$slots) => {
       {
         "@type": "BreadcrumbList",
         "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "World Explorer", "item": siteBase },
+          { "@type": "ListItem", "position": 1, "name": "TerraLenses", "item": siteBase },
           { "@type": "ListItem", "position": 2, "name": "Compare", "item": new URL("compare/", siteBase).href },
           { "@type": "ListItem", "position": 3, "name": `${countryA.name} vs ${countryB.name}`, "item": pageUrl }
         ]

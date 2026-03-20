@@ -274,9 +274,9 @@ const countriesList = [...new Set([
 ])].sort().map((name:string) => ({ name, slug: slugify(name) }));
 
 // ─── SEO ───────────────────────────────────────────────────────────────────────
-const siteBase  = Astro.site?.href ?? 'https://world-explorer.com/';
+const siteBase  = Astro.site?.href ?? 'https://terralenses.com/';
 const pageUrl   = new URL(`compare/${countryA.slug}-vs-${countryB.slug}/`, siteBase).href;
-const title     = `${countryA.name} vs ${countryB.name}: Country Comparison — Facts, Culture & Travel | World Explorer`;
+const title     = `${countryA.name} vs ${countryB.name}: Country Comparison — Facts, Culture & Travel | TerraLenses`;
 const description = `Compare ${countryA.name} and ${countryB.name} side by side: key facts, travel scores, food, culture, sport and nature. Discover the differences and decide where to go next.`;
 
 const jsonLd = JSON.stringify({
@@ -285,7 +285,7 @@ const jsonLd = JSON.stringify({
     {
       "@type": "BreadcrumbList",
       "itemListElement": [
-        { "@type":"ListItem","position":1,"name":"World Explorer","item":siteBase },
+        { "@type":"ListItem","position":1,"name":"TerraLenses","item":siteBase },
         { "@type":"ListItem","position":2,"name":"Compare","item": new URL('compare/', siteBase).href },
         { "@type":"ListItem","position":3,"name":`${countryA.name} vs ${countryB.name}`,"item":pageUrl },
       ]

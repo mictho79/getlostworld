@@ -1,9 +1,8 @@
 globalThis.process ??= {}; globalThis.process.env ??= {};
-import { c as createComponent, f as renderComponent, r as renderTemplate, e as createAstro, F as Fragment, u as unescapeHTML, a as addAttribute, m as maybeRenderHead } from '../../chunks/astro/server_CzKrnJyY.mjs';
-import { $ as $$Base } from '../../chunks/Base_V3W5Uk2M.mjs';
-import { d as detectLang, a as COUNTRY_VIBES, C as COUNTRY_DATA, b as COUNTRY_INSIGHTS, s as slugify, f as COUNTRY_CITIES, e as COUNTRY_DISHES, c as COUNTRY_PEAKS } from '../../chunks/detect_Dmjs2yL7.mjs';
+import { c as createComponent, f as renderComponent, d as renderTemplate, e as createAstro, F as Fragment, u as unescapeHTML, a as addAttribute, m as maybeRenderHead } from '../../chunks/astro/server_C2HQGDfO.mjs';
+import { $ as $$Base } from '../../chunks/Base_DzHndBSy.mjs';
+import { d as detectLang, a as COUNTRY_VIBES, C as COUNTRY_DATA, b as COUNTRY_INSIGHTS, s as slugify, f as COUNTRY_CITIES, e as COUNTRY_DISHES, c as COUNTRY_PEAKS, g as getT, t as translateRegion } from '../../chunks/detect_CIgPMk7_.mjs';
 import { T as TRAVEL_ADVISORY } from '../../chunks/travelScores_CyA0wfgg.mjs';
-import { g as getT, t as translateRegion } from '../../chunks/translations_DBjSdkLy.mjs';
 /* empty css                                     */
 export { renderers } from '../../renderers.mjs';
 
@@ -279,9 +278,9 @@ const $$slug = createComponent(async ($$result, $$props, $$slots) => {
     ...Object.keys(countryDataSrc),
     ...Object.keys(countryVibes)
   ])].sort().map((name) => ({ name, slug: slugify(name) }));
-  const siteBase = Astro2.site?.href ?? "https://world-explorer.com/";
+  const siteBase = Astro2.site?.href ?? "https://terralenses.com/";
   const pageUrl = new URL(`country/${country.slug}/`, siteBase).href;
-  const title = `${country.name} \u2013 Facts, Capital & Geography | World Explorer`;
+  const title = `${country.name} \u2013 Facts, Capital & Geography | TerraLenses`;
   const description = [
     `${country.name} is a country in ${country.subregion || country.region}.`,
     country.capital !== "\u2014" ? `Capital: ${country.capital}.` : "",
@@ -356,7 +355,7 @@ const $$slug = createComponent(async ($$result, $$props, $$slots) => {
       {
         "@type": "BreadcrumbList",
         "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "World Explorer", "item": siteBase },
+          { "@type": "ListItem", "position": 1, "name": "TerraLenses", "item": siteBase },
           { "@type": "ListItem", "position": 2, "name": country.name, "item": pageUrl }
         ]
       },

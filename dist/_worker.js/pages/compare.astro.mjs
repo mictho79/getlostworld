@@ -1,8 +1,7 @@
 globalThis.process ??= {}; globalThis.process.env ??= {};
-import { c as createComponent, f as renderComponent, r as renderTemplate, e as createAstro, a as addAttribute, m as maybeRenderHead, u as unescapeHTML } from '../chunks/astro/server_CzKrnJyY.mjs';
-import { $ as $$Base } from '../chunks/Base_V3W5Uk2M.mjs';
-import { d as detectLang, C as COUNTRY_DATA, a as COUNTRY_VIBES, b as COUNTRY_INSIGHTS, s as slugify, c as COUNTRY_PEAKS, e as COUNTRY_DISHES } from '../chunks/detect_Dmjs2yL7.mjs';
-import { t as translateRegion, g as getT } from '../chunks/translations_DBjSdkLy.mjs';
+import { c as createComponent, f as renderComponent, d as renderTemplate, e as createAstro, a as addAttribute, m as maybeRenderHead, u as unescapeHTML } from '../chunks/astro/server_C2HQGDfO.mjs';
+import { $ as $$Base } from '../chunks/Base_DzHndBSy.mjs';
+import { d as detectLang, C as COUNTRY_DATA, a as COUNTRY_VIBES, b as COUNTRY_INSIGHTS, s as slugify, t as translateRegion, c as COUNTRY_PEAKS, e as COUNTRY_DISHES, g as getT } from '../chunks/detect_CIgPMk7_.mjs';
 /* empty css                                 */
 export { renderers } from '../renderers.mjs';
 
@@ -257,7 +256,7 @@ const $$Index = createComponent(async ($$result, $$props, $$slots) => {
     };
   }
   const countriesList = Object.values(allData).map((c) => ({ name: c.name, slug: c.slug })).sort((a, b) => a.name.localeCompare(b.name));
-  const title = lang === "fr" ? "Comparer les pays \u2014 C\xF4te \xE0 c\xF4te | World Explorer" : "Compare Countries \u2014 Side-by-Side | World Explorer";
+  const title = lang === "fr" ? "Comparer les pays \u2014 C\xF4te \xE0 c\xF4te | TerraLenses" : "Compare Countries \u2014 Side-by-Side | TerraLenses";
   const description = lang === "fr" ? "Comparez deux pays c\xF4te \xE0 c\xF4te : faits, gastronomie, sport, nature et culture. Recherchez et choisissez parmi tous les pays du monde." : "Compare any two countries side by side: facts, food, sport, nature and culture. Search and pick any countries from around the world.";
   const uiLabels = {
     countryA: t.countryA,

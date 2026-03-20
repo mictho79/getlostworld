@@ -176,6 +176,16 @@ const T = {
     editAtTable:             'At the table, order ',
     editInCountry:           ' in ',
     editTwoPlates:           ' — two plates, two worlds.',
+
+    // ── Homepage ──────────────────────────────────────────────────────────────
+    tagline:        'Explore 195 countries \u2014 cultures, landscapes, facts, and comparisons.',
+    searchCountry:  'Search for a country\u2026',
+    exploreTheMap:  'Explore the map',
+    statCountries:  'Countries',
+    statContinents: 'Continents',
+    statPeople:     'People',
+    discoverLabel:  'Discover',
+    clickToExplore: 'Click any country to explore',
   },
 
   fr: {
@@ -347,6 +357,16 @@ const T = {
     editAtTable:             'À table, commandez ',
     editInCountry:           ' dans ',
     editTwoPlates:           ' — deux assiettes, deux mondes.',
+
+    // ── Homepage ──────────────────────────────────────────────────────────────
+    tagline:        'Explorez 195 pays \u2014 cultures, paysages, faits et comparaisons.',
+    searchCountry:  'Rechercher un pays\u2026',
+    exploreTheMap:  'Explorer la carte',
+    statCountries:  'Pays',
+    statContinents: 'Continents',
+    statPeople:     'Habitants',
+    discoverLabel:  'D\u00e9couvrir',
+    clickToExplore: 'Cliquez sur un pays pour l\u2019explorer',
   },
 
   es: {
@@ -518,6 +538,16 @@ const T = {
     editAtTable:             'En la mesa, pide ',
     editInCountry:           ' en ',
     editTwoPlates:           ' — dos platos, dos mundos.',
+
+    // ── Homepage ──────────────────────────────────────────────────────────────
+    tagline:        'Explora 195 pa\u00edses \u2014 culturas, paisajes, datos y comparaciones.',
+    searchCountry:  'Buscar un pa\u00eds\u2026',
+    exploreTheMap:  'Explorar el mapa',
+    statCountries:  'Pa\u00edses',
+    statContinents: 'Continentes',
+    statPeople:     'Habitantes',
+    discoverLabel:  'Descubrir',
+    clickToExplore: 'Haz clic en un pa\u00eds para explorarlo',
   },
 
   de: {
@@ -689,6 +719,16 @@ const T = {
     editAtTable:             'Am Tisch bestellen Sie ',
     editInCountry:           ' in ',
     editTwoPlates:           ' — zwei Teller, zwei Welten.',
+
+    // ── Homepage ──────────────────────────────────────────────────────────────
+    tagline:        '195 L\u00e4nder entdecken \u2014 Kulturen, Landschaften, Fakten und Vergleiche.',
+    searchCountry:  'Land suchen\u2026',
+    exploreTheMap:  'Karte erkunden',
+    statCountries:  'L\u00e4nder',
+    statContinents: 'Kontinente',
+    statPeople:     'Bev\u00f6lkerung',
+    discoverLabel:  'Entdecken',
+    clickToExplore: 'Auf ein Land klicken, um es zu entdecken',
   },
 } as const;
 

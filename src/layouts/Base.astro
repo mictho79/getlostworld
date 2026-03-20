@@ -6,7 +6,7 @@ interface Props {
   countryName?: string;
 }
 const { title, description, ogImage, countryName } = Astro.props;
-const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://world-explorer.com').href;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://terralenses.com').href;
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -17,17 +17,25 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://world-explo
   <meta name="description" content={description}>
   <link rel="canonical" href={canonical}>
 
+  <!-- Favicons -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/favicon.svg" />
+
   <!-- Open Graph -->
   <meta property="og:title" content={title}>
   <meta property="og:description" content={description}>
   <meta property="og:type" content={countryName ? 'article' : 'website'}>
   <meta property="og:url" content={canonical}>
-  {ogImage && <meta property="og:image" content={ogImage}>}
+  <meta property="og:image" content={ogImage ?? '/og-image.svg'}>
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content={title}>
   <meta name="twitter:description" content={description}>
+  <meta name="twitter:image" content={ogImage ?? '/og-image.svg'}>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">

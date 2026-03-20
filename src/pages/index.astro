@@ -35,7 +35,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>World Explorer — Get lost in the world</title>
+  <title>TerraLenses — Get lost in the world</title>
   <meta name="description" content="Explore interactive facts, insights, and comparisons for every country on Earth. Powered by a beautiful 3D globe." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -427,10 +427,10 @@ const countryList = Object.keys(globeData).sort().map(n => ({
     <div id="panel-header">
       <div class="site-badge">
         <div class="badge-dot"></div>
-        World Explorer
+        TerraLenses
       </div>
       <h1 id="site-title">Get lost<br>in <em>the world</em></h1>
-      <p id="tagline">Explore 195 countries — cultures, landscapes, facts, and comparisons.</p>
+      <p id="tagline">{t.tagline}</p>
     </div>
 
     <!-- Search -->
@@ -441,7 +441,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
             <circle cx="8.5" cy="8.5" r="5.5"/><path d="M14 14l3.5 3.5"/>
           </svg>
         </span>
-        <input id="search" type="text" placeholder="Search for a country…" autocomplete="off" spellcheck="false" />
+        <input id="search" type="text" placeholder={t.searchCountry} autocomplete="off" spellcheck="false" />
         <div id="ac-list"></div>
       </div>
     </div>
@@ -454,15 +454,15 @@ const countryList = Object.keys(globeData).sort().map(n => ({
           <line x1="2" y1="12" x2="22" y2="12"/>
           <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
         </svg>
-        Explore the map
+        {t.exploreTheMap}
       </a>
     </div>
 
     <!-- Stats -->
     <div id="stats">
-      <div class="stat"><div class="stat-num">195</div><div class="stat-lbl">Countries</div></div>
-      <div class="stat"><div class="stat-num">7</div><div class="stat-lbl">Continents</div></div>
-      <div class="stat"><div class="stat-num">8B+</div><div class="stat-lbl">People</div></div>
+      <div class="stat"><div class="stat-num">195</div><div class="stat-lbl">{t.statCountries}</div></div>
+      <div class="stat"><div class="stat-num">7</div><div class="stat-lbl">{t.statContinents}</div></div>
+      <div class="stat"><div class="stat-num">8B+</div><div class="stat-lbl">{t.statPeople}</div></div>
     </div>
 
     <div class="sep"></div>
@@ -483,10 +483,10 @@ const countryList = Object.keys(globeData).sort().map(n => ({
   </aside>
 
   <!-- Globe hint -->
-  <div id="globe-hint">Click any country to explore</div>
+  <div id="globe-hint">{t.clickToExplore}</div>
 
   <!-- Data injected from server -->
-  <script set:html={`window._GD=${JSON.stringify(globeData)};window._CL=${JSON.stringify(countryList)};`}></script>
+  <script set:html={`window._GD=${JSON.stringify(globeData)};window._CL=${JSON.stringify(countryList)};window._UI=${JSON.stringify({discoverLabel:t.discoverLabel})};`}></script>
 
   <!-- Static deps loaded synchronously before paint -->
   <script is:inline src="/topojson.min.js"></script>
@@ -916,7 +916,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         document.getElementById('card-fact').textContent = p.fact;
         var lnk = document.getElementById('card-link');
         lnk.href        = '/country/' + p.slug;
-        lnk.textContent = 'Discover ' + p.name + ' ';
+        lnk.textContent = window._UI.discoverLabel + ' ' + p.name + ' \u2192';
         document.getElementById('country-card').classList.add('visible');
 
         if (fly) {
