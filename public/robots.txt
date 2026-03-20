@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://terralenses.com/sitemap.xml
