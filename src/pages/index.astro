@@ -561,7 +561,8 @@ const countryList = Object.keys(globeData).sort().map(n => ({
 
       var scene  = new THREE.Scene();
       var camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 200);
-      camera.position.z = 2.6;
+      camera.position.z = 3.25;
+      camera.position.y = -0.25;
 
       var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -591,14 +592,14 @@ const countryList = Object.keys(globeData).sort().map(n => ({
             'void main(){',
             /* Fresnel: 0 at centre, 1 at limb — drives edge darkening */
             '  float f=pow(1.0-max(0.0,dot(vN,vV)),2.8);',
-            /* Ocean: #0a1628 at centre → #050d1e at edges */
-            '  vec3 col=mix(vec3(0.039,0.086,0.157),vec3(0.020,0.051,0.118),f);',
-            /* Subtle diffuse fill */
+            /* Ocean: #0d0514 deep purple-dark at centre → darker purple at limb */
+            '  vec3 col=mix(vec3(0.051,0.020,0.078),vec3(0.027,0.008,0.063),f);',
+            /* Subtle diffuse fill — purple tint */
             '  vec3 L=normalize(vec3(-0.65,0.70,0.40));',
-            '  col+=vec3(0.015,0.030,0.060)*max(0.0,dot(vN,L));',
+            '  col+=vec3(0.010,0.008,0.035)*max(0.0,dot(vN,L));',
             /* Soft specular highlight — upper left */
             '  vec3 H=normalize(L+vV);',
-            '  col+=vec3(0.10,0.14,0.22)*pow(max(0.0,dot(vN,H)),110.0);',
+            '  col+=vec3(0.08,0.05,0.18)*pow(max(0.0,dot(vN,H)),110.0);',
             '  gl_FragColor=vec4(col,1.0);',
             '}'
           ].join('\n'),
@@ -612,7 +613,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       /* ── Atmosphere — thin blue halo, barely visible ── */
       globe.add(new THREE.Mesh(
         new THREE.SphereGeometry(1.016, 32, 32),
-        new THREE.MeshBasicMaterial({ color: 0x64a0ff, transparent: true, opacity: 0.12, side: THREE.BackSide })
+        new THREE.MeshBasicMaterial({ color: 0x8844ff, transparent: true, opacity: 0.08, side: THREE.BackSide })
       ));
 
       /* Lights for atmosphere spheres (globe itself uses the shader above) */
@@ -681,7 +682,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         var gg = new THREE.BufferGeometry();
         gg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
         globe.add(new THREE.LineSegments(gg, new THREE.LineBasicMaterial({
-          color: 0xffffff, transparent: true, opacity: 0.04, depthWrite: false
+          color: 0xa855f7, transparent: true, opacity: 0.35, depthWrite: false
         })));
       })();
 
@@ -780,6 +781,30 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         return out;
       }
 
+      /* ── Polygon helpers — shared by setHighlight + buildLandLayer ── */
+      function unwrap(ring) {
+        var out = [[ring[0][0], ring[0][1]]];
+        for (var i = 1; i < ring.length; i++) {
+          var prev = out[i - 1][0], cur = ring[i][0];
+          var d = cur - prev;
+          if (d >  180) cur -= 360;
+          else if (d < -180) cur += 360;
+          out.push([cur, ring[i][1]]);
+        }
+        return out;
+      }
+      function pip(lo, la, ring) {
+        var inside = false;
+        for (var i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+          var xi = ring[i][0], yi = ring[i][1], xj = ring[j][0], yj = ring[j][1];
+          if (((yi > la) !== (yj > la)) &&
+              (lo < (xj - xi) * (la - yi) / (yj - yi) + xi))
+            inside = !inside;
+        }
+        return inside;
+      }
+      function norm(l) { return ((l % 360) + 540) % 360 - 180; }
+
       /* ── Grid-sampled highlight — correct for concave + antimeridian polygons ── */
       function setHighlight(f) {
         for (var k = 0; k < hlObjects.length; k++) globe.remove(hlObjects[k]);
@@ -788,34 +813,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         var g = f.geometry;
         if (!g) return;
         var polys = g.type === 'MultiPolygon' ? g.coordinates : [g.coordinates];
-
-        /* Unwrap ring: adjust each lng so no consecutive jump exceeds ±180° */
-        function unwrap(ring) {
-          var out = [[ring[0][0], ring[0][1]]];
-          for (var i = 1; i < ring.length; i++) {
-            var prev = out[i - 1][0], cur = ring[i][0];
-            var d = cur - prev;
-            if (d >  180) cur -= 360;
-            else if (d < -180) cur += 360;
-            out.push([cur, ring[i][1]]);
-          }
-          return out;
-        }
-
-        /* Point-in-ring on unwrapped coordinates (no antimeridian skip needed) */
-        function pip(lo, la, ring) {
-          var inside = false;
-          for (var i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-            var xi = ring[i][0], yi = ring[i][1], xj = ring[j][0], yj = ring[j][1];
-            if (((yi > la) !== (yj > la)) &&
-                (lo < (xj - xi) * (la - yi) / (yj - yi) + xi))
-              inside = !inside;
-          }
-          return inside;
-        }
-
-        /* Normalise any longitude value to [-180, 180] */
-        function norm(l) { return ((l % 360) + 540) % 360 - 180; }
 
         var STEP = 0.5; /* degrees — finer than 110m TopoJSON resolution */
         var fillVerts = [], fillIdx = [], vIdx = 0;
@@ -850,11 +847,11 @@ const countryList = Object.keys(globeData).sort().map(n => ({
               }
               if (inHole) continue;
 
-              /* Map quad corners to sphere at r = 1.001 */
-              var va = ll3(la,        norm(lo),        1.001);
-              var vb = ll3(la,        norm(lo + STEP), 1.001);
-              var vc = ll3(la + STEP, norm(lo + STEP), 1.001);
-              var vd = ll3(la + STEP, norm(lo),        1.001);
+              /* Map quad corners to sphere at r = 1.0015 (above base land layer) */
+              var va = ll3(la,        norm(lo),        1.0015);
+              var vb = ll3(la,        norm(lo + STEP), 1.0015);
+              var vc = ll3(la + STEP, norm(lo + STEP), 1.0015);
+              var vd = ll3(la + STEP, norm(lo),        1.0015);
               fillVerts.push(va.x, va.y, va.z, vb.x, vb.y, vb.z,
                              vc.x, vc.y, vc.z, vd.x, vd.y, vd.z);
               fillIdx.push(vIdx, vIdx+1, vIdx+2, vIdx, vIdx+2, vIdx+3);
@@ -1031,7 +1028,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
           var bg     = new THREE.BufferGeometry();
           bg.setAttribute('position', new THREE.Float32BufferAttribute(allPos, 3));
           globe.add(new THREE.LineSegments(bg,
-            new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.25 })
+            new THREE.LineBasicMaterial({ color: 0x9966cc, transparent: true, opacity: 0.45 })
           ));
 
           /* Per-feature: metadata + bbox for click detection */

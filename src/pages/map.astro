@@ -238,9 +238,36 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
       right: 0; bottom: 0;
     }
     .leaflet-container { background: #dde1e7 !important; }
+
+    /* ── Mobile logo ─────────────────────────────── */
+    #mobile-logo {
+      display: none;
+      position: fixed;
+      top: 12px; left: 12px;
+      z-index: 9600;
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.02em;
+      background: rgba(13,17,23,0.75);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.08);
+      pointer-events: none;
+    }
+
+    @media (max-width: 768px) {
+      #sidebar     { display: none; }
+      #map         { left: 0; }
+      #mobile-logo { display: block; }
+    }
   </style>
 </head>
 <body>
+
+  <div id="mobile-logo">TerraLenses</div>
 
   <aside id="sidebar">
 
@@ -633,10 +660,37 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
           hoveredId = null; showWelcome(); mapEl.style.cursor = '';
         });
 
-        map.on('click', () => {
-          if (!hoveredId) return;
-          const info = COUNTRY_ID_MAP[+hoveredId] || UK_NATIONS_INFO[hoveredId];
-          if (info) window.location.href = '/country/' + info.slug;
+        map.on('click', (e) => {
+          if (window.innerWidth <= 768) {
+            // Mobile: no hover state — hit-test the tap position directly
+            const { lat, lng } = e.latlng;
+            let foundId = null, foundArea = Infinity;
+            const checkedIds = new Set();
+            for (const f of geojson.features) {
+              if (checkedIds.has(f.id)) continue;
+              checkedIds.add(f.id);
+              const bb = featureBboxes[f.id];
+              if (!bb || lng < bb[0]-1 || lng > bb[2]+1 || lat < bb[1]-1 || lat > bb[3]+1) continue;
+              const rings = hitRings.get(f.id);
+              if (!rings) continue;
+              for (const ring of rings) {
+                if (ptInRing(lng, lat, ring)) {
+                  const area = (bb[2] - bb[0]) * (bb[3] - bb[1]);
+                  if (area < foundArea) { foundId = f.id; foundArea = area; }
+                  break;
+                }
+              }
+            }
+            if (foundId) {
+              const info = COUNTRY_ID_MAP[+foundId] || UK_NATIONS_INFO[foundId];
+              if (info && info.slug) window.location.href = '/country/' + info.slug;
+            }
+          } else {
+            // Desktop: use hover state set by mousemove
+            if (!hoveredId) return;
+            const info = COUNTRY_ID_MAP[+hoveredId] || UK_NATIONS_INFO[hoveredId];
+            if (info) window.location.href = '/country/' + info.slug;
+          }
         });
       });
   </script>
