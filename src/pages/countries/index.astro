@@ -29,11 +29,15 @@ for (const cont of CONTINENT_ORDER) {
 }
 
 const totalCountries = Object.values(byContinent).reduce((s, arr) => s + arr.length, 0);
+const SITE = 'https://terralenses.com';
 ---
 
 <Base
   title="All Countries – Facts & Geography | TerraLenses"
   description="Browse all 195 countries. Explore facts, capitals, populations and geography for every nation on Earth."
+  lang="en"
+  hreflangEn={`${SITE}/countries/`}
+  hreflangFr={`${SITE}/fr/countries/`}
 >
   <style is:global>
     html, body { overflow: auto !important; height: auto !important; }

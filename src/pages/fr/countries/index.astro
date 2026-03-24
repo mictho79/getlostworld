@@ -3,6 +3,7 @@ export const prerender = true;
 import { COUNTRY_DATA as DATA_EN, slugify } from '../../../lib/countryData.js';
 import { COUNTRY_REGION } from '../../../lib/countryExtras.js';
 import Base from '../../../layouts/Base.astro';
+import { getCountryNameFR } from '../../../i18n/translations';
 
 const fr = await import('../../../lib/countryData.fr.js');
 const COUNTRY_DATA_FR: Record<string,any> = { ...(DATA_EN as any), ...(fr.COUNTRY_DATA as any) };
@@ -30,7 +31,7 @@ for (const [name, data] of Object.entries(DATA_EN as Record<string,any>)) {
   });
 }
 for (const cont of CONTINENT_ORDER) {
-  byContinent[cont].sort((a, b) => a.name.localeCompare(b.name));
+  byContinent[cont].sort((a, b) => getCountryNameFR(a.name).localeCompare(getCountryNameFR(b.name), 'fr'));
 }
 
 const totalCountries = Object.values(byContinent).reduce((s, arr) => s + arr.length, 0);
@@ -164,7 +165,7 @@ const SITE = 'https://terralenses.com';
               <a href={`/fr/country/${c.slug}/`} class="country-card">
                 <span class="country-flag">{c.flag}</span>
                 <span class="country-info">
-                  <span class="country-name">{c.name}</span>
+                  <span class="country-name">{getCountryNameFR(c.name)}</span>
                   <span class="country-capital">{c.capital}</span>
                 </span>
               </a>

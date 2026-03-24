@@ -5,7 +5,7 @@ import { COUNTRY_DATA as DATA_EN, COUNTRY_VIBES as VIBES_EN, COUNTRY_PEAKS, COUN
 import { COUNTRY_CCN3 } from '../../../lib/countryCodes.js';
 import { TRAVEL_ADVISORY } from '../../../lib/travelScores.js';
 import { geojsonToSvgPath } from '../../../lib/geojsonSvg.js';
-import { getT, translateRegion, getCountryNameFR, translateLangs, artFR, withArticleFR, deArticleFR } from '../../../i18n/translations';
+import { getT, translateRegion, getCountryNameFR, translateLangs, translateCurrencyName, artFR, withArticleFR, deArticleFR } from '../../../i18n/translations';
 
 // ─── Slug aliases ──────────────────────────────────────────────────────────────
 const SLUG_ALIASES: Record<string,string> = {
@@ -55,6 +55,12 @@ function formatCurrency(c: any): string {
   const vals = Object.values(c) as any[];
   if (!vals.length) return '—';
   return vals.map((v: any) => `${v.name}${v.symbol ? ' (' + v.symbol + ')' : ''}`).join(', ');
+}
+function formatCurrencyFR(c: any): string {
+  if (!c) return '—';
+  const vals = Object.values(c) as any[];
+  if (!vals.length) return '—';
+  return vals.map((v: any) => `${translateCurrencyName(v.name)}${v.symbol ? ' (' + v.symbol + ')' : ''}`).join(', ');
 }
 
 // ─── REST name mapping ─────────────────────────────────────────────────────────
@@ -139,7 +145,7 @@ const country = {
   region:          rc?.region    || '',
   subregion:       rc?.subregion || '',
   latlng:          (rc?.latlng   || [0, 0]) as [number, number],
-  currency:        formatCurrency(rc?.currencies),
+  currency:        formatCurrencyFR(rc?.currencies),
   timezone:        localData.timezone || rc?.timezones?.[0] || '—',
   callingCode:     rc?.idd?.root ? rc.idd.root + (rc.idd.suffixes?.length === 1 ? rc.idd.suffixes[0] : '') : '—',
   drivingSide:     rc?.car?.side === 'left' ? t.driveLeft : rc?.car?.side === 'right' ? t.driveRight : '—',
@@ -175,7 +181,7 @@ const countriesList = [...new Set([
 const siteBase = Astro.site?.href ?? 'https://terralenses.com/';
 const pageUrl  = new URL(`fr/country/${country.slug}/`, siteBase).href;
 
-const title       = `${country.name} – Faits, Capitale & Géographie | TerraLenses`;
+const title       = `${nameFR} – Faits, Capitale & Géographie | TerraLenses`;
 const locFR = tr(country.subregion || country.region);
 const description = [
   locFR ? `${nameFR} est un pays ${deOrD(locFR)}${locFR}.` : `${nameFR} est un pays du monde.`,
@@ -228,7 +234,7 @@ if (country.currency !== '—') {
 
 if (country.dish) {
   insights.push({ icon: '🍽', title: t.insightFood,
-    text: `${t.foodEmblem}${artFR(country.name)}${nameFR}${t.foodIs}${country.dish}. ${ci.food ? ci.food : `${t.foodCulture}${withArticleFR(country.name, nameFR)}${t.foodTied}`}` });
+    text: `${t.foodEmblem}${deArticleFR(country.name, nameFR)}${t.foodIs}${country.dish}. ${ci.food ? ci.food : `${t.foodCulture}${withArticleFR(country.name, nameFR)}${t.foodTied}`}` });
 }
 
 if (country.sport !== '—') {
@@ -308,7 +314,7 @@ const jsonLd = JSON.stringify({
       ) : (
         <span class="cp-flag" role="img" aria-label={`Flag of ${country.name}`}>{country.flag}</span>
       )}
-      <h1 class="cp-title">{country.name}</h1>
+      <h1 class="cp-title">{nameFR}</h1>
       {country.officialName !== country.name && <p class="cp-official">{country.officialName}</p>}
       <p class="cp-region">{tr(country.subregion || country.region)}</p>
       <p class="cp-vibe">{country.vibe}</p>
@@ -320,13 +326,13 @@ const jsonLd = JSON.stringify({
     {isRecon && (
       <div class="cp-advisory cp-advisory--reconsider" role="alert">
         <span>⚠️</span>
-        <span>{t.advisoryReconsiderPre}<strong>{country.name}</strong>{t.advisoryReconsiderPost}</span>
+        <span>{t.advisoryReconsiderPre}<strong>{nameFR}</strong>{t.advisoryReconsiderPost}</span>
       </div>
     )}
     {isDNT && (
       <div class="cp-advisory cp-advisory--dnt" role="alert">
         <span>⛔</span>
-        <span>{t.advisoryDntPre}<strong>{country.name}</strong>{t.advisoryDntPost}</span>
+        <span>{t.advisoryDntPre}<strong>{nameFR}</strong>{t.advisoryDntPost}</span>
       </div>
     )}
 
@@ -381,7 +387,7 @@ const jsonLd = JSON.stringify({
     <!-- SEO Insight paragraphs -->
     {insights.length > 0 && (
       <section class="cp-section">
-        <h2 class="cp-section-label">{t.exploreSection} {country.name}</h2>
+        <h2 class="cp-section-label">{t.exploreSection} {withArticleFR(country.name, nameFR)}</h2>
         <div class="cp-insights">
           {insights.map(ins => (
             <div class="cp-insight">
@@ -436,20 +442,20 @@ const jsonLd = JSON.stringify({
             <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
           </svg>
-          {isRecon ? `${t.viewOnMapPre}${country.name}${t.viewOnMapPost}` : t.exploreOnMap}
+          {isRecon ? `${t.viewOnMapPre}${nameFR}${t.viewOnMapPost}` : t.exploreOnMap}
         </a>
       </div>
     )}
 
   </div>
   <!-- Countries data for modal autocomplete -->
-  <script type="application/json" id="cp-countries-data" set:html={JSON.stringify(countriesList)} />
+  <script type="application/json" id="cp-countries-data" set:html={JSON.stringify(countriesList)}></script>
 
   <!-- Compare modal -->
   <div class="cp-modal-overlay" id="cp-modal" hidden aria-modal="true" role="dialog" aria-label="Compare countries">
     <div class="cp-modal-box">
       <div class="cp-modal-header">
-        <p class="cp-modal-title">{t.compareModalPre}<strong>{country.name}</strong>{t.compareModalPost}</p>
+        <p class="cp-modal-title">{t.compareModalPre}<strong>{nameFR}</strong>{t.compareModalPost}</p>
         <button class="cp-modal-close" id="cp-modal-close" aria-label="Close">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 2l12 12M14 2L2 14"/></svg>
         </button>
