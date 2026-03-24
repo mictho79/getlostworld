@@ -1,35 +1,34 @@
 ---
 export const prerender = false;
-import Base from '../../layouts/Base.astro';
-import { COUNTRY_DATA as DATA_EN, COUNTRY_VIBES as VIBES_EN, COUNTRY_PEAKS, COUNTRY_DISHES, COUNTRY_CITIES, COUNTRY_INSIGHTS as INSIGHTS_EN, slugify } from '../../lib/countryData.js';
-import { COUNTRY_CCN3 } from '../../lib/countryCodes.js';
-import { TRAVEL_ADVISORY } from '../../lib/travelScores.js';
-import { geojsonToSvgPath } from '../../lib/geojsonSvg.js';
-import { getT, translateRegion } from '../../i18n/translations';
-import { detectLang } from '../../i18n/detect';
+import Base from '../../../layouts/Base.astro';
+import { COUNTRY_DATA as DATA_EN, COUNTRY_VIBES as VIBES_EN, COUNTRY_PEAKS, COUNTRY_DISHES, COUNTRY_CITIES, COUNTRY_INSIGHTS as INSIGHTS_EN, slugify } from '../../../lib/countryData.js';
+import { COUNTRY_CCN3 } from '../../../lib/countryCodes.js';
+import { TRAVEL_ADVISORY } from '../../../lib/travelScores.js';
+import { geojsonToSvgPath } from '../../../lib/geojsonSvg.js';
+import { getT, translateRegion } from '../../../i18n/translations';
 
 // ─── Slug aliases ──────────────────────────────────────────────────────────────
 const SLUG_ALIASES: Record<string,string> = {
-  'united-states':   '/country/united-states-of-america/',
-  'usa':             '/country/united-states-of-america/',
-  'uk':              '/country/england/',
-  'united-kingdom':  '/country/england/',
-  'czechia':         '/country/czech-republic/',
-  'dr-congo':        '/country/democratic-republic-of-the-congo/',
-  'ivory-coast':     '/country/cote-divoire/',
-  'cape-verde':      '/country/cabo-verde/',
+  'united-states':   '/fr/country/united-states-of-america/',
+  'usa':             '/fr/country/united-states-of-america/',
+  'uk':              '/fr/country/england/',
+  'united-kingdom':  '/fr/country/england/',
+  'czechia':         '/fr/country/czech-republic/',
+  'dr-congo':        '/fr/country/democratic-republic-of-the-congo/',
+  'ivory-coast':     '/fr/country/cote-divoire/',
+  'cape-verde':      '/fr/country/cabo-verde/',
 };
 
 const { slug } = Astro.params;
-if (!slug) return Astro.redirect('/');
+if (!slug) return Astro.redirect('/fr/');
 if (SLUG_ALIASES[slug as string]) return Astro.redirect(SLUG_ALIASES[slug as string], 301);
 
 const SITE = 'https://terralenses.com';
 const enUrl = `${SITE}/country/${slug}/`;
 const frUrl = `${SITE}/fr/country/${slug}/`;
 
-// ─── Language detection ────────────────────────────────────────────────────────
-const lang = detectLang(Astro.request.headers.get('accept-language') ?? 'en');
+// ─── Language ─────────────────────────────────────────────────────────────────
+const lang = 'fr' as const;
 const t = getT(lang);
 const tr = (r: string) => translateRegion(r, lang);
 
@@ -38,7 +37,7 @@ let countryDataSrc:  typeof DATA_EN     = DATA_EN;
 let countryInsights: typeof INSIGHTS_EN = INSIGHTS_EN;
 
 if (lang === 'fr') {
-  const fr = await import('../../lib/countryData.fr.js');
+  const fr = await import('../../../lib/countryData.fr.js');
   // Merge EN as base so nations missing from the FR translation (e.g. England, Scotland,
   // Wales, Northern Ireland) fall back to English rather than returning undefined.
   countryVibes    = { ...(VIBES_EN    as any), ...(fr.COUNTRY_VIBES    as any) };
@@ -81,7 +80,7 @@ const REST_TO_LOCAL: Record<string,string> = {
 const localName =
   Object.keys(countryDataSrc as any).find(k => slugify(k) === slug) ||
   (lang !== 'en' ? Object.keys(DATA_EN as any).find(k => slugify(k) === slug) : undefined);
-if (!localName) return Astro.redirect('/');
+if (!localName) return Astro.redirect('/fr/');
 const localData = (countryDataSrc as any)[localName] || (DATA_EN as any)[localName] || {};
 const restName  = LOCAL_TO_REST[localName] || localName;
 
@@ -176,14 +175,14 @@ const countriesList = [...new Set([
 ])].sort().map(name => ({ name, slug: slugify(name) }));
 
 const siteBase = Astro.site?.href ?? 'https://terralenses.com/';
-const pageUrl  = new URL(`country/${country.slug}/`, siteBase).href;
+const pageUrl  = new URL(`fr/country/${country.slug}/`, siteBase).href;
 
-const title       = `${country.name} – Facts, Capital & Geography | TerraLenses`;
+const title       = `${country.name} – Faits, Capitale & Géographie | TerraLenses`;
 const description = [
-  `${country.name} is a country in ${country.subregion || country.region}.`,
-  country.capital    !== '—' ? `Capital: ${country.capital}.`       : '',
-  country.population !== '—' ? `Population: ${country.population}.` : '',
-  country.language   !== '—' ? `Language: ${country.language}.`     : '',
+  `${country.name} est un pays de ${country.subregion || country.region}.`,
+  country.capital    !== '—' ? `Capitale : ${country.capital}.`       : '',
+  country.population !== '—' ? `Population : ${country.population}.` : '',
+  country.language   !== '—' ? `Langue : ${country.language}.`     : '',
   country.fact ? country.fact.slice(0, 110) + '…' : country.vibe,
 ].filter(Boolean).join(' ');
 
@@ -218,7 +217,7 @@ if (country.area !== '—') {
     ? `${t.geoGeoCentred}${Math.abs(country.latlng[0]).toFixed(1)}°${country.latlng[0] >= 0 ? 'N' : 'S'}, ${Math.abs(country.latlng[1]).toFixed(1)}°${country.latlng[1] >= 0 ? 'E' : 'W'},`
     : '';
   const drive = country.drivingSide !== '—'
-    ? `${country.drivingSide === 'Left' ? t.geoLeftHandRule : t.geoRightHandRule}${tr(country.region) || 'regional'}${t.geoConvention}`
+    ? `${country.drivingSide === t.driveLeft ? t.geoLeftHandRule : t.geoRightHandRule}${tr(country.region) || 'regional'}${t.geoConvention}`
     : '';
   insights.push({ icon: '🗺', title: t.insightGeography,
     text: `${country.name}${t.geoSpans}${country.area} km²${loc ? `, ${loc}` : ''}.${coords}${t.geoDiverseLandscapes}${drive}` });
@@ -273,7 +272,7 @@ const jsonLd = JSON.stringify({
 });
 ---
 
-<Base title={title} description={description} countryName={country.name} lang="en" hreflangEn={enUrl} hreflangFr={frUrl}>
+<Base title={title} description={description} countryName={country.name} lang="fr" hreflangEn={enUrl} hreflangFr={frUrl}>
 
   <Fragment slot="head">
     <script type="application/ld+json" set:html={jsonLd} />
@@ -296,7 +295,7 @@ const jsonLd = JSON.stringify({
   <div class="cp-wrap">
 
     <!-- Back -->
-    <a href="/map" class="cp-back">
+    <a href="/fr/map/" class="cp-back">
       <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12L6 8l4-4"/></svg>
       {t.backToMap}
     </a>
@@ -345,7 +344,7 @@ const jsonLd = JSON.stringify({
         {country.currency   !== '—' && <div class="cp-stat"><span class="cp-stat-label">{t.currencyLabel}</span><span class="cp-stat-val">{country.currency}</span></div>}
         {country.timezone   !== '—' && <div class="cp-stat"><span class="cp-stat-label">{t.timezoneLabel}</span><span class="cp-stat-val">{country.timezone}</span></div>}
         {country.callingCode !== '—' && <div class="cp-stat"><span class="cp-stat-label">{t.callingCodeLabel}</span><span class="cp-stat-val">{country.callingCode}</span></div>}
-        {country.drivingSide !== '—' && <div class="cp-stat"><span class="cp-stat-label">{t.drivesOnLabel}</span><span class="cp-stat-val">{country.drivingSide === 'Left' ? t.driveLeft : t.driveRight}</span></div>}
+        {country.drivingSide !== '—' && <div class="cp-stat"><span class="cp-stat-label">{t.drivesOnLabel}</span><span class="cp-stat-val">{country.drivingSide}</span></div>}
         {country.sport       !== '—' && <div class="cp-stat"><span class="cp-stat-label">{t.nationalSportLabel}</span><span class="cp-stat-val">{country.sport}</span></div>}
         {country.dish                && <div class="cp-stat"><span class="cp-stat-label">{t.nationalDishLabel}</span><span class="cp-stat-val">{country.dish}</span></div>}
       </div>
@@ -370,7 +369,7 @@ const jsonLd = JSON.stringify({
         {country.population !== '—' && <>{t.aboutPopApprox}<strong>{country.population}</strong>{country.language !== '—' ? <>{country.language.includes(',') ? t.aboutMainLangsAre : t.aboutMainLangIs}<strong>{country.language}</strong>{'.'}</> : '.'}</>}
         {country.area !== '—' && <>{t.aboutCoversArea}<strong>{country.area} km²</strong>{'.'}</>}
         {country.currency !== '—' && <>{t.aboutOfficialCurrency}<strong>{country.currency}</strong>{'.'}</>}
-        {country.drivingSide !== '—' && (country.drivingSide === 'Left' ? t.aboutDrivesLeft : t.aboutDrivesRight)}
+        {country.drivingSide !== '—' && (country.drivingSide === t.driveLeft ? t.aboutDrivesLeft : t.aboutDrivesRight)}
       </p>
     </section>
 
@@ -426,7 +425,7 @@ const jsonLd = JSON.stringify({
         <h2 class="cp-section-label">{t.neighbouringCountries}</h2>
         <div class="cp-neighbours">
           {country.borderCountries.map(b => (
-            <a href={`/country/${b.slug}/`} class="cp-neighbour">{b.name}</a>
+            <a href={`/fr/country/${b.slug}/`} class="cp-neighbour">{b.name}</a>
           ))}
         </div>
       </nav>
@@ -435,7 +434,7 @@ const jsonLd = JSON.stringify({
     <!-- CTA map -->
     {!isDNT && (
       <div class="cp-map-cta">
-        <a href="/map" class="cp-map-btn">
+        <a href="/fr/map/" class="cp-map-btn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
@@ -1096,7 +1095,7 @@ const jsonLd = JSON.stringify({
   }
 
   function pick(c: {name:string; slug:string}) {
-    window.location.href = `/compare/${currentSlug}-vs-${c.slug}/`;
+    window.location.href = `/fr/compare/${currentSlug}-vs-${c.slug}/`;
   }
 
   function setActive(idx: number) {

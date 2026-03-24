@@ -1,17 +1,16 @@
 ---
 export const prerender = false;
 
-import Base from '../../layouts/Base.astro';
+import Base from '../../../layouts/Base.astro';
 import {
   COUNTRY_DATA as DATA_EN, COUNTRY_VIBES as VIBES_EN, COUNTRY_PEAKS, COUNTRY_DISHES,
   COUNTRY_CITIES, COUNTRY_INSIGHTS as INSIGHTS_EN, slugify
-} from '../../lib/countryData.js';
-import { TRAVEL_SCORES, TRAVEL_ADVISORY } from '../../lib/travelScores.js';
-import { COUNTRY_REGION, COUNTRY_EXTRAS } from '../../lib/countryExtras.js';
-import { getT, translateRegion } from '../../i18n/translations';
-import { detectLang } from '../../i18n/detect';
+} from '../../../lib/countryData.js';
+import { TRAVEL_SCORES, TRAVEL_ADVISORY } from '../../../lib/travelScores.js';
+import { COUNTRY_REGION, COUNTRY_EXTRAS } from '../../../lib/countryExtras.js';
+import { getT, translateRegion } from '../../../i18n/translations';
 
-const lang = detectLang(Astro.request.headers.get('accept-language') ?? 'en');
+const lang = 'fr' as const;
 const t = getT(lang);
 const tr = (r: string) => translateRegion(r, lang);
 
@@ -19,12 +18,10 @@ let countryVibes:    typeof VIBES_EN    = VIBES_EN;
 let countryDataSrc:  typeof DATA_EN     = DATA_EN;
 let countryInsights: typeof INSIGHTS_EN = INSIGHTS_EN;
 
-if (lang === 'fr') {
-  const fr = await import('../../lib/countryData.fr.js');
-  countryVibes    = fr.COUNTRY_VIBES;
-  countryDataSrc  = fr.COUNTRY_DATA;
-  countryInsights = fr.COUNTRY_INSIGHTS;
-}
+const fr = await import('../../../lib/countryData.fr.js');
+countryVibes    = fr.COUNTRY_VIBES;
+countryDataSrc  = fr.COUNTRY_DATA;
+countryInsights = fr.COUNTRY_INSIGHTS;
 
 // ─── Build country from local data only (no REST API) ─────────────────────────
 function buildCountryFromLocal(name: string) {
@@ -41,7 +38,7 @@ function buildCountryFromLocal(name: string) {
     language:        local.language || '—',
     sport:           local.sport || '—',
     fact:            local.fact  || '',
-    vibe:            (countryVibes as any)[name]    || 'Fascinating · Historic · Unique',
+    vibe:            (countryVibes as any)[name]    || 'Fascinant · Historique · Unique',
     area:            '—',
     areaRaw:         0,
     region:          (COUNTRY_REGION as any)[name]   || '',
@@ -63,10 +60,14 @@ function buildCountryFromLocal(name: string) {
 // ─── Parse slug from URL ───────────────────────────────────────────────────────
 const { slug } = Astro.params;
 const vsIdx = (slug as string).indexOf('-vs-');
-if (vsIdx === -1) return Astro.redirect('/');
+if (vsIdx === -1) return Astro.redirect('/fr/');
 
 const slugA = (slug as string).slice(0, vsIdx);
 const slugB = (slug as string).slice(vsIdx + 4);
+
+const SITE = 'https://terralenses.com';
+const enUrl = `${SITE}/compare/${slug}/`;
+const frUrl = `${SITE}/fr/compare/${slug}/`;
 
 const findCountry = (s: string) => {
   const name = Object.keys(countryDataSrc as any).find(k => slugify(k) === s);
@@ -76,11 +77,7 @@ const findCountry = (s: string) => {
 
 const countryA = findCountry(slugA);
 const countryB = findCountry(slugB);
-if (!countryA || !countryB) return Astro.redirect('/');
-
-const SITE = 'https://terralenses.com';
-const enUrl = `${SITE}/compare/${slug}/`;
-const frUrl = `${SITE}/fr/compare/${slug}/`;
+if (!countryA || !countryB) return Astro.redirect('/fr/');
 
 const ciA = countryA.insights as Record<string,string>;
 const ciB = countryB.insights as Record<string,string>;
@@ -224,7 +221,7 @@ const exB = (COUNTRY_EXTRAS as any)[countryB.name] || {};
 function density(pop: number, area: number): string {
   if (!pop || !area) return '—';
   const d = pop / area;
-  return d < 1 ? '<1 /km²' : `${Math.round(d).toLocaleString('en-US')} /km²`;
+  return d < 1 ? '<1 /km²' : `${Math.round(d).toLocaleString('fr-FR')} /km²`;
 }
 
 // ─── Editorial ─────────────────────────────────────────────────────────────────
@@ -260,7 +257,7 @@ const addMore = (a:{name:string,slug:string}, b:{name:string,slug:string}) => {
   const key = [a.slug,b.slug].sort().join('::');
   if (!moreSet.has(key) && a.slug !== b.slug) {
     moreSet.add(key);
-    moreComparisons.push({ label: `${a.name} vs ${b.name}`, href: `/compare/${a.slug}-vs-${b.slug}/` });
+    moreComparisons.push({ label: `${a.name} vs ${b.name}`, href: `/fr/compare/${a.slug}-vs-${b.slug}/` });
   }
 };
 for (const n of (countryA.borderCountries||[]).slice(0,3)) {
@@ -279,9 +276,9 @@ const countriesList = [...new Set([
 
 // ─── SEO ───────────────────────────────────────────────────────────────────────
 const siteBase  = Astro.site?.href ?? 'https://terralenses.com/';
-const pageUrl   = new URL(`compare/${countryA.slug}-vs-${countryB.slug}/`, siteBase).href;
-const title     = `${countryA.name} vs ${countryB.name}: Country Comparison — Facts, Culture & Travel | TerraLenses`;
-const description = `Compare ${countryA.name} and ${countryB.name} side by side: key facts, travel scores, food, culture, sport and nature. Discover the differences and decide where to go next.`;
+const pageUrl   = new URL(`fr/compare/${countryA.slug}-vs-${countryB.slug}/`, siteBase).href;
+const title     = `${countryA.name} vs ${countryB.name} : Comparaison | TerraLenses`;
+const description = `Comparez ${countryA.name} et ${countryB.name} côte à côte : faits clés, scores de voyage, gastronomie, culture, sport et nature. Découvrez les différences et choisissez votre prochaine destination.`;
 
 const jsonLd = JSON.stringify({
   "@context": "https://schema.org",
@@ -290,7 +287,7 @@ const jsonLd = JSON.stringify({
       "@type": "BreadcrumbList",
       "itemListElement": [
         { "@type":"ListItem","position":1,"name":"TerraLenses","item":siteBase },
-        { "@type":"ListItem","position":2,"name":"Compare","item": new URL('compare/', siteBase).href },
+        { "@type":"ListItem","position":2,"name":"Comparer","item": new URL('fr/compare/', siteBase).href },
         { "@type":"ListItem","position":3,"name":`${countryA.name} vs ${countryB.name}`,"item":pageUrl },
       ]
     },
@@ -302,7 +299,7 @@ const jsonLd = JSON.stringify({
 });
 ---
 
-<Base title={title} description={description} lang="en" hreflangEn={enUrl} hreflangFr={frUrl}>
+<Base title={title} description={description} lang="fr" hreflangEn={enUrl} hreflangFr={frUrl}>
 
   <Fragment slot="head">
     <script type="application/ld+json" set:html={jsonLd} />
@@ -328,7 +325,7 @@ const jsonLd = JSON.stringify({
 
       <!-- 1 ── Breadcrumb ──────────────────────────────────────────── -->
       <nav class="breadcrumb" aria-label="Breadcrumb">
-        <a href="/">{t.home}</a><span aria-hidden="true">›</span>
+        <a href="/fr/">{t.home}</a><span aria-hidden="true">›</span>
         <span>{t.compare}</span><span aria-hidden="true">›</span>
         <span>{countryA.name} vs {countryB.name}</span>
       </nav>
@@ -337,7 +334,7 @@ const jsonLd = JSON.stringify({
       {hasReconsider && (
         <div class="advisory advisory--reconsider" role="alert">
           <span class="advisory-icon">⚠️</span>
-          <span>{t.advisoryReconsiderComparePre}<strong>{reconsiderNames.join(' and ')}</strong>{t.advisoryReconsiderComparePost}</span>
+          <span>{t.advisoryReconsiderComparePre}<strong>{reconsiderNames.join(' et ')}</strong>{t.advisoryReconsiderComparePost}</span>
         </div>
       )}
 
@@ -368,7 +365,7 @@ const jsonLd = JSON.stringify({
       </header>
 
       <!-- 3 ── Country switcher ────────────────────────────────────── -->
-      <div class="switcher" role="search" aria-label="Switch countries">
+      <div class="switcher" role="search" aria-label="Changer de pays">
         <div class="sw-field">
           <label class="sw-label" for="sw-a">{t.countryA}</label>
           <div class="sw-wrap">
@@ -376,7 +373,7 @@ const jsonLd = JSON.stringify({
             <div class="sw-drop" id="sw-drop-a" role="listbox" hidden></div>
           </div>
         </div>
-        <button class="sw-swap" id="sw-swap" title="Swap" aria-label="Swap countries">
+        <button class="sw-swap" id="sw-swap" title="Inverser" aria-label="Inverser les pays">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M7 16V4m0 0L3 8m4-4l4 4"/><path d="M17 8v12m0 0l4-4m-4 4l-4-4"/>
           </svg>
@@ -451,11 +448,11 @@ const jsonLd = JSON.stringify({
           {(countryA.peak || countryB.peak) ? (
             <div class="facts-row">
               <span class={`facts-a${countryA.peak && countryB.peak && countryA.peak.elevation >= countryB.peak.elevation ? ' facts-win' : ''}`}>
-                {countryA.peak ? `${countryA.peak.name} · ${countryA.peak.elevation.toLocaleString('en-US')} m` : '—'}
+                {countryA.peak ? `${countryA.peak.name} · ${countryA.peak.elevation.toLocaleString('fr-FR')} m` : '—'}
               </span>
               <span class="facts-m">{t.highestPeakLabel}</span>
               <span class={`facts-b${countryA.peak && countryB.peak && countryB.peak.elevation > countryA.peak.elevation ? ' facts-win' : ''}`}>
-                {countryB.peak ? `${countryB.peak.name} · ${countryB.peak.elevation.toLocaleString('en-US')} m` : '—'}
+                {countryB.peak ? `${countryB.peak.name} · ${countryB.peak.elevation.toLocaleString('fr-FR')} m` : '—'}
               </span>
             </div>
           ) : null}
@@ -515,7 +512,7 @@ const jsonLd = JSON.stringify({
             <div class="dr-list">
               {countryA.area !== '—' && <div class="dr"><span class="dr-l">{t.areaLabel}</span><span class="dr-v">{countryA.area} km²</span></div>}
               {exA.climate && <div class="dr"><span class="dr-l">{t.climateLabel}</span><span class="dr-v">{exA.climate}</span></div>}
-              {countryA.peak && <div class="dr"><span class="dr-l">{t.highestPeakLabel}</span><span class="dr-v">{countryA.peak.name} · {countryA.peak.elevation.toLocaleString('en-US')} m</span></div>}
+              {countryA.peak && <div class="dr"><span class="dr-l">{t.highestPeakLabel}</span><span class="dr-v">{countryA.peak.name} · {countryA.peak.elevation.toLocaleString('fr-FR')} m</span></div>}
               <div class="dr"><span class="dr-l">{t.coastlineLabel}</span><span class="dr-v">{exA.landlocked ? t.landlocked : t.coastal}</span></div>
             </div>
           </div>
@@ -524,7 +521,7 @@ const jsonLd = JSON.stringify({
             <div class="dr-list">
               {countryB.area !== '—' && <div class="dr"><span class="dr-l">{t.areaLabel}</span><span class="dr-v">{countryB.area} km²</span></div>}
               {exB.climate && <div class="dr"><span class="dr-l">{t.climateLabel}</span><span class="dr-v">{exB.climate}</span></div>}
-              {countryB.peak && <div class="dr"><span class="dr-l">{t.highestPeakLabel}</span><span class="dr-v">{countryB.peak.name} · {countryB.peak.elevation.toLocaleString('en-US')} m</span></div>}
+              {countryB.peak && <div class="dr"><span class="dr-l">{t.highestPeakLabel}</span><span class="dr-v">{countryB.peak.name} · {countryB.peak.elevation.toLocaleString('fr-FR')} m</span></div>}
               <div class="dr"><span class="dr-l">{t.coastlineLabel}</span><span class="dr-v">{exB.landlocked ? t.landlocked : t.coastal}</span></div>
             </div>
           </div>
@@ -582,7 +579,7 @@ const jsonLd = JSON.stringify({
               {countryB.dish && <div class="dr"><span class="dr-l">{t.nationalDishLabel}</span><span class="dr-v">{countryB.dish}</span></div>}
               {exB.dishes?.length > 0 && (
                 <div class="dr dr--wrap">
-                  <span class="dr-l">Also known for</span>
+                  <span class="dr-l">{t.alsoKnownFor}</span>
                   <span class="dr-v dr-pills">
                     {(exB.dishes as string[]).map((d: string) => <span class="pill-sm">{d}</span>)}
                   </span>
@@ -658,7 +655,7 @@ const jsonLd = JSON.stringify({
               <span class="cta-sub cta-sub--dnt">{t.informationalOnly}</span>
             </div>
           ) : (
-            <a href={`/country/${countryA.slug}/`} class="cta-card" style={`--cc:${accentA};`}>
+            <a href={`/fr/country/${countryA.slug}/`} class="cta-card" style={`--cc:${accentA};`}>
               <span class="cta-flag">{countryA.flag}</span>
               <span class="cta-name">{countryA.name}</span>
               <span class="cta-sub">{labelA}</span>
@@ -672,7 +669,7 @@ const jsonLd = JSON.stringify({
               <span class="cta-sub cta-sub--dnt">{t.informationalOnly}</span>
             </div>
           ) : (
-            <a href={`/country/${countryB.slug}/`} class="cta-card" style={`--cc:${accentB};`}>
+            <a href={`/fr/country/${countryB.slug}/`} class="cta-card" style={`--cc:${accentB};`}>
               <span class="cta-flag">{countryB.flag}</span>
               <span class="cta-name">{countryB.name}</span>
               <span class="cta-sub">{labelB}</span>
@@ -700,7 +697,7 @@ const jsonLd = JSON.stringify({
               <h2 class="sh sh--inline">{countryA.flag} {countryA.name} {t.borders}</h2>
               <div class="pills">
                 {countryA.borderCountries.map((b:any) => (
-                  <a href={`/country/${b.slug}/`} class="pill pill--sm">{b.name}</a>
+                  <a href={`/fr/country/${b.slug}/`} class="pill pill--sm">{b.name}</a>
                 ))}
               </div>
             </div>
@@ -710,7 +707,7 @@ const jsonLd = JSON.stringify({
               <h2 class="sh sh--inline">{countryB.flag} {countryB.name} {t.borders}</h2>
               <div class="pills">
                 {countryB.borderCountries.map((b:any) => (
-                  <a href={`/country/${b.slug}/`} class="pill pill--sm">{b.name}</a>
+                  <a href={`/fr/country/${b.slug}/`} class="pill pill--sm">{b.name}</a>
                 ))}
               </div>
             </div>
@@ -720,7 +717,7 @@ const jsonLd = JSON.stringify({
 
       <!-- World map CTA -->
       <div class="map-cta">
-        <a href="/map" class="map-btn">
+        <a href="/fr/map/" class="map-btn">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
@@ -1211,7 +1208,7 @@ const jsonLd = JSON.stringify({
   let slugA = (document.querySelector('.hero-name--a') as HTMLElement)?.closest('.hero-side')?.querySelector<HTMLElement>('.hero-name')?.dataset.slug ?? '';
   let slugB = (document.querySelector('.hero-name--b') as HTMLElement)?.closest('.hero-side')?.querySelector<HTMLElement>('.hero-name')?.dataset.slug ?? '';
 
-  // Read current slugs from URL path: /compare/france-vs-germany/
+  // Read current slugs from URL path: /fr/compare/france-vs-germany/
   const path = window.location.pathname.replace(/\/$/, '');
   const seg  = path.split('/').pop() || '';
   const vsIdx = seg.indexOf('-vs-');
@@ -1268,7 +1265,7 @@ const jsonLd = JSON.stringify({
 
   function go() {
     if (slugA && slugB && slugA !== slugB)
-      window.location.href = `/compare/${slugA}-vs-${slugB}/`;
+      window.location.href = `/fr/compare/${slugA}-vs-${slugB}/`;
   }
 
   const inputA = document.getElementById('sw-a')      as HTMLInputElement;

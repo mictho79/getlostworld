@@ -1,24 +1,21 @@
 ---
 export const prerender = false;
-import Base from '../../layouts/Base.astro';
-import { COUNTRY_DATA as DATA_EN, COUNTRY_VIBES as VIBES_EN, COUNTRY_PEAKS, COUNTRY_DISHES, COUNTRY_INSIGHTS as INSIGHTS_EN, slugify } from '../../lib/countryData.js';
-import { getT, translateRegion } from '../../i18n/translations';
-import { detectLang } from '../../i18n/detect';
+import Base from '../../../layouts/Base.astro';
+import { COUNTRY_DATA as DATA_EN, COUNTRY_VIBES as VIBES_EN, COUNTRY_PEAKS, COUNTRY_DISHES, COUNTRY_INSIGHTS as INSIGHTS_EN, slugify } from '../../../lib/countryData.js';
+import { getT, translateRegion } from '../../../i18n/translations';
 
 const SITE = 'https://terralenses.com';
-const lang = detectLang(Astro.request.headers.get('accept-language') || '');
+const lang = 'fr' as const;
 const t = getT(lang);
 
 let COUNTRY_DATA: any = DATA_EN;
 let COUNTRY_VIBES: any = VIBES_EN;
 let COUNTRY_INSIGHTS: any = INSIGHTS_EN;
 
-if (lang === 'fr') {
-  const fr = await import('../../lib/countryData.fr.js');
-  COUNTRY_DATA    = { ...(DATA_EN    as any), ...(fr.COUNTRY_DATA    as any) };
-  COUNTRY_VIBES   = { ...(VIBES_EN   as any), ...(fr.COUNTRY_VIBES   as any) };
-  COUNTRY_INSIGHTS = { ...(INSIGHTS_EN as any), ...(fr.COUNTRY_INSIGHTS as any) };
-}
+const fr = await import('../../../lib/countryData.fr.js');
+COUNTRY_DATA    = { ...(DATA_EN    as any), ...(fr.COUNTRY_DATA    as any) };
+COUNTRY_VIBES   = { ...(VIBES_EN   as any), ...(fr.COUNTRY_VIBES   as any) };
+COUNTRY_INSIGHTS = { ...(INSIGHTS_EN as any), ...(fr.COUNTRY_INSIGHTS as any) };
 
 const REGION_MAP: Record<string,string> = {
   Algeria:'Africa',Angola:'Africa',Benin:'Africa',Botswana:'Africa','Burkina Faso':'Africa',
@@ -88,7 +85,7 @@ for (const name of allNames) {
     population: cd[name]?.population || '—',
     language:   cd[name]?.language   || '—',
     sport:      cd[name]?.sport      || '—',
-    vibe:       cv[name]             || 'Fascinating · Historic · Unique',
+    vibe:       cv[name]             || 'Fascinant · Historique · Unique',
     dish:       (COUNTRY_DISHES  as any)[name] || null,
     peak:       (COUNTRY_PEAKS   as any)[name] || null,
     insights:   (COUNTRY_INSIGHTS as any)[name] || {},
@@ -100,12 +97,8 @@ const countriesList = Object.values(allData)
   .map((c:any) => ({ name: c.name, slug: c.slug }))
   .sort((a:any, b:any) => a.name.localeCompare(b.name));
 
-const title       = lang === 'fr'
-  ? 'Comparer les pays — Côte à côte | TerraLenses'
-  : 'Compare Countries — Side-by-Side | TerraLenses';
-const description = lang === 'fr'
-  ? 'Comparez deux pays côte à côte : faits, gastronomie, sport, nature et culture. Recherchez et choisissez parmi tous les pays du monde.'
-  : 'Compare any two countries side by side: facts, food, sport, nature and culture. Search and pick any countries from around the world.';
+const title       = 'Comparer les pays — Côte à côte | TerraLenses';
+const description = 'Comparez deux pays côte à côte : faits, gastronomie, sport, nature et culture. Recherchez et choisissez parmi tous les pays du monde.';
 
 // Serialise translated UI labels for client-side use
 const uiLabels = {
@@ -125,14 +118,14 @@ const uiLabels = {
   foodCuisine:     t.foodCuisine,
   sportSection:    t.sportSection,
   whichVisit:      t.whichVisit,
-  exploreEach:     lang === 'fr' ? 'Explorer chaque pays' : lang === 'es' ? 'Explorar cada país' : lang === 'de' ? 'Jedes Land entdecken' : 'Explore each country',
+  exploreEach:     'Explorer chaque pays',
   exploreMap:      t.exploreOnMap,
-  emptyState:      lang === 'fr' ? 'Sélectionnez deux pays ci-dessus pour les comparer' : lang === 'es' ? 'Selecciona dos países arriba para compararlos' : lang === 'de' ? 'Wählen Sie oben zwei Länder aus, um sie zu vergleichen' : 'Select two countries above to compare them',
-  backToMap:       lang === 'fr' ? 'Carte du monde' : lang === 'es' ? 'Mapa mundial' : lang === 'de' ? 'Weltkarte' : 'World map',
+  emptyState:      'Sélectionnez deux pays ci-dessus pour les comparer',
+  backToMap:       'Carte du monde',
 };
 ---
 
-<Base title={title} description={description} lang="en" hreflangEn={`${SITE}/compare/`} hreflangFr={`${SITE}/fr/compare/`}>
+<Base title={title} description={description} lang="fr" hreflangEn={`${SITE}/compare/`} hreflangFr={`${SITE}/fr/compare/`}>
 
   <script type="application/json" id="cmp-all-data"     set:html={JSON.stringify(allData)} />
   <script type="application/json" id="cmp-country-list" set:html={JSON.stringify(countriesList)} />
@@ -148,13 +141,13 @@ const uiLabels = {
 
     <div class="cmp-wrap">
 
-      <a href="/map" class="cmp-back">
+      <a href="/fr/map/" class="cmp-back">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12L6 8l4-4"/></svg>
         {uiLabels.backToMap}
       </a>
 
       <!-- Switcher -->
-      <div class="cmp-switcher" role="search" aria-label="Compare countries">
+      <div class="cmp-switcher" role="search" aria-label="Comparer les pays">
         <div class="cmp-switcher-field">
           <label class="cmp-switcher-label" for="cmp-input-a">{uiLabels.countryA}</label>
           <div class="cmp-switcher-input-wrap">
@@ -546,19 +539,19 @@ function editorial(a:any, b:any):string {
   const popA=parseNum(a.population), popB=parseNum(b.population);
   if(popA>0&&popB>0) {
     const bigger=popA>popB?a:b, ratio=Math.round(Math.max(popA,popB)/Math.min(popA,popB));
-    if(ratio>=3) parts.push(`${bigger.name} has roughly ${ratio}× the population of the other.`);
+    if(ratio>=3) parts.push(`${bigger.name} a environ ${ratio}× la population de l'autre.`);
   }
   if(a.region&&b.region&&a.region!==b.region)
-    parts.push(`${a.name} (${a.region}) and ${b.name} (${b.region}) offer contrasting continental experiences.`);
+    parts.push(`${a.name} (${a.region}) et ${b.name} (${b.region}) offrent des expériences continentales contrastées.`);
   else if(a.region)
-    parts.push(`Both countries share the ${a.region} continent, yet each has a distinct character shaped by history.`);
+    parts.push(`Les deux pays partagent le continent ${a.region}, mais chacun possède un caractère distinct forgé par l'histoire.`);
   if(a.sport!=='—'&&b.sport!=='—'&&a.sport!==b.sport)
-    parts.push(`Sports fans will note: ${a.name} is passionate about ${a.sport}, while ${b.name} rallies around ${b.sport}.`);
+    parts.push(`Les amateurs de sport noteront : ${a.name} est passionné par ${a.sport}, tandis que ${b.name} se rassemble autour du ${b.sport}.`);
   if(a.dish&&b.dish&&a.dish!==b.dish)
-    parts.push(`At the table, ${a.name} is famous for ${a.dish} while ${b.name} celebrates ${b.dish}.`);
+    parts.push(`À table, ${a.name} est célèbre pour ${a.dish} tandis que ${b.name} célèbre ${b.dish}.`);
   const vA=a.vibe.split('·')[0].trim().toLowerCase();
   const vB=b.vibe.split('·')[0].trim().toLowerCase();
-  parts.push(`Choose ${a.name} for a ${vA} experience, or ${b.name} for a ${vB} adventure — both reward the curious traveller.`);
+  parts.push(`Choisissez ${a.name} pour une expérience ${vA}, ou ${b.name} pour une aventure ${vB} — les deux récompensent le voyageur curieux.`);
   return parts.join(' ');
 }
 
@@ -585,28 +578,28 @@ function renderComparison(a:any, b:any) {
 
   const ciA = a.insights, ciB = b.insights;
 
-  const natA = `${a.peak?`<strong>${esc(a.peak.name)}</strong> rises to ${a.peak.elevation.toLocaleString()} m. `:''}${ciA.nature ? esc(ciA.nature) : `${esc(a.name)} offers diverse natural landscapes shaped by its location in ${esc(a.region||'the world')}.`}`;
-  const natB = `${b.peak?`<strong>${esc(b.peak.name)}</strong> rises to ${b.peak.elevation.toLocaleString()} m. `:''}${ciB.nature ? esc(ciB.nature) : `${esc(b.name)} offers diverse natural landscapes shaped by its location in ${esc(b.region||'the world')}.`}`;
-  const pepA = ciA.people ? esc(ciA.people) : `With a population of ${esc(a.population)}, ${esc(a.name)} is a vibrant society with rich traditions.`;
-  const pepB = ciB.people ? esc(ciB.people) : `With a population of ${esc(b.population)}, ${esc(b.name)} is a vibrant society with rich traditions.`;
-  const fooA = `${a.dish?`<strong>${esc(a.dish)}</strong> is the emblematic dish. `:''}${ciA.food?esc(ciA.food):`Food culture in ${esc(a.name)} is deeply tied to local identity.`}`;
-  const fooB = `${b.dish?`<strong>${esc(b.dish)}</strong> is the emblematic dish. `:''}${ciB.food?esc(ciB.food):`Food culture in ${esc(b.name)} is deeply tied to local identity.`}`;
-  const spA  = `${a.sport!=='—'?`<strong>${esc(a.sport)}</strong> holds a special place in ${esc(a.name)}'s identity. `:''}${ciA.sport?esc(ciA.sport):`Sport in ${esc(a.name)} unites communities and fuels local pride.`}`;
-  const spB  = `${b.sport!=='—'?`<strong>${esc(b.sport)}</strong> holds a special place in ${esc(b.name)}'s identity. `:''}${ciB.sport?esc(ciB.sport):`Sport in ${esc(b.name)} unites communities and fuels local pride.`}`;
+  const natA = `${a.peak?`<strong>${esc(a.peak.name)}</strong> culmine à ${a.peak.elevation.toLocaleString()} m. `:''}${ciA.nature ? esc(ciA.nature) : `${esc(a.name)} offre des paysages naturels variés façonnés par sa situation en ${esc(a.region||'monde')}.`}`;
+  const natB = `${b.peak?`<strong>${esc(b.peak.name)}</strong> culmine à ${b.peak.elevation.toLocaleString()} m. `:''}${ciB.nature ? esc(ciB.nature) : `${esc(b.name)} offre des paysages naturels variés façonnés par sa situation en ${esc(b.region||'monde')}.`}`;
+  const pepA = ciA.people ? esc(ciA.people) : `Avec une population de ${esc(a.population)}, ${esc(a.name)} est une société dynamique aux riches traditions.`;
+  const pepB = ciB.people ? esc(ciB.people) : `Avec une population de ${esc(b.population)}, ${esc(b.name)} est une société dynamique aux riches traditions.`;
+  const fooA = `${a.dish?`<strong>${esc(a.dish)}</strong> est le plat emblématique. `:''}${ciA.food?esc(ciA.food):`La culture culinaire de ${esc(a.name)} est profondément liée à l'identité locale.`}`;
+  const fooB = `${b.dish?`<strong>${esc(b.dish)}</strong> est le plat emblématique. `:''}${ciB.food?esc(ciB.food):`La culture culinaire de ${esc(b.name)} est profondément liée à l'identité locale.`}`;
+  const spA  = `${a.sport!=='—'?`<strong>${esc(a.sport)}</strong> occupe une place spéciale dans l'identité de ${esc(a.name)}. `:''}${ciA.sport?esc(ciA.sport):`Le sport à ${esc(a.name)} unit les communautés et attise la fierté locale.`}`;
+  const spB  = `${b.sport!=='—'?`<strong>${esc(b.sport)}</strong> occupe une place spéciale dans l'identité de ${esc(b.name)}. `:''}${ciB.sport?esc(ciB.sport):`Le sport à ${esc(b.name)} unit les communautés et attise la fierté locale.`}`;
 
   document.getElementById('cmp-content')!.innerHTML = `
     <div class="cmp-hero">
       <div class="cmp-hero-country">
         <span class="cmp-hero-flag">${a.flag}</span>
         <h1 class="cmp-hero-name cmp-hero-name--a">${esc(a.name)}</h1>
-        <span class="cmp-region-badge" style="color:${a.accent};border:0.5px solid color-mix(in srgb,${a.accent} 30%,transparent);background:color-mix(in srgb,${a.accent} 8%,transparent)">${esc(a.region||'World')}</span>
+        <span class="cmp-region-badge" style="color:${a.accent};border:0.5px solid color-mix(in srgb,${a.accent} 30%,transparent);background:color-mix(in srgb,${a.accent} 8%,transparent)">${esc(a.region||'Monde')}</span>
         <span class="cmp-vibe">${esc(a.vibe)}</span>
       </div>
       <div class="cmp-vs-badge" aria-hidden="true">VS</div>
       <div class="cmp-hero-country">
         <span class="cmp-hero-flag">${b.flag}</span>
         <h1 class="cmp-hero-name cmp-hero-name--b">${esc(b.name)}</h1>
-        <span class="cmp-region-badge" style="color:${b.accent};border:0.5px solid color-mix(in srgb,${b.accent} 30%,transparent);background:color-mix(in srgb,${b.accent} 8%,transparent)">${esc(b.region||'World')}</span>
+        <span class="cmp-region-badge" style="color:${b.accent};border:0.5px solid color-mix(in srgb,${b.accent} 30%,transparent);background:color-mix(in srgb,${b.accent} 8%,transparent)">${esc(b.region||'Monde')}</span>
         <span class="cmp-vibe">${esc(b.vibe)}</span>
       </div>
     </div>
@@ -653,13 +646,13 @@ function renderComparison(a:any, b:any) {
     <div class="cmp-section">
       <h2 class="cmp-section-label">${esc(UI.exploreEach)}</h2>
       <div class="cmp-cta-row">
-        <a href="/country/${a.slug}/" class="cmp-cta-card" style="border:0.5px solid color-mix(in srgb,${a.accent} 22%,rgba(255,255,255,0.06));background:color-mix(in srgb,${a.accent} 5%,rgba(255,255,255,0.02))">
+        <a href="/fr/country/${a.slug}/" class="cmp-cta-card" style="border:0.5px solid color-mix(in srgb,${a.accent} 22%,rgba(255,255,255,0.06));background:color-mix(in srgb,${a.accent} 5%,rgba(255,255,255,0.02))">
           <span class="cmp-cta-flag">${a.flag}</span>
           <span class="cmp-cta-name">${esc(a.name)}</span>
           <span class="cmp-cta-sub" style="color:${a.accent}">${esc(a.region)}</span>
           <span class="cmp-cta-arrow" style="color:${a.accent}">→</span>
         </a>
-        <a href="/country/${b.slug}/" class="cmp-cta-card" style="border:0.5px solid color-mix(in srgb,${b.accent} 22%,rgba(255,255,255,0.06));background:color-mix(in srgb,${b.accent} 5%,rgba(255,255,255,0.02))">
+        <a href="/fr/country/${b.slug}/" class="cmp-cta-card" style="border:0.5px solid color-mix(in srgb,${b.accent} 22%,rgba(255,255,255,0.06));background:color-mix(in srgb,${b.accent} 5%,rgba(255,255,255,0.02))">
           <span class="cmp-cta-flag">${b.flag}</span>
           <span class="cmp-cta-name">${esc(b.name)}</span>
           <span class="cmp-cta-sub" style="color:${b.accent}">${esc(b.region)}</span>
@@ -669,7 +662,7 @@ function renderComparison(a:any, b:any) {
     </div>
 
     <div class="cmp-map-cta">
-      <a href="/map" class="cmp-map-btn">
+      <a href="/fr/map/" class="cmp-map-btn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
           <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>

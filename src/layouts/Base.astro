@@ -4,12 +4,16 @@ interface Props {
   description: string;
   ogImage?: string;
   countryName?: string;
+  lang?: string;
+  hreflangEn?: string;
+  hreflangFr?: string;
 }
-const { title, description, ogImage, countryName } = Astro.props;
+const { title, description, ogImage, countryName, lang = 'en', hreflangEn, hreflangFr } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://terralenses.com').href;
+const p = lang === 'fr' ? '/fr' : '';
 ---
 <!DOCTYPE html>
-<html lang="en">
+<html lang={lang}>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,6 +21,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://terralenses
   <meta name="description" content={description}>
   <link rel="canonical" href={canonical}>
   <meta name="google-site-verification" content="jncrLZewF1YuN4wAuQFWpmCTFcOhhZjQCeyAdK03Bcc" />
+
+  {hreflangEn && <link rel="alternate" hreflang="en" href={hreflangEn} />}
+  {hreflangFr && <link rel="alternate" hreflang="fr" href={hreflangFr} />}
+  {hreflangEn && <link rel="alternate" hreflang="x-default" href={hreflangEn} />}
 
   <!-- Favicons -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -28,7 +36,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://terralenses
   <meta property="og:description" content={description}>
   <meta property="og:type" content={countryName ? 'article' : 'website'}>
   <meta property="og:url" content={canonical}>
-  <meta property="og:image" content={ogImage ?? '/og-image.svg'}>
+  <meta property="og:image" content={ogImage ?? '/og-image.png'}>
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
 
@@ -36,7 +44,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://terralenses
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content={title}>
   <meta name="twitter:description" content={description}>
-  <meta name="twitter:image" content={ogImage ?? '/og-image.svg'}>
+  <meta name="twitter:image" content={ogImage ?? '/og-image.png'}>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -52,6 +60,55 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://terralenses
   <slot name="head" />
 </head>
 <body>
+  {hreflangEn && hreflangFr && (
+    <div id="lang-switcher">
+      <a href={hreflangEn} class={lang === 'en' ? 'active' : ''}>EN</a>
+      <span>/</span>
+      <a href={hreflangFr} class={lang === 'fr' ? 'active' : ''}>FR</a>
+    </div>
+  )}
   <slot />
+  <footer id="site-footer">
+    <a href={lang === 'fr' ? '/fr/' : '/'}>TerraLenses</a>
+    <span class="sep">·</span>
+    <a href={`${p}/countries/`}>{lang === 'fr' ? 'Tous les pays' : 'All Countries'}</a>
+    <span class="sep">·</span>
+    <a href={`${p}/map/`}>{lang === 'fr' ? 'Carte' : 'Map'}</a>
+    <span class="sep">·</span>
+    <a href={`${p}/compare/`}>{lang === 'fr' ? 'Comparer' : 'Compare'}</a>
+  </footer>
+  <style>
+    #lang-switcher {
+      position: fixed;
+      top: 14px; right: 16px;
+      z-index: 9999;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(6,13,26,0.82);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 8px;
+      padding: 5px 10px;
+      display: flex; gap: 5px; align-items: center;
+      letter-spacing: 0.04em;
+    }
+    #lang-switcher a { color: rgba(255,255,255,0.3); text-decoration: none; transition: color 0.15s; }
+    #lang-switcher a.active { color: rgba(255,255,255,0.92); }
+    #lang-switcher a:hover { color: rgba(255,255,255,0.7); }
+    #lang-switcher span { color: rgba(255,255,255,0.12); font-weight: 300; }
+    #site-footer {
+      text-align: center;
+      padding: 20px 16px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.2);
+      font-family: 'DM Sans', sans-serif;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      margin-top: 40px;
+    }
+    #site-footer a { color: rgba(255,255,255,0.35); text-decoration: none; }
+    #site-footer a:hover { color: rgba(255,255,255,0.7); }
+    #site-footer .sep { margin: 0 8px; }
+  </style>
 </body>
 </html>

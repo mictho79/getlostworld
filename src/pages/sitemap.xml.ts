@@ -17,18 +17,31 @@ export const GET: APIRoute = async () => {
     ['india', 'china'],
     ['brazil', 'argentina'],
     ['australia', 'new-zealand'],
-    ['united-kingdom', 'france'],
     ['spain', 'italy'],
     ['egypt', 'morocco'],
     ['nigeria', 'ghana'],
+    ['portugal', 'spain'],
   ];
 
   const lines = [
-    url(base + '/',         '1.0', 'weekly'),
-    url(base + '/map/',     '0.9', 'weekly'),
-    url(base + '/compare/', '0.8', 'weekly'),
+    // ── EN static ───────────────────────────────────────────
+    url(base + '/',           '1.0', 'weekly'),
+    url(base + '/map/',       '0.9', 'weekly'),
+    url(base + '/compare/',   '0.8', 'weekly'),
+    url(base + '/countries/', '0.8', 'weekly'),
+    // ── FR static ───────────────────────────────────────────
+    url(base + '/fr/',           '0.9', 'weekly'),
+    url(base + '/fr/map/',       '0.8', 'weekly'),
+    url(base + '/fr/compare/',   '0.7', 'weekly'),
+    url(base + '/fr/countries/', '0.7', 'weekly'),
+    // ── EN country pages ────────────────────────────────────
     ...countries.map(c => url(`${base}/country/${slugify(c)}/`, '0.8', 'monthly')),
+    // ── FR country pages ────────────────────────────────────
+    ...countries.map(c => url(`${base}/fr/country/${slugify(c)}/`, '0.7', 'monthly')),
+    // ── EN curated compare pairs ────────────────────────────
     ...curated.map(([a, b]) => url(`${base}/compare/${a}-vs-${b}/`, '0.7', 'monthly')),
+    // ── FR curated compare pairs ────────────────────────────
+    ...curated.map(([a, b]) => url(`${base}/fr/compare/${a}-vs-${b}/`, '0.6', 'monthly')),
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

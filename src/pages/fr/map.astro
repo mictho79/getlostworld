@@ -1,17 +1,14 @@
 ---
 export const prerender = false;
-import { COUNTRY_DATA as DATA_EN } from '../lib/countryData.js';
-import { getT } from '../i18n/translations';
-import { detectLang } from '../i18n/detect';
+import { COUNTRY_DATA as DATA_EN } from '../../lib/countryData.js';
+import { getT } from '../../i18n/translations';
 
-const lang = detectLang(Astro.request.headers.get('accept-language') ?? 'en');
+const lang = 'fr' as const;
 const t = getT(lang);
 
 let countryDataSrc: typeof DATA_EN = DATA_EN;
-if (lang === 'fr') {
-  const fr = await import('../lib/countryData.fr.js');
-  countryDataSrc = { ...(DATA_EN as any), ...(fr.COUNTRY_DATA as any) };
-}
+const fr = await import('../../lib/countryData.fr.js');
+countryDataSrc = { ...(DATA_EN as any), ...(fr.COUNTRY_DATA as any) };
 
 // Extract just the fact field per country for the sidebar
 const sidebarFacts: Record<string, string> = {};
@@ -31,13 +28,13 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
 }
 ---
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>World Map – Explore Every Country | TerraLenses</title>
-  <meta name="description" content="Interactive world map. Click any country to explore facts, culture, geography and more." />
-  <link rel="canonical" href="https://terralenses.com/map/" />
+  <title>Carte du monde – Explorez chaque pays | TerraLenses</title>
+  <meta name="description" content="Carte du monde interactive. Cliquez sur un pays pour explorer ses faits, culture, géographie et plus." />
+  <link rel="canonical" href="https://terralenses.com/fr/map/" />
   <meta name="google-site-verification" content="jncrLZewF1YuN4wAuQFWpmCTFcOhhZjQCeyAdK03Bcc" />
   <link rel="alternate" hreflang="en" href="https://terralenses.com/map/" />
   <link rel="alternate" hreflang="fr" href="https://terralenses.com/fr/map/" />
@@ -263,6 +260,13 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
       pointer-events: none;
     }
 
+    /* ── Lang switcher ────────────────────────────────────────── */
+    #lang-sw { position:fixed; top:14px; right:16px; z-index:9999; font-size:11px; font-weight:600; background:rgba(6,13,26,0.82); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:5px 10px; display:flex; gap:5px; align-items:center; letter-spacing:0.04em; }
+    #lang-sw a { color:rgba(255,255,255,0.3); text-decoration:none; transition:color 0.15s; }
+    #lang-sw a.active { color:rgba(255,255,255,0.92); }
+    #lang-sw a:hover { color:rgba(255,255,255,0.7); }
+    #lang-sw span { color:rgba(255,255,255,0.12); }
+
     @media (max-width: 768px) {
       #sidebar     { display: none; }
       #map         { left: 0; }
@@ -274,12 +278,15 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
 
   <div id="mobile-logo">TerraLenses</div>
 
+  <!-- Lang switcher -->
+  <div id="lang-sw"><a href="/map/">EN</a><span>/</span><a href="/fr/map/" class="active">FR</a></div>
+
   <aside id="sidebar">
 
     <div id="sb-welcome">
       <div class="sb-globe">🌍</div>
       <div class="sb-welcome-title">TerraLenses</div>
-      <div class="sb-welcome-sub">Hover a country to discover it</div>
+      <div class="sb-welcome-sub">Survolez un pays pour le découvrir</div>
     </div>
 
     <div id="sb-country">
@@ -688,13 +695,13 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
             }
             if (foundId) {
               const info = COUNTRY_ID_MAP[+foundId] || UK_NATIONS_INFO[foundId];
-              if (info && info.slug) window.location.href = '/country/' + info.slug;
+              if (info && info.slug) window.location.href = '/fr/country/' + info.slug;
             }
           } else {
             // Desktop: use hover state set by mousemove
             if (!hoveredId) return;
             const info = COUNTRY_ID_MAP[+hoveredId] || UK_NATIONS_INFO[hoveredId];
-            if (info) window.location.href = '/country/' + info.slug;
+            if (info) window.location.href = '/fr/country/' + info.slug;
           }
         });
       });

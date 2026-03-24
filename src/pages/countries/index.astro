@@ -1,0 +1,180 @@
+---
+export const prerender = true;
+import { COUNTRY_DATA, slugify } from '../../lib/countryData.js';
+import { COUNTRY_REGION } from '../../lib/countryExtras.js';
+import Base from '../../layouts/Base.astro';
+
+const CONTINENT_ORDER = ['Europe', 'Asia', 'Africa', 'Americas', 'Oceania'];
+const CONTINENT_EMOJI: Record<string, string> = {
+  Europe: '🌍', Asia: '🌏', Africa: '🌍', Americas: '🌎', Oceania: '🌏',
+};
+
+// Group countries by continent
+const byContinent: Record<string, { name: string; slug: string; flag: string; capital: string }[]> = {};
+for (const cont of CONTINENT_ORDER) byContinent[cont] = [];
+
+for (const [name, data] of Object.entries(COUNTRY_DATA as Record<string, any>)) {
+  const region = (COUNTRY_REGION as Record<string, string>)[name];
+  if (!region || !byContinent[region]) continue;
+  byContinent[region].push({
+    name,
+    slug: slugify(name),
+    flag: (data as any).flag ?? '',
+    capital: (data as any).capital ?? '',
+  });
+}
+
+for (const cont of CONTINENT_ORDER) {
+  byContinent[cont].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+const totalCountries = Object.values(byContinent).reduce((s, arr) => s + arr.length, 0);
+---
+
+<Base
+  title="All Countries – Facts & Geography | TerraLenses"
+  description="Browse all 195 countries. Explore facts, capitals, populations and geography for every nation on Earth."
+>
+  <style is:global>
+    html, body { overflow: auto !important; height: auto !important; }
+  </style>
+  <style>
+    * { box-sizing: border-box; }
+    body { background: #060d1a; color: #fff; }
+
+    #countries-main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    .page-header {
+      margin-bottom: 56px;
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.35);
+      text-decoration: none;
+      margin-bottom: 24px;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: rgba(255,255,255,0.7); }
+
+    h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0 0 10px;
+      line-height: 1.1;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: rgba(255,255,255,0.35);
+      margin: 0;
+    }
+
+    .continent-section {
+      margin-bottom: 52px;
+    }
+
+    h2.continent-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      margin: 0 0 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    h2.continent-title .emoji { font-size: 14px; }
+
+    .country-grid {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 6px;
+    }
+
+    .country-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid transparent;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .country-card:hover {
+      background: rgba(91,143,255,0.08);
+      border-color: rgba(91,143,255,0.2);
+    }
+
+    .country-flag { font-size: 20px; line-height: 1; flex-shrink: 0; }
+
+    .country-info { min-width: 0; }
+    .country-name {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.85);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .country-capital {
+      display: block;
+      font-size: 11px;
+      color: rgba(255,255,255,0.28);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 600px) {
+      .country-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+    }
+  </style>
+
+  <main id="countries-main">
+    <div class="page-header">
+      <a href="/" class="back-link">← TerraLenses</a>
+      <h1>Explore All Countries</h1>
+      <p class="subtitle">{totalCountries} countries across {CONTINENT_ORDER.length} continents</p>
+    </div>
+
+    {CONTINENT_ORDER.map(continent => (
+      <section class="continent-section">
+        <h2 class="continent-title">
+          <span class="emoji">{CONTINENT_EMOJI[continent]}</span>
+          {continent}
+          <span style="margin-left:auto;font-weight:400;opacity:0.5;">{byContinent[continent].length}</span>
+        </h2>
+        <ul class="country-grid">
+          {byContinent[continent].map(c => (
+            <li>
+              <a href={`/country/${c.slug}/`} class="country-card">
+                <span class="country-flag">{c.flag}</span>
+                <span class="country-info">
+                  <span class="country-name">{c.name}</span>
+                  <span class="country-capital">{c.capital}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </main>
+</Base>

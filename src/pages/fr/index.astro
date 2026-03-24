@@ -1,19 +1,16 @@
 ---
 export const prerender = false;
-import { COUNTRY_VIBES as VIBES_EN, COUNTRY_DATA as DATA_EN, slugify } from '../lib/countryData.js';
-import { getT } from '../i18n/translations';
-import { detectLang } from '../i18n/detect';
+import { COUNTRY_VIBES as VIBES_EN, COUNTRY_DATA as DATA_EN, slugify } from '../../lib/countryData.js';
+import { getT } from '../../i18n/translations';
 
-const lang = detectLang(Astro.request.headers.get('accept-language') ?? 'en');
+const lang = 'fr' as const;
 const t    = getT(lang);
 
 let vibesSrc: typeof VIBES_EN = VIBES_EN;
 let dataSrc:  typeof DATA_EN  = DATA_EN;
-if (lang === 'fr') {
-  const fr = await import('../lib/countryData.fr.js');
-  vibesSrc = (fr as any).COUNTRY_VIBES;
-  dataSrc  = (fr as any).COUNTRY_DATA;
-}
+const fr = await import('../../lib/countryData.fr.js');
+vibesSrc = (fr as any).COUNTRY_VIBES;
+dataSrc  = (fr as any).COUNTRY_DATA;
 
 // Build enriched country payload for the globe — always iterate EN keys so new nations are included
 const globeData: Record<string, { vibe: string; fact: string; slug: string }> = {};
@@ -31,13 +28,17 @@ const countryList = Object.keys(globeData).sort().map(n => ({
 }));
 ---
 <!DOCTYPE html>
-<html lang={lang}>
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TerraLenses — Get lost in the world</title>
-  <meta name="description" content="Explore interactive facts, insights, and comparisons for every country on Earth. Powered by a beautiful 3D globe." />
+  <title>TerraLenses — Perdez-vous dans le monde</title>
+  <meta name="description" content="Explorez 195 pays — cultures, paysages, faits et comparaisons." />
   <meta name="google-site-verification" content="jncrLZewF1YuN4wAuQFWpmCTFcOhhZjQCeyAdK03Bcc" />
+  <link rel="canonical" href="https://terralenses.com/fr/" />
+  <link rel="alternate" hreflang="en" href="https://terralenses.com/" />
+  <link rel="alternate" hreflang="fr" href="https://terralenses.com/fr/" />
+  <link rel="alternate" hreflang="x-default" href="https://terralenses.com/" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="apple-touch-icon" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -412,6 +413,13 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       text-transform: uppercase;
     }
 
+    /* ── Lang switcher ────────────────────────────────────────── */
+    #lang-sw { position:fixed; top:14px; right:16px; z-index:9999; font-size:11px; font-weight:600; background:rgba(6,13,26,0.82); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:5px 10px; display:flex; gap:5px; align-items:center; letter-spacing:0.04em; }
+    #lang-sw a { color:rgba(255,255,255,0.3); text-decoration:none; transition:color 0.15s; }
+    #lang-sw a.active { color:rgba(255,255,255,0.92); }
+    #lang-sw a:hover { color:rgba(255,255,255,0.7); }
+    #lang-sw span { color:rgba(255,255,255,0.12); }
+
     /* ── Responsive ───────────────────────────────────────────── */
     @media (max-width: 700px) {
       #panel {
@@ -438,11 +446,14 @@ const countryList = Object.keys(globeData).sort().map(n => ({
   <!-- Loading -->
   <div id="loading">
     <div class="ld-ring"></div>
-    <div class="ld-text">Loading&hellip;</div>
+    <div class="ld-text">Chargement&hellip;</div>
   </div>
 
   <!-- Globe (fills full screen as background layer) -->
   <div id="globe-container"></div>
+
+  <!-- Lang switcher -->
+  <div id="lang-sw"><a href="/">EN</a><span>/</span><a href="/fr/" class="active">FR</a></div>
 
   <!-- Left panel -->
   <aside id="panel">
@@ -451,7 +462,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         <div class="badge-dot"></div>
         TerraLenses
       </div>
-      <h1 id="site-title">Get lost <br>in <em>the world</em></h1>
+      <h1 id="site-title">Perdez-vous <br>dans <em>le monde</em></h1>
       <p id="tagline">{t.tagline}</p>
     </div>
 
@@ -470,7 +481,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
 
     <!-- CTA -->
     <div id="cta-wrap">
-      <a href="/map" id="cta">
+      <a href="/fr/map" id="cta">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"/>
           <line x1="2" y1="12" x2="22" y2="12"/>
@@ -488,7 +499,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
     </div>
 
     <div id="nav-countries">
-      <a href="/countries/">🌐 Browse all 195 countries →</a>
+      <a href="/fr/countries/">🌐 Parcourir les 195 pays →</a>
     </div>
 
     <div class="sep"></div>
@@ -548,13 +559,13 @@ const countryList = Object.keys(globeData).sort().map(n => ({
 
     acList.addEventListener('click', function(e) {
       var item = e.target.closest('.ac-item');
-      if (item) window.location.href = '/country/' + item.dataset.slug;
+      if (item) window.location.href = '/fr/country/' + item.dataset.slug;
     });
 
     searchEl.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
         var first = acList.querySelector('.ac-item');
-        if (first) window.location.href = '/country/' + first.dataset.slug;
+        if (first) window.location.href = '/fr/country/' + first.dataset.slug;
       }
       if (e.key === 'Escape') { acList.innerHTML = ''; }
     });
@@ -938,7 +949,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         document.getElementById('card-vibe').textContent = p.vibe;
         document.getElementById('card-fact').textContent = p.fact;
         var lnk = document.getElementById('card-link');
-        lnk.href        = '/country/' + p.slug;
+        lnk.href        = '/fr/country/' + p.slug;
         lnk.textContent = window._UI.discoverLabel + ' ' + p.name;
         document.getElementById('country-card').classList.add('visible');
 
@@ -983,7 +994,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         var local = globe.worldToLocal(hits[0].point.clone());
         var ll    = v3ll(local);
         var f     = findFeature(ll.lat, ll.lng);
-        if (f && f.properties.slug) window.location.href = '/country/' + f.properties.slug;
+        if (f && f.properties.slug) window.location.href = '/fr/country/' + f.properties.slug;
       });
 
       renderer.domElement.addEventListener('mousemove', function(e) {
