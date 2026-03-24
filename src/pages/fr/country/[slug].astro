@@ -5,7 +5,7 @@ import { COUNTRY_DATA as DATA_EN, COUNTRY_VIBES as VIBES_EN, COUNTRY_PEAKS, COUN
 import { COUNTRY_CCN3 } from '../../../lib/countryCodes.js';
 import { TRAVEL_ADVISORY } from '../../../lib/travelScores.js';
 import { geojsonToSvgPath } from '../../../lib/geojsonSvg.js';
-import { getT, translateRegion, getCountryNameFR, translateLangs } from '../../../i18n/translations';
+import { getT, translateRegion, getCountryNameFR, translateLangs, artFR, withArticleFR, deArticleFR } from '../../../i18n/translations';
 
 // ─── Slug aliases ──────────────────────────────────────────────────────────────
 const SLUG_ALIASES: Record<string,string> = {
@@ -140,7 +140,7 @@ const country = {
   subregion:       rc?.subregion || '',
   latlng:          (rc?.latlng   || [0, 0]) as [number, number],
   currency:        formatCurrency(rc?.currencies),
-  timezone:        rc?.timezones?.[0] || '—',
+  timezone:        localData.timezone || rc?.timezones?.[0] || '—',
   callingCode:     rc?.idd?.root ? rc.idd.root + (rc.idd.suffixes?.length === 1 ? rc.idd.suffixes[0] : '') : '—',
   drivingSide:     rc?.car?.side === 'left' ? t.driveLeft : rc?.car?.side === 'right' ? t.driveRight : '—',
   borderCountries,
@@ -194,7 +194,7 @@ if (country.capital !== '—') {
     ? `${t.capBeyond}${otherCities.join(', ')}${t.capCitiesHub}`
     : '';
   insights.push({ icon: '🏛', title: t.insightCapital,
-    text: `${country.capital}${t.capServes}${nameFR}${country.subregion ? `${t.capPositionedIn}${tr(country.subregion)}` : ''}${t.capSeat}${cityLine}${ci.capital ? ' ' + ci.capital : ''}` });
+    text: `${country.capital}${t.capServes}${deArticleFR(country.name, nameFR)}${country.subregion ? `${t.capPositionedIn}${tr(country.subregion)}` : ''}${t.capSeat}${cityLine}${ci.capital ? ' ' + ci.capital : ''}` });
 }
 
 if (country.population !== '—') {
@@ -203,9 +203,9 @@ if (country.population !== '—') {
   const langNote = langs
     ? ` ${plural ? t.popLangsAre : t.popLangIs}${langs}${plural ? t.popLangReflect : t.popLangReflects}`
     : '';
-  const callNote = country.callingCode !== '—' ? `${t.popInternationally}${nameFR}${t.popDialCode}${country.callingCode}${t.popDialCodeEnd}` : '';
+  const callNote = country.callingCode !== '—' ? `${t.popInternationally}${withArticleFR(country.name, nameFR)}${t.popDialCode}${country.callingCode}${t.popDialCodeEnd}` : '';
   insights.push({ icon: '👥', title: t.insightPeople,
-    text: `${t.aboutPopApprox.trimStart()}${country.population}, ${nameFR}${t.popVibrant}${langNote}${callNote}${ci.people ? ' ' + ci.people : ''}` });
+    text: `${t.aboutPopApprox.trimStart()}${country.population}, ${withArticleFR(country.name, nameFR, true)}${t.popVibrant}${langNote}${callNote}${ci.people ? ' ' + ci.people : ''}` });
 }
 
 if (country.area !== '—') {
@@ -215,7 +215,7 @@ if (country.area !== '—') {
     ? `${country.drivingSide === t.driveLeft ? t.geoLeftHandRule : t.geoRightHandRule}`
     : '';
   insights.push({ icon: '🗺', title: t.insightGeography,
-    text: `${nameFR}${t.geoSpans}${country.area} km²${loc ? ` ${loc}` : ''}.${t.geoDiverseLandscapes}${drive}` });
+    text: `${withArticleFR(country.name, nameFR, true)}${t.geoSpans}${country.area} km²${loc ? ` ${loc}` : ''}.${t.geoDiverseLandscapes}${drive}` });
 }
 
 if (country.currency !== '—') {
@@ -228,20 +228,20 @@ if (country.currency !== '—') {
 
 if (country.dish) {
   insights.push({ icon: '🍽', title: t.insightFood,
-    text: `${t.foodEmblem}${nameFR}${t.foodIs}${country.dish}. ${ci.food ? ci.food : `${t.foodCulture}${nameFR}${t.foodTied}`}` });
+    text: `${t.foodEmblem}${artFR(country.name)}${nameFR}${t.foodIs}${country.dish}. ${ci.food ? ci.food : `${t.foodCulture}${withArticleFR(country.name, nameFR)}${t.foodTied}`}` });
 }
 
 if (country.sport !== '—') {
   const sportText = ci.sport
     ? ci.sport
-    : `${t.sportIn}${nameFR}${t.sportBeyond}`;
+    : `${t.sportIn}${withArticleFR(country.name, nameFR)}${t.sportBeyond}`;
   insights.push({ icon: '🏅', title: t.insightSport, text: sportText });
 }
 
 if (country.peak) {
   const elev = country.peak.elevation.toLocaleString('fr-FR');
   insights.push({ icon: '⛰', title: t.insightNature,
-    text: `${t.natureHighest}${nameFR}${t.natureIs}${country.peak.name}${t.natureRising}${elev}${t.natureMetres}${ci.nature ? ci.nature : t.natureEmbodies}` });
+    text: `${t.natureHighest}${deArticleFR(country.name, nameFR)}${t.natureIs}${country.peak.name}${t.natureRising}${elev}${t.natureMetres}${ci.nature ? ci.nature : t.natureEmbodies}` });
 }
 
 const jsonLd = JSON.stringify({
@@ -359,9 +359,9 @@ const jsonLd = JSON.stringify({
 
     <!-- About -->
     <section class="cp-section">
-      <h2 class="cp-section-label">{t.aboutSection} {country.name}</h2>
+      <h2 class="cp-section-label">{t.aboutSection} {deArticleFR(country.name, nameFR)}</h2>
       <p class="cp-about">
-        <strong>{nameFR}</strong>{country.officialName !== country.name ? ` (${t.aboutOfficially} ${country.officialName})` : ''}{locFR ? ` est un pays ${deOrD(locFR)}${locFR}.` : ' est un pays du monde.'}
+        {artFR(country.name) ? artFR(country.name)[0].toUpperCase() + artFR(country.name).slice(1) : ''}<strong>{nameFR}</strong>{country.officialName !== country.name ? ` (${t.aboutOfficially} ${country.officialName})` : ''}{locFR ? ` est un pays ${deOrD(locFR)}${locFR}.` : ' est un pays du monde.'}
         {country.capital !== '—' && <>{t.aboutCapitalIs}<strong>{country.capital}</strong>{`${country.cities.length > 0 ? `${t.aboutWithOtherCities}${country.cities.slice(0, 2).map((c: {name:string}) => c.name).join(` ${t.andConj} `)}` : ''}.`}</>}
         {country.population !== '—' && <>{t.aboutPopApprox}<strong>{country.population}</strong>{country.language !== '—' ? <>{country.language.includes(',') ? t.aboutMainLangsAre : t.aboutMainLangIs}<strong>{country.language}</strong>{'.'}</> : '.'}</>}
         {country.area !== '—' && <>{t.aboutCoversArea}<strong>{country.area} km²</strong>{'.'}</>}

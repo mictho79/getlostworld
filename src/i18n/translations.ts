@@ -205,7 +205,7 @@ const T = {
     callingCodeLabel:   'Indicatif',
     drivesOnLabel:      'Conduite',
     compareWithAnother: 'Comparer avec un autre pays',
-    aboutSection:       'À propos de',
+    aboutSection:       'À propos',
     didYouKnow:         'Le saviez-vous',
     exploreSection:     'Découvrir',
     majorCities:        'Grandes villes',
@@ -287,7 +287,7 @@ const T = {
 
     // ── Insight — Capital ──────────────────────────────────────────────────────
     capServes:               ' est le cœur politique, culturel et économique de ',
-    capPositionedIn:         ', situé(e) dans ',
+    capPositionedIn:         ', située dans ',
     capSeat:                 '. Siège du gouvernement et souvent ville la plus peuplée, elle concentre les principales institutions, universités et sites culturels du pays.',
     capBeyond:               ' Au-delà de la capitale, les grandes villes comprennent ',
     capCitiesHub:            ' — chacune un foyer de culture régionale, d\'économie et d\'histoire.',
@@ -306,7 +306,7 @@ const T = {
     geoSubregionOf:          '',
     geoIn:                   'en ',
     geoGeoCentred:           ' Centré géographiquement autour de ',
-    geoDiverseLandscapes:    ' le pays offre une grande diversité de paysages.',
+    geoDiverseLandscapes:    ' Le pays offre une grande diversité de paysages.',
     geoRightHandRule:        ' La circulation se fait à droite.',
     geoLeftHandRule:         ' La circulation se fait à gauche.',
     geoConvention:           '',
@@ -782,42 +782,157 @@ export function translateRegion(region: string, lang: Lang): string {
 
 // ── French country name overrides ─────────────────────────────────────────────
 export const COUNTRY_NAMES_FR: Record<string, string> = {
-  'North Macedonia':              'Macédoine du Nord',
+  // Americas
   'United States of America':     'États-Unis',
   'United States':                'États-Unis',
-  'United Kingdom':               'Royaume-Uni',
-  'Czech Republic':               'République tchèque',
   'Dominican Republic':           'République dominicaine',
   'Central African Republic':     'République centrafricaine',
-  'South Korea':                  'Corée du Sud',
-  'North Korea':                  'Corée du Nord',
-  'Saudi Arabia':                 'Arabie saoudite',
-  'United Arab Emirates':         'Émirats arabes unis',
-  'New Zealand':                  'Nouvelle-Zélande',
-  'Papua New Guinea':             'Papouasie-Nouvelle-Guinée',
-  'Ivory Coast':                  "Côte d'Ivoire",
-  'Cape Verde':                   'Cap-Vert',
-  'Bosnia and Herzegovina':       'Bosnie-Herzégovine',
   'Trinidad and Tobago':          'Trinité-et-Tobago',
   'São Tomé and Príncipe':        'Sao Tomé-et-Principe',
   'Sao Tome and Principe':        'Sao Tomé-et-Principe',
-  'Democratic Republic of the Congo': 'République démocratique du Congo',
-  'Republic of the Congo':        'République du Congo',
-  'Cabo Verde':                   'Cap-Vert',
-  'Eswatini':                     'Eswatini',
+  'Argentina':                    'Argentine',
+  'Bolivia':                      'Bolivie',
+  'Colombia':                     'Colombie',
+  'Jamaica':                      'Jamaïque',
+  'Venezuela':                    'Venezuela',
+  // Europe
+  'United Kingdom':               'Royaume-Uni',
+  'Czech Republic':               'République tchèque',
+  'North Macedonia':              'Macédoine du Nord',
+  'Bosnia and Herzegovina':       'Bosnie-Herzégovine',
+  'Germany':                      'Allemagne',
+  'Albania':                      'Albanie',
+  'Armenia':                      'Arménie',
+  'Austria':                      'Autriche',
+  'Azerbaijan':                   'Azerbaïdjan',
+  'Belgium':                      'Belgique',
+  'Bulgaria':                     'Bulgarie',
+  'Croatia':                      'Croatie',
+  'Estonia':                      'Estonie',
+  'Finland':                      'Finlande',
+  'Georgia':                      'Géorgie',
+  'Greece':                       'Grèce',
+  'Hungary':                      'Hongrie',
+  'Ireland':                      'Irlande',
+  'Italy':                        'Italie',
+  'Latvia':                       'Lettonie',
+  'Lithuania':                    'Lituanie',
+  'Moldova':                      'Moldavie',
+  'Montenegro':                   'Monténégro',
+  'Netherlands':                  'Pays-Bas',
+  'Norway':                       'Norvège',
+  'Poland':                       'Pologne',
+  'Romania':                      'Roumanie',
+  'Russia':                       'Russie',
+  'Serbia':                       'Serbie',
+  'Slovakia':                     'Slovaquie',
+  'Slovenia':                     'Slovénie',
+  'Spain':                        'Espagne',
+  'Sweden':                       'Suède',
+  'Switzerland':                  'Suisse',
+  'Turkey':                       'Turquie',
+  // Asia
+  'Saudi Arabia':                 'Arabie saoudite',
+  'United Arab Emirates':         'Émirats arabes unis',
+  'South Korea':                  'Corée du Sud',
+  'North Korea':                  'Corée du Nord',
   'Myanmar':                      'Birmanie',
   'Timor-Leste':                  'Timor oriental',
+  'China':                        'Chine',
+  'India':                        'Inde',
+  'Indonesia':                    'Indonésie',
+  'Iraq':                         'Irak',
+  'Japan':                        'Japon',
+  'Jordan':                       'Jordanie',
+  'Malaysia':                     'Malaisie',
+  'Mongolia':                     'Mongolie',
+  'Syria':                        'Syrie',
+  'Thailand':                     'Thaïlande',
+  'Kyrgyzstan':                   'Kirghizistan',
+  // Africa
+  'Algeria':                      'Algérie',
+  'Egypt':                        'Égypte',
+  'Ethiopia':                     'Éthiopie',
+  'Libya':                        'Libye',
+  'Morocco':                      'Maroc',
+  'South Africa':                 'Afrique du Sud',
+  'Somalia':                      'Somalie',
+  'Tanzania':                     'Tanzanie',
+  'Tunisia':                      'Tunisie',
+  'Uganda':                       'Ouganda',
+  'Zambia':                       'Zambie',
+  'Ivory Coast':                  "Côte d'Ivoire",
+  'Cape Verde':                   'Cap-Vert',
+  'Cabo Verde':                   'Cap-Vert',
+  'Democratic Republic of the Congo': 'République démocratique du Congo',
+  'Republic of the Congo':        'République du Congo',
+  // Oceania
+  'New Zealand':                  'Nouvelle-Zélande',
+  'Papua New Guinea':             'Papouasie-Nouvelle-Guinée',
   'Marshall Islands':             'Îles Marshall',
   'Solomon Islands':              'Îles Salomon',
+  'Cook Islands':                 'Îles Cook',
   'Faroe Islands':                'Îles Féroé',
   'Cayman Islands':               'Îles Caïmans',
-  'Virgin Islands':               'Îles Vierges',
   'Falkland Islands':             'Îles Malouines',
-  'Cook Islands':                 'Îles Cook',
+  'Virgin Islands':               'Îles Vierges',
+  'Eswatini':                     'Eswatini',
 };
 
 export function getCountryNameFR(name: string): string {
   return COUNTRY_NAMES_FR[name] ?? name;
+}
+
+// ── French article helpers ─────────────────────────────────────────────────────
+// Uses English key to look up grammatical properties, French name for vowel check
+const _NO_ART = new Set([
+  'Singapore','Cyprus','Malta','Djibouti','Oman','Bahrain','Israel','Cuba','Haiti',
+  'Monaco','Andorra','Liechtenstein','San Marino','Tuvalu','Nauru','Kiribati','Palau',
+]);
+const _LES = new Set([
+  'United States of America','United States','Netherlands','Philippines',
+  'Maldives','Seychelles','Marshall Islands','Solomon Islands','Fiji','Comoros',
+  'Bahamas','United Arab Emirates','Cook Islands','Faroe Islands',
+]);
+const _MASC = new Set([
+  'Japan','Canada','Mexico','Brazil','Portugal','Morocco','Senegal','Cameroon',
+  'Sudan','Chad','Niger','Mali','Benin','Togo','Gabon','Congo',
+  'Democratic Republic of the Congo','Republic of the Congo',
+  'Rwanda','Burundi','Mozambique','Zimbabwe','Malawi','Botswana','Lesotho',
+  'Kuwait','Qatar','Yemen','Lebanon','Pakistan','Bangladesh','Nepal',
+  'Cambodia','Laos','Vietnam','Kazakhstan','Kyrgyzstan','Tajikistan',
+  'Turkmenistan','Uzbekistan','Afghanistan','Peru','Chile','Paraguay','Uruguay',
+  'Ecuador','Guatemala','Honduras','El Salvador','Nicaragua','Panama',
+  'Denmark','Luxembourg','Bhutan','Suriname','Guyana','Liberia','Sierra Leone',
+  'Venezuela','Mongolia',
+]);
+
+/** Returns the French definite article (lowercase) for a country given its English key. */
+export function artFR(enName: string): string {
+  if (_NO_ART.has(enName)) return '';
+  if (_LES.has(enName)) return 'les ';
+  const fr = COUNTRY_NAMES_FR[enName] ?? enName;
+  if (/^[AEIOUÉÈÊËÀÂÎÏÙÛŒÆaeiouéèêëàâîïùûœæ]/.test(fr)) return "l'";
+  if (_MASC.has(enName)) return 'le ';
+  return 'la ';
+}
+
+/** Returns article + French name, optionally capitalized (for start of sentence). */
+export function withArticleFR(enName: string, frName: string, cap = false): string {
+  const art = artFR(enName);
+  if (!art) return frName;
+  if (cap) return art[0].toUpperCase() + art.slice(1) + frName;
+  return art + frName;
+}
+
+/** Returns "de la X" / "du X" / "de l'X" / "des X" / "de X" for after a "de" preposition. */
+export function deArticleFR(enName: string, frName: string): string {
+  if (_NO_ART.has(enName)) return 'de ' + frName;
+  if (_LES.has(enName)) return 'des ' + frName;
+  const fr = COUNTRY_NAMES_FR[enName] ?? enName;
+  if (/^[AEIOUÉÈÊËÀÂÎÏÙÛŒÆaeiouéèêëàâîïùûœæ]/.test(fr)) return "de l'" + frName;
+  if (_MASC.has(enName)) return 'du ' + frName;
+  return 'de la ' + frName;
 }
 
 // ── French language name translations ─────────────────────────────────────────

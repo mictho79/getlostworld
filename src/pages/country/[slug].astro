@@ -134,7 +134,7 @@ const country = {
   subregion:       rc?.subregion || '',
   latlng:          (rc?.latlng   || [0, 0]) as [number, number],
   currency:        formatCurrency(rc?.currencies),
-  timezone:        rc?.timezones?.[0] || '—',
+  timezone:        localData.timezone || rc?.timezones?.[0] || '—',
   callingCode:     rc?.idd?.root ? rc.idd.root + (rc.idd.suffixes?.length === 1 ? rc.idd.suffixes[0] : '') : '—',
   drivingSide:     rc?.car?.side === 'left' ? t.driveLeft : rc?.car?.side === 'right' ? t.driveRight : '—',
   borderCountries,
