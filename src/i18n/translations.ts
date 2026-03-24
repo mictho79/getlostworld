@@ -773,6 +773,12 @@ const REGION_TRANSLATIONS: Record<string, Record<'fr'|'es'|'de', string>> = {
   'Australia and New Zealand': { fr: 'Australie et Nouvelle-Zélande', es: 'Australia y Nueva Zelanda', de: 'Australien und Neuseeland' },
   'Melanesia':                 { fr: 'Mélanésie',                es: 'Melanesia',                de: 'Melanesien'               },
   'Polynesia':                 { fr: 'Polynésie',                es: 'Polynesia',                de: 'Polynesien'               },
+  // REST Countries API v3 uses these exact strings (different from our aliases above)
+  'Eastern Asia':              { fr: 'Asie de l\'Est',           es: 'Asia Oriental',            de: 'Ostasien'                 },
+  'Southern Asia':             { fr: 'Asie du Sud',              es: 'Asia del Sur',             de: 'Südasien'                 },
+  'South-Eastern Asia':        { fr: 'Asie du Sud-Est',          es: 'Asia Sudoriental',         de: 'Südostasien'              },
+  'Northern America':          { fr: 'Amérique du Nord',         es: 'América del Norte',        de: 'Nordamerika'              },
+  'Micronesia':                { fr: 'Micronésie',               es: 'Micronesia',               de: 'Mikronesien'              },
 };
 
 export function translateRegion(region: string, lang: Lang): string {
@@ -923,6 +929,11 @@ export function withArticleFR(enName: string, frName: string, cap = false): stri
   if (!art) return frName;
   if (cap) return art[0].toUpperCase() + art.slice(1) + frName;
   return art + frName;
+}
+
+/** Returns true if the country is grammatically plural in French (article "les"). */
+export function isPlural(enName: string): boolean {
+  return _LES.has(enName);
 }
 
 /** Returns "de la X" / "du X" / "de l'X" / "des X" / "de X" for after a "de" preposition. */
@@ -1092,6 +1103,94 @@ export const CURRENCIES_FR: Record<string, string> = {
   'Georgian lari':        'lari géorgien',
   'Armenian dram':        'dram arménien',
   'Azerbaijani manat':    'manat azerbaïdjanais',
+  // Oceania & island nations
+  'Maldivian rufiyaa':    'rufiyaa maldivien',
+  'Seychellois rupee':    'roupie seychelloise',
+  'Solomon Islands dollar': 'dollar des Îles Salomon',
+  'Fijian dollar':        'dollar fidjien',
+  'Comorian franc':       'franc comorien',
+  'Bahamian dollar':      'dollar bahamien',
+  'Papua New Guinean kina': 'kina papouasien',
+  'Tongan paʻanga':       'paʻanga tonguien',
+  'Vanuatu vatu':         'vatu vanuatuan',
+  'Samoan tālā':          'tālā samoan',
+  'Kiribati dollar':      'dollar des Kiribati',
+  'Nauruan dollar':       'dollar nauruan',
+  // Central America & Caribbean
+  'Guatemalan quetzal':   'quetzal guatémaltèque',
+  'Honduran lempira':     'lempira hondurien',
+  'Nicaraguan córdoba':   'córdoba nicaraguayen',
+  'Costa Rican colón':    'colón costaricien',
+  'Panamanian balboa':    'balboa panaméen',
+  'Haitian gourde':       'gourde haïtienne',
+  'Cuban peso':           'peso cubain',
+  'Dominican peso':       'peso dominicain',
+  'Jamaican dollar':      'dollar jamaïcain',
+  'Trinidadian dollar':   'dollar de Trinité-et-Tobago',
+  'Trinidad and Tobago dollar': 'dollar de Trinité-et-Tobago',
+  'Barbadian dollar':     'dollar barbadien',
+  'Eastern Caribbean dollar': 'dollar des Caraïbes orientales',
+  // South America
+  'Bolivian boliviano':   'boliviano bolivien',
+  'Paraguayan guaraní':   'guaraní paraguayen',
+  'Uruguayan peso':       'peso uruguayen',
+  'Guyanese dollar':      'dollar guyanais',
+  'Surinamese dollar':    'dollar surinamais',
+  // Africa (additional)
+  'West African CFA franc':    'franc CFA ouest-africain',
+  'Central African CFA franc': 'franc CFA d\'Afrique centrale',
+  'CFP franc':            'franc CFP',
+  'Libyan dinar':         'dinar libyen',
+  'Sudanese pound':       'livre soudanaise',
+  'Ugandan shilling':     'shilling ougandais',
+  'Tanzanian shilling':   'shilling tanzanien',
+  'Zambian kwacha':       'kwacha zambien',
+  'Malawian kwacha':      'kwacha malawien',
+  'Mozambican metical':   'metical mozambicain',
+  'Angolan kwanza':       'kwanza angolais',
+  'Zimbabwean dollar':    'dollar zimbabwéen',
+  'Malagasy ariary':      'ariary malgache',
+  'Mauritanian ouguiya':  'ouguiya mauritanienne',
+  'Cape Verdean escudo':  'escudo cap-verdien',
+  'São Tomé and Príncipe dobra': 'dobra santoméenne',
+  'Burundian franc':      'franc burundais',
+  'Rwandan franc':        'franc rwandais',
+  'Congolese franc':      'franc congolais',
+  'Liberian dollar':      'dollar libérien',
+  'Sierra Leonean leone': 'leone sierra-léonais',
+  'Gambian dalasi':       'dalasi gambien',
+  'Guinean franc':        'franc guinéen',
+  'Guinean-Bissauan franc': 'franc de Guinée-Bissau',
+  'Botswana pula':        'pula botswanaise',
+  'Lesotho loti':         'loti lésothien',
+  'Swazi lilangeni':      'lilangeni swati',
+  'Namibian dollar':      'dollar namibien',
+  'Eritrean nakfa':       'nakfa érythréen',
+  'Djiboutian franc':     'franc djiboutien',
+  'Somali shilling':      'shilling somalien',
+  // Asia (additional)
+  'Afghan afghani':       'afghani afghan',
+  'Myanma kyat':          'kyat birman',
+  'Myanmar kyat':         'kyat birman',
+  'Cambodian riel':       'riel cambodgien',
+  'Lao kip':              'kip laotien',
+  'Mongolian tögrög':     'tögrög mongol',
+  'Bhutanese ngultrum':   'ngultrum bhoutanais',
+  'Brunei dollar':        'dollar de Brunei',
+  'Tajikistani somoni':   'somoni tadjik',
+  'Turkmenistani manat':  'manat turkmène',
+  'Uzbekistani soʻm':     'soum ouzbek',
+  'Kyrgyzstani som':      'som kirghiz',
+  // Europe (additional)
+  'Macedonian denar':     'denar macédonien',
+  'Bosnian convertible mark': 'mark convertible de Bosnie',
+  'Moldovan leu':         'leu moldave',
+  'Belarusian ruble':     'rouble biélorusse',
+  'Icelandic króna':      'couronne islandaise',
+  'Liechtenstein franc':  'franc suisse',
+  'New Israeli shekel':   'shekel israélien',
+  'Syrian pound':         'livre syrienne',
+  'Yemeni rial':          'rial yéménite',
 };
 
 export function translateCurrencyName(name: string): string {

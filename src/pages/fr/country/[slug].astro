@@ -5,7 +5,7 @@ import { COUNTRY_DATA as DATA_EN, COUNTRY_VIBES as VIBES_EN, COUNTRY_PEAKS, COUN
 import { COUNTRY_CCN3 } from '../../../lib/countryCodes.js';
 import { TRAVEL_ADVISORY } from '../../../lib/travelScores.js';
 import { geojsonToSvgPath } from '../../../lib/geojsonSvg.js';
-import { getT, translateRegion, getCountryNameFR, translateLangs, translateCurrencyName, artFR, withArticleFR, deArticleFR } from '../../../i18n/translations';
+import { getT, translateRegion, getCountryNameFR, translateLangs, translateCurrencyName, artFR, withArticleFR, deArticleFR, isPlural } from '../../../i18n/translations';
 
 // ─── Slug aliases ──────────────────────────────────────────────────────────────
 const SLUG_ALIASES: Record<string,string> = {
@@ -157,7 +157,15 @@ const country = {
   svgViewBox,
 };
 
-const nameFR = getCountryNameFR(country.name);
+const nameFR   = getCountryNameFR(country.name);
+// Plural countries (article "les") require plural verb forms
+const plural_c  = isPlural(country.name);
+const verbEtre  = plural_c ? 'sont' : 'est';
+const geoSpansFR    = plural_c ? ' couvrent ' : t.geoSpans;
+const popVibrantFR  = plural_c
+  ? ' sont une société dynamique avec un riche mélange de traditions et de communautés.'
+  : t.popVibrant;
+const popDialCodeFR = plural_c ? " sont accessibles via l'indicatif " : t.popDialCode;
 const ci = (countryInsights as Record<string, Record<string, string>>)[country.name] || {};
 const advisory = (TRAVEL_ADVISORY as Record<string,string>)[country.name] ?? null;
 const isDNT     = advisory === 'do-not-travel';
@@ -184,7 +192,7 @@ const pageUrl  = new URL(`fr/country/${country.slug}/`, siteBase).href;
 const title       = `${nameFR} – Faits, Capitale & Géographie | TerraLenses`;
 const locFR = tr(country.subregion || country.region);
 const description = [
-  locFR ? `${nameFR} est un pays ${deOrD(locFR)}${locFR}.` : `${nameFR} est un pays du monde.`,
+  locFR ? `${nameFR} ${verbEtre} un pays ${deOrD(locFR)}${locFR}.` : `${nameFR} ${verbEtre} un pays du monde.`,
   country.capital    !== '—' ? `Capitale : ${country.capital}.`       : '',
   country.population !== '—' ? `Population : ${country.population}.` : '',
   country.language   !== '—' ? `Langue : ${country.language}.`     : '',
@@ -209,9 +217,9 @@ if (country.population !== '—') {
   const langNote = langs
     ? ` ${plural ? t.popLangsAre : t.popLangIs}${langs}${plural ? t.popLangReflect : t.popLangReflects}`
     : '';
-  const callNote = country.callingCode !== '—' ? `${t.popInternationally}${withArticleFR(country.name, nameFR)}${t.popDialCode}${country.callingCode}${t.popDialCodeEnd}` : '';
+  const callNote = country.callingCode !== '—' ? `${t.popInternationally}${withArticleFR(country.name, nameFR)}${popDialCodeFR}${country.callingCode}${t.popDialCodeEnd}` : '';
   insights.push({ icon: '👥', title: t.insightPeople,
-    text: `${t.aboutPopApprox.trimStart()}${country.population}, ${withArticleFR(country.name, nameFR, true)}${t.popVibrant}${langNote}${callNote}${ci.people ? ' ' + ci.people : ''}` });
+    text: `${t.aboutPopApprox.trimStart()}${country.population}, ${withArticleFR(country.name, nameFR, true)}${popVibrantFR}${langNote}${callNote}${ci.people ? ' ' + ci.people : ''}` });
 }
 
 if (country.area !== '—') {
@@ -221,7 +229,7 @@ if (country.area !== '—') {
     ? `${country.drivingSide === t.driveLeft ? t.geoLeftHandRule : t.geoRightHandRule}`
     : '';
   insights.push({ icon: '🗺', title: t.insightGeography,
-    text: `${withArticleFR(country.name, nameFR, true)}${t.geoSpans}${country.area} km²${loc ? ` ${loc}` : ''}.${t.geoDiverseLandscapes}${drive}` });
+    text: `${withArticleFR(country.name, nameFR, true)}${geoSpansFR}${country.area} km²${loc ? ` ${loc}` : ''}.${t.geoDiverseLandscapes}${drive}` });
 }
 
 if (country.currency !== '—') {
@@ -367,7 +375,7 @@ const jsonLd = JSON.stringify({
     <section class="cp-section">
       <h2 class="cp-section-label">{t.aboutSection} {deArticleFR(country.name, nameFR)}</h2>
       <p class="cp-about">
-        {artFR(country.name) ? artFR(country.name)[0].toUpperCase() + artFR(country.name).slice(1) : ''}<strong>{nameFR}</strong>{country.officialName !== country.name ? ` (${t.aboutOfficially} ${country.officialName})` : ''}{locFR ? ` est un pays ${deOrD(locFR)}${locFR}.` : ' est un pays du monde.'}
+        {artFR(country.name) ? artFR(country.name)[0].toUpperCase() + artFR(country.name).slice(1) : ''}<strong>{nameFR}</strong>{country.officialName !== country.name ? ` (${t.aboutOfficially} ${country.officialName})` : ''}{locFR ? ` ${verbEtre} un pays ${deOrD(locFR)}${locFR}.` : ` ${verbEtre} un pays du monde.`}
         {country.capital !== '—' && <>{t.aboutCapitalIs}<strong>{country.capital}</strong>{`${country.cities.length > 0 ? `${t.aboutWithOtherCities}${country.cities.slice(0, 2).map((c: {name:string}) => c.name).join(` ${t.andConj} `)}` : ''}.`}</>}
         {country.population !== '—' && <>{t.aboutPopApprox}<strong>{country.population}</strong>{country.language !== '—' ? <>{country.language.includes(',') ? t.aboutMainLangsAre : t.aboutMainLangIs}<strong>{country.language}</strong>{'.'}</> : '.'}</>}
         {country.area !== '—' && <>{t.aboutCoversArea}<strong>{country.area} km²</strong>{'.'}</>}
