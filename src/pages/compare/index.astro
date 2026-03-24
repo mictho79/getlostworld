@@ -3,22 +3,14 @@ export const prerender = false;
 import Base from '../../layouts/Base.astro';
 import { COUNTRY_DATA as DATA_EN, COUNTRY_VIBES as VIBES_EN, COUNTRY_PEAKS, COUNTRY_DISHES, COUNTRY_INSIGHTS as INSIGHTS_EN, slugify } from '../../lib/countryData.js';
 import { getT, translateRegion } from '../../i18n/translations';
-import { detectLang } from '../../i18n/detect';
 
 const SITE = 'https://terralenses.com';
-const lang = detectLang(Astro.request.headers.get('accept-language') || '');
+const lang = 'en' as const;
 const t = getT(lang);
 
-let COUNTRY_DATA: any = DATA_EN;
-let COUNTRY_VIBES: any = VIBES_EN;
-let COUNTRY_INSIGHTS: any = INSIGHTS_EN;
-
-if (lang === 'fr') {
-  const fr = await import('../../lib/countryData.fr.js');
-  COUNTRY_DATA    = { ...(DATA_EN    as any), ...(fr.COUNTRY_DATA    as any) };
-  COUNTRY_VIBES   = { ...(VIBES_EN   as any), ...(fr.COUNTRY_VIBES   as any) };
-  COUNTRY_INSIGHTS = { ...(INSIGHTS_EN as any), ...(fr.COUNTRY_INSIGHTS as any) };
-}
+const COUNTRY_DATA: any = DATA_EN;
+const COUNTRY_VIBES: any = VIBES_EN;
+const COUNTRY_INSIGHTS: any = INSIGHTS_EN;
 
 const REGION_MAP: Record<string,string> = {
   Algeria:'Africa',Angola:'Africa',Benin:'Africa',Botswana:'Africa','Burkina Faso':'Africa',

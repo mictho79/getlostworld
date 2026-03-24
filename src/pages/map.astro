@@ -2,16 +2,11 @@
 export const prerender = false;
 import { COUNTRY_DATA as DATA_EN } from '../lib/countryData.js';
 import { getT } from '../i18n/translations';
-import { detectLang } from '../i18n/detect';
 
-const lang = detectLang(Astro.request.headers.get('accept-language') ?? 'en');
+const lang = 'en' as const;
 const t = getT(lang);
 
-let countryDataSrc: typeof DATA_EN = DATA_EN;
-if (lang === 'fr') {
-  const fr = await import('../lib/countryData.fr.js');
-  countryDataSrc = { ...(DATA_EN as any), ...(fr.COUNTRY_DATA as any) };
-}
+const countryDataSrc: typeof DATA_EN = DATA_EN;
 
 // Extract just the fact field per country for the sidebar
 const sidebarFacts: Record<string, string> = {};
@@ -42,6 +37,7 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
   <link rel="alternate" hreflang="en" href="https://terralenses.com/map/" />
   <link rel="alternate" hreflang="fr" href="https://terralenses.com/fr/map/" />
   <link rel="alternate" hreflang="x-default" href="https://terralenses.com/map/" />
+  <script>(function(){var c=localStorage.getItem('lang-choice');if(c)return;var isFr=(navigator.language||'').toLowerCase().startsWith('fr');if(isFr)window.location.replace('/fr'+window.location.pathname);})();</script>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="apple-touch-icon" href="/favicon.svg" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -268,10 +264,17 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
       #map         { left: 0; }
       #mobile-logo { display: block; }
     }
+
+    #lang-sw { position:fixed; top:14px; right:16px; z-index:9999; font-size:11px; font-weight:600; background:rgba(6,13,26,0.82); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:5px 10px; display:flex; gap:5px; align-items:center; letter-spacing:0.04em; }
+    #lang-sw a { color:rgba(255,255,255,0.3); text-decoration:none; transition:color 0.15s; }
+    #lang-sw a.active { color:rgba(255,255,255,0.92); }
+    #lang-sw a:hover { color:rgba(255,255,255,0.7); }
+    #lang-sw span { color:rgba(255,255,255,0.12); }
   </style>
 </head>
 <body>
 
+  <div id="lang-sw"><a href="/map/" class="active" onclick="localStorage.setItem('lang-choice','en')">EN</a><span>/</span><a href="/fr/map/" onclick="localStorage.setItem('lang-choice','fr')">FR</a></div>
   <div id="mobile-logo">TerraLenses</div>
 
   <aside id="sidebar">

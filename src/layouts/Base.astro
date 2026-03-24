@@ -21,6 +21,7 @@ const p = lang === 'fr' ? '/fr' : '';
   <meta name="description" content={description}>
   <link rel="canonical" href={canonical}>
   <meta name="google-site-verification" content="jncrLZewF1YuN4wAuQFWpmCTFcOhhZjQCeyAdK03Bcc" />
+  <script>(function(){var c=localStorage.getItem('lang-choice');if(c)return;var isFr=(navigator.language||'').toLowerCase().startsWith('fr');var alreadyFr=window.location.pathname.startsWith('/fr');if(isFr&&!alreadyFr)window.location.replace('/fr'+window.location.pathname);})();</script>
 
   {hreflangEn && <link rel="alternate" hreflang="en" href={hreflangEn} />}
   {hreflangFr && <link rel="alternate" hreflang="fr" href={hreflangFr} />}
@@ -62,9 +63,9 @@ const p = lang === 'fr' ? '/fr' : '';
 <body>
   {hreflangEn && hreflangFr && (
     <div id="lang-switcher">
-      <a href={hreflangEn} class={lang === 'en' ? 'active' : ''}>EN</a>
+      <a href={hreflangEn} class={lang === 'en' ? 'active' : ''} onclick="localStorage.setItem('lang-choice','en')">EN</a>
       <span>/</span>
-      <a href={hreflangFr} class={lang === 'fr' ? 'active' : ''}>FR</a>
+      <a href={hreflangFr} class={lang === 'fr' ? 'active' : ''} onclick="localStorage.setItem('lang-choice','fr')">FR</a>
     </div>
   )}
   <slot />

@@ -9,22 +9,14 @@ import {
 import { TRAVEL_SCORES, TRAVEL_ADVISORY } from '../../lib/travelScores.js';
 import { COUNTRY_REGION, COUNTRY_EXTRAS } from '../../lib/countryExtras.js';
 import { getT, translateRegion } from '../../i18n/translations';
-import { detectLang } from '../../i18n/detect';
 
-const lang = detectLang(Astro.request.headers.get('accept-language') ?? 'en');
+const lang = 'en' as const;
 const t = getT(lang);
 const tr = (r: string) => translateRegion(r, lang);
 
-let countryVibes:    typeof VIBES_EN    = VIBES_EN;
-let countryDataSrc:  typeof DATA_EN     = DATA_EN;
-let countryInsights: typeof INSIGHTS_EN = INSIGHTS_EN;
-
-if (lang === 'fr') {
-  const fr = await import('../../lib/countryData.fr.js');
-  countryVibes    = fr.COUNTRY_VIBES;
-  countryDataSrc  = fr.COUNTRY_DATA;
-  countryInsights = fr.COUNTRY_INSIGHTS;
-}
+const countryVibes    = VIBES_EN;
+const countryDataSrc  = DATA_EN;
+const countryInsights = INSIGHTS_EN;
 
 // ─── Build country from local data only (no REST API) ─────────────────────────
 function buildCountryFromLocal(name: string) {

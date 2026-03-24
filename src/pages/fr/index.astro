@@ -453,7 +453,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
   <div id="globe-container"></div>
 
   <!-- Lang switcher -->
-  <div id="lang-sw"><a href="/">EN</a><span>/</span><a href="/fr/" class="active">FR</a></div>
+  <div id="lang-sw"><a href="/" onclick="localStorage.setItem('lang-choice','en')">EN</a><span>/</span><a href="/fr/" class="active" onclick="localStorage.setItem('lang-choice','fr')">FR</a></div>
 
   <!-- Left panel -->
   <aside id="panel">

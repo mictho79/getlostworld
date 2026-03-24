@@ -2,18 +2,12 @@
 export const prerender = false;
 import { COUNTRY_VIBES as VIBES_EN, COUNTRY_DATA as DATA_EN, slugify } from '../lib/countryData.js';
 import { getT } from '../i18n/translations';
-import { detectLang } from '../i18n/detect';
 
-const lang = detectLang(Astro.request.headers.get('accept-language') ?? 'en');
+const lang = 'en' as const;
 const t    = getT(lang);
 
-let vibesSrc: typeof VIBES_EN = VIBES_EN;
-let dataSrc:  typeof DATA_EN  = DATA_EN;
-if (lang === 'fr') {
-  const fr = await import('../lib/countryData.fr.js');
-  vibesSrc = (fr as any).COUNTRY_VIBES;
-  dataSrc  = (fr as any).COUNTRY_DATA;
-}
+const vibesSrc = VIBES_EN;
+const dataSrc  = DATA_EN;
 
 // Build enriched country payload for the globe — always iterate EN keys so new nations are included
 const globeData: Record<string, { vibe: string; fact: string; slug: string }> = {};
@@ -37,7 +31,12 @@ const countryList = Object.keys(globeData).sort().map(n => ({
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TerraLenses — Get lost in the world</title>
   <meta name="description" content="Explore interactive facts, insights, and comparisons for every country on Earth. Powered by a beautiful 3D globe." />
+  <link rel="canonical" href="https://terralenses.com/" />
   <meta name="google-site-verification" content="jncrLZewF1YuN4wAuQFWpmCTFcOhhZjQCeyAdK03Bcc" />
+  <link rel="alternate" hreflang="en" href="https://terralenses.com/" />
+  <link rel="alternate" hreflang="fr" href="https://terralenses.com/fr/" />
+  <link rel="alternate" hreflang="x-default" href="https://terralenses.com/" />
+  <script>(function(){var c=localStorage.getItem('lang-choice');if(c)return;var isFr=(navigator.language||'').toLowerCase().startsWith('fr');if(isFr)window.location.replace('/fr'+window.location.pathname);})();</script>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="apple-touch-icon" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -413,6 +412,12 @@ const countryList = Object.keys(globeData).sort().map(n => ({
     }
 
     /* ── Responsive ───────────────────────────────────────────── */
+    #lang-sw { position:fixed; top:14px; right:16px; z-index:9999; font-size:11px; font-weight:600; background:rgba(6,13,26,0.82); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:5px 10px; display:flex; gap:5px; align-items:center; letter-spacing:0.04em; }
+    #lang-sw a { color:rgba(255,255,255,0.3); text-decoration:none; transition:color 0.15s; }
+    #lang-sw a.active { color:rgba(255,255,255,0.92); }
+    #lang-sw a:hover { color:rgba(255,255,255,0.7); }
+    #lang-sw span { color:rgba(255,255,255,0.12); }
+
     @media (max-width: 700px) {
       #panel {
         width: 100%;
@@ -440,6 +445,9 @@ const countryList = Object.keys(globeData).sort().map(n => ({
     <div class="ld-ring"></div>
     <div class="ld-text">Loading&hellip;</div>
   </div>
+
+  <!-- Lang switcher -->
+  <div id="lang-sw"><a href="/" class="active" onclick="localStorage.setItem('lang-choice','en')">EN</a><span>/</span><a href="/fr/" onclick="localStorage.setItem('lang-choice','fr')">FR</a></div>
 
   <!-- Globe (fills full screen as background layer) -->
   <div id="globe-container"></div>

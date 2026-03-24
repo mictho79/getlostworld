@@ -279,7 +279,7 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
   <div id="mobile-logo">TerraLenses</div>
 
   <!-- Lang switcher -->
-  <div id="lang-sw"><a href="/map/">EN</a><span>/</span><a href="/fr/map/" class="active">FR</a></div>
+  <div id="lang-sw"><a href="/map/" onclick="localStorage.setItem('lang-choice','en')">EN</a><span>/</span><a href="/fr/map/" class="active" onclick="localStorage.setItem('lang-choice','fr')">FR</a></div>
 
   <aside id="sidebar">
 

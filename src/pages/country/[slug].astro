@@ -6,7 +6,6 @@ import { COUNTRY_CCN3 } from '../../lib/countryCodes.js';
 import { TRAVEL_ADVISORY } from '../../lib/travelScores.js';
 import { geojsonToSvgPath } from '../../lib/geojsonSvg.js';
 import { getT, translateRegion } from '../../i18n/translations';
-import { detectLang } from '../../i18n/detect';
 
 // ─── Slug aliases ──────────────────────────────────────────────────────────────
 const SLUG_ALIASES: Record<string,string> = {
@@ -28,23 +27,14 @@ const SITE = 'https://terralenses.com';
 const enUrl = `${SITE}/country/${slug}/`;
 const frUrl = `${SITE}/fr/country/${slug}/`;
 
-// ─── Language detection ────────────────────────────────────────────────────────
-const lang = detectLang(Astro.request.headers.get('accept-language') ?? 'en');
+// ─── Language ──────────────────────────────────────────────────────────────────
+const lang = 'en' as const;
 const t = getT(lang);
 const tr = (r: string) => translateRegion(r, lang);
 
-let countryVibes:    typeof VIBES_EN    = VIBES_EN;
-let countryDataSrc:  typeof DATA_EN     = DATA_EN;
-let countryInsights: typeof INSIGHTS_EN = INSIGHTS_EN;
-
-if (lang === 'fr') {
-  const fr = await import('../../lib/countryData.fr.js');
-  // Merge EN as base so nations missing from the FR translation (e.g. England, Scotland,
-  // Wales, Northern Ireland) fall back to English rather than returning undefined.
-  countryVibes    = { ...(VIBES_EN    as any), ...(fr.COUNTRY_VIBES    as any) };
-  countryDataSrc  = { ...(DATA_EN     as any), ...(fr.COUNTRY_DATA     as any) };
-  countryInsights = { ...(INSIGHTS_EN as any), ...(fr.COUNTRY_INSIGHTS as any) };
-}
+const countryVibes    = VIBES_EN;
+const countryDataSrc  = DATA_EN;
+const countryInsights = INSIGHTS_EN;
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 function formatPop(n: number): string {
