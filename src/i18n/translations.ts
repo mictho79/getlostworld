@@ -802,6 +802,7 @@ export const COUNTRY_NAMES_FR: Record<string, string> = {
   'Jamaica':                      'Jamaïque',
   'Venezuela':                    'Venezuela',
   // Europe
+  
   'United Kingdom':               'Royaume-Uni',
   'Czech Republic':               'République tchèque',
   'North Macedonia':              'Macédoine du Nord',
@@ -960,7 +961,7 @@ const _LES = new Set([
 ]);
 const _MASC = new Set([
   'Japan','Canada','Mexico','Brazil','Portugal','Morocco','Senegal','Cameroon',
-  'Sudan','Chad','Niger','Mali','Benin','Togo','Gabon','Congo',
+  'Sudan','South Sudan','Chad','Niger','Mali','Benin','Togo','Gabon','Congo',
   'Democratic Republic of the Congo','Republic of the Congo',
   'Rwanda','Burundi','Mozambique','Zimbabwe','Malawi','Botswana','Lesotho',
   'Kuwait','Qatar','Yemen','Lebanon','Pakistan','Bangladesh','Nepal',
@@ -969,6 +970,7 @@ const _MASC = new Set([
   'Ecuador','Guatemala','Honduras','El Salvador','Nicaragua','Panama',
   'Denmark','Luxembourg','Bhutan','Suriname','Guyana','Liberia','Sierra Leone',
   'Venezuela','Mongolia',
+  'Greenland','Montenegro','Kosovo','Belize','Timor-Leste',
 ]);
 
 /** Returns the French definite article (lowercase) for a country given its English key. */
@@ -1253,4 +1255,127 @@ export const CURRENCIES_FR: Record<string, string> = {
 
 export function translateCurrencyName(name: string): string {
   return CURRENCIES_FR[name] ?? name;
+}
+
+// ── French sport name translations ────────────────────────────────────────────
+export const SPORTS_FR: Record<string, string> = {
+  'Football':      'Football',
+  'Table Tennis':  'Tennis de table',
+  'Basketball':    'Basketball',
+  'Cricket':       'Cricket',
+  'Baseball':      'Baseball',
+  'Rugby':         'Rugby',
+  'Tennis':        'Tennis',
+  'Volleyball':    'Volleyball',
+  'Wrestling':     'Lutte',
+  'Cycling':       'Cyclisme',
+  'Swimming':      'Natation',
+  'Athletics':     'Athlétisme',
+  'Badminton':     'Badminton',
+  'Ice Hockey':    'Hockey sur glace',
+  'Skiing':        'Ski',
+  'Taekwondo':     'Taekwondo',
+  'Sumo':          'Sumo',
+  'Polo':          'Polo',
+  'Golf':          'Golf',
+  'Archery':       "Tir à l'arc",
+  'Boxing':        'Boxe',
+  'Judo':          'Judo',
+  'Karate':        'Karaté',
+  'Handball':      'Handball',
+  'Water Polo':    'Water-polo',
+  'Kabaddi':       'Kabaddi',
+  'Sepak Takraw':  'Sepak takraw',
+  'Muay Thai':     'Muay-thaï',
+  'Hurling':       'Hurling',
+  'Gaelic Football': 'Football gaélique',
+  'Buzkashi':      'Bouzkachi',
+  'Lacrosse':      'Lacrosse',
+  'Horse Racing':  'Courses hippiques',
+  'Snooker':       'Snooker',
+  'Weightlifting': 'Haltérophilie',
+  'Gymnastics':    'Gymnastique',
+  'Fencing':       'Escrime',
+  'Sailing':       'Voile',
+  'Motorsport':    'Sport automobile',
+  'Surfing':       'Surf',
+  'Rowing':        'Aviron',
+  'Triathlon':     'Triathlon',
+  'Chess':         'Échecs',
+};
+
+export function translateSportFR(name: string): string {
+  if (!name || name === '—') return name;
+  return SPORTS_FR[name] ?? name;
+}
+
+// ── French national dish translations ─────────────────────────────────────────
+export const DISHES_FR: Record<string, string> = {
+  'Peking Duck':        'Canard laqué de Pékin',
+  'Sushi':              'Sushis',
+  'Ramen':              'Ramen',
+  'Kimchi':             'Kimchi',
+  'Pad Thai':           'Pad Thaï',
+  'Pho':                'Phở',
+  'Nasi Goreng':        'Nasi goreng',
+  'Rendang':            'Rendang',
+  'Biryani':            'Biryani',
+  'Butter Chicken':     'Poulet au beurre',
+  'Falafel':            'Falafel',
+  'Hummus':             'Houmous',
+  'Shawarma':           'Chawarma',
+  'Kebab':              'Kebab',
+  'Moussaka':           'Moussaka',
+  'Paella':             'Paella',
+  'Pizza':              'Pizza',
+  'Pasta':              'Pâtes',
+  'Croissant':          'Croissant',
+  'Boeuf Bourguignon':  'Bœuf Bourguignon',
+  'Schnitzel':          'Schnitzel',
+  'Bratwurst':          'Bratwurst',
+  'Fish and Chips':     'Fish and chips',
+  'Haggis':             'Haggis',
+  'Stroganoff':         'Bœuf Stroganov',
+  'Borscht':            'Bortsch',
+  'Pierogi':            'Pierogi',
+  'Goulash':            'Goulache',
+  'Tacos':              'Tacos',
+  'Burrito':            'Burrito',
+  'Churrasco':          'Churrasco',
+  'Empanadas':          'Empanadas',
+  'Ceviche':            'Ceviche',
+  'Jerk Chicken':       'Poulet jerk',
+  'Injera':             'Injera',
+  'Tagine':             'Tajine',
+  'Couscous':           'Couscous',
+  'Jollof Rice':        'Riz jollof',
+  'Bobotie':            'Bobotie',
+  'Poutine':            'Poutine',
+  'Sushi Roll':         'Maki',
+  'Tom Yum':            'Tom yum',
+  'Satay':              'Saté',
+  'Dim Sum':            'Dim sum',
+  'Hot Pot':            'Fondue chinoise',
+  'Baklava':            'Baklava',
+  'Dolma':              'Dolma',
+  'Gyros':              'Gyros',
+  'Shakshuka':          'Chakchouka',
+  'Fufu':               'Foufou',
+  'Egusi Soup':         'Soupe Egusi',
+  'Bunny Chow':         'Bunny chow',
+  'Braai':              'Braai',
+  'Adobo':              'Adobo',
+  'Sinigang':           'Sinigang',
+  'Lechon':             'Lechon',
+  'Feijoda':            'Feijoada',
+  'Feijoada':           'Feijoada',
+  'Asado':              'Asado',
+  'Mate':               'Maté',
+  'Cuy':                'Cochon d\'Inde rôti',
+  'Lomo Saltado':       'Lomo saltado',
+};
+
+export function translateDishFR(name: string | null): string | null {
+  if (!name) return null;
+  return DISHES_FR[name] ?? name;
 }

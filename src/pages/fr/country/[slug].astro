@@ -5,7 +5,7 @@ import { COUNTRY_DATA as DATA_EN, COUNTRY_VIBES as VIBES_EN, COUNTRY_PEAKS, COUN
 import { COUNTRY_CCN3 } from '../../../lib/countryCodes.js';
 import { TRAVEL_ADVISORY } from '../../../lib/travelScores.js';
 import { geojsonToSvgPath } from '../../../lib/geojsonSvg.js';
-import { getT, translateRegion, getCountryNameFR, translateLangs, translateCurrencyName, artFR, withArticleFR, deArticleFR, isPlural } from '../../../i18n/translations';
+import { getT, translateRegion, getCountryNameFR, translateLangs, translateCurrencyName, translateSportFR, translateDishFR, artFR, withArticleFR, deArticleFR, isPlural } from '../../../i18n/translations';
 
 // ─── Slug aliases ──────────────────────────────────────────────────────────────
 const SLUG_ALIASES: Record<string,string> = {
@@ -138,7 +138,7 @@ const country = {
   capital:         localData.capital || rc?.capital?.[0] || '—',
   population:      localData.population || formatPop(rc?.population),
   language:        translateLangs(localData.language || Object.values(rc?.languages || {}).join(', ') || '—'),
-  sport:           localData.sport || '—',
+  sport:           translateSportFR(localData.sport || '—'),
   fact:            localData.fact  || '',
   vibe:            (countryVibes as any)[localName] || 'Fascinating · Historic · Unique',
   area:            rc?.area ? Math.round(rc.area).toLocaleString('fr-FR') : '—',
@@ -150,7 +150,7 @@ const country = {
   callingCode:     rc?.idd?.root ? rc.idd.root + (rc.idd.suffixes?.length === 1 ? rc.idd.suffixes[0] : '') : '—',
   drivingSide:     rc?.car?.side === 'left' ? t.driveLeft : rc?.car?.side === 'right' ? t.driveRight : '—',
   borderCountries,
-  dish:            (COUNTRY_DISHES  as any)[localName] || null,
+  dish:            translateDishFR((COUNTRY_DISHES as any)[localName] || null),
   peak:            (COUNTRY_PEAKS   as any)[localName] || null,
   cities:          (COUNTRY_CITIES  as any)[localName] || [],
   svgShape,
@@ -219,17 +219,37 @@ if (country.population !== '—') {
     : '';
   const callNote = country.callingCode !== '—' ? `${t.popInternationally}${withArticleFR(country.name, nameFR)}${popDialCodeFR}${country.callingCode}${t.popDialCodeEnd}` : '';
   insights.push({ icon: '👥', title: t.insightPeople,
-    text: `${t.aboutPopApprox.trimStart()}${country.population}, ${withArticleFR(country.name, nameFR, true)}${popVibrantFR}${langNote}${callNote}${ci.people ? ' ' + ci.people : ''}` });
+    text: `${t.aboutPopApprox.trimStart()}${country.population}, ${withArticleFR(country.name, nameFR)}${popVibrantFR}${langNote}${callNote}${ci.people ? ' ' + ci.people : ''}` });
 }
 
 if (country.area !== '—') {
-  const locRaw = tr(country.subregion || country.region);
-  const loc = locRaw ? `${deOrD(locRaw)}${locRaw}` : '';
-  const drive = country.drivingSide !== '—'
-    ? `${country.drivingSide === t.driveLeft ? t.geoLeftHandRule : t.geoRightHandRule}`
-    : '';
-  insights.push({ icon: '🗺', title: t.insightGeography,
-    text: `${withArticleFR(country.name, nameFR, true)}${geoSpansFR}${country.area} km²${loc ? ` ${loc}` : ''}.${t.geoDiverseLandscapes}${drive}` });
+  const geoText = (() => {
+    if (ci.geography) return ci.geography;
+    // Dynamic generation
+    const art = artFR(country.name);
+    const capArt = art ? art[0].toUpperCase() + art.slice(1) : '';
+    const geoSubject = capArt + nameFR;
+    const verbCovrir = geoSpansFR.trim(); // 'couvre' or 'couvrent'
+    const subregionFR = tr(country.subregion || country.region);
+    const locPhrase = subregionFR ? ` en ${subregionFR}` : '';
+    let txt = `${geoSubject} ${verbCovrir} ${country.area} km²${locPhrase}`;
+    if (country.borderCountries.length > 0) {
+      const verbPartage = plural_c ? 'partagent' : 'partage';
+      const possAdj    = plural_c ? 'leurs' : 'ses';
+      const MAX_N = 8;
+      const shown = country.borderCountries.slice(0, MAX_N);
+      const total = country.borderCountries.length;
+      const nFR   = shown.map((b: any) => withArticleFR(b.name, getCountryNameFR(b.name))).join(', ');
+      const extra = total > MAX_N ? ` et ${total - MAX_N} autres pays` : '';
+      txt += ` et ${verbPartage} ${possAdj} frontières avec ${nFR}${extra}`;
+    }
+    txt += '.';
+    if (country.drivingSide !== '—') {
+      txt += country.drivingSide === t.driveLeft ? t.geoLeftHandRule : t.geoRightHandRule;
+    }
+    return txt;
+  })();
+  insights.push({ icon: '🗺', title: t.insightGeography, text: geoText });
 }
 
 if (country.currency !== '—') {
@@ -436,7 +456,7 @@ const jsonLd = JSON.stringify({
         <h2 class="cp-section-label">{t.neighbouringCountries}</h2>
         <div class="cp-neighbours">
           {country.borderCountries.map(b => (
-            <a href={`/fr/country/${b.slug}/`} class="cp-neighbour">{b.name}</a>
+            <a href={`/fr/country/${b.slug}/`} class="cp-neighbour">{getCountryNameFR(b.name)}</a>
           ))}
         </div>
       </nav>
