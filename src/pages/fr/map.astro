@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 import { COUNTRY_DATA as DATA_EN } from '../../lib/countryData.js';
-import { getT } from '../../i18n/translations';
+import { getT, COUNTRY_NAMES_FR } from '../../i18n/translations';
 
 const lang = 'fr' as const;
 const t = getT(lang);
@@ -345,6 +345,7 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
   <div id="map"></div>
 
   <script set:html={`window.SIDEBAR_FACTS = ${JSON.stringify(sidebarFacts)};`}></script>
+  <script set:html={`window.COUNTRY_NAMES_FR_MAP = ${JSON.stringify(COUNTRY_NAMES_FR)};`}></script>
   <script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script is:inline src="/topojson.min.js"></script>
   <script is:inline src="/countries.js"></script>
@@ -375,14 +376,16 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
       Americas: 'linear-gradient(90deg,#8b5cf6,#3b82f6)',
       Oceania:  'linear-gradient(90deg,#06b6d4,#10b981)',
     };
+    const REGION_FR = { Europe:'Europe', Asia:'Asie', Africa:'Afrique', Americas:'Amériques', Oceania:'Océanie' };
 
     function showCountry(info, data) {
+      const nameFR = (window.COUNTRY_NAMES_FR_MAP && window.COUNTRY_NAMES_FR_MAP[info.name]) || info.name;
       document.getElementById('sb-welcome').classList.add('hidden');
       document.getElementById('sb-country').classList.add('visible');
       document.getElementById('sb-accent').style.background = ACCENT[info.region] || ACCENT.Europe;
       document.getElementById('sb-flag').textContent     = info.flag     || '';
-      document.getElementById('sb-name').textContent     = info.name     || '';
-      document.getElementById('sb-region').textContent   = info.region   || '';
+      document.getElementById('sb-name').textContent     = nameFR;
+      document.getElementById('sb-region').textContent   = REGION_FR[info.region] || info.region || '';
       document.getElementById('sb-capital').textContent  = data.capital  || '—';
       document.getElementById('sb-pop').textContent      = data.pop      || '—';
       document.getElementById('sb-currency').textContent = data.currency || '—';
@@ -407,10 +410,10 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
 
     // UK constituent nations info (used instead of COUNTRY_ID_MAP for UK features)
     const UK_NATIONS_INFO = {
-      'england':          { name:'England',          slug:'england',          flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', region:'Europe' },
-      'scotland':         { name:'Scotland',          slug:'scotland',         flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', region:'Europe' },
-      'wales':            { name:'Wales',             slug:'wales',            flag:'🏴󠁧󠁢󠁷󠁬󠁳󠁿', region:'Europe' },
-      'northern-ireland': { name:'Northern Ireland',  slug:'northern-ireland', flag:'🏴󠁧󠁢󠁮󠁩󠁲󠁿', region:'Europe' },
+      'england':          { name:'Angleterre',        slug:'england',          flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', region:'Europe' },
+      'scotland':         { name:'Écosse',            slug:'scotland',         flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', region:'Europe' },
+      'wales':            { name:'Pays de Galles',    slug:'wales',            flag:'🏴󠁧󠁢󠁷󠁬󠁳󠁿', region:'Europe' },
+      'northern-ireland': { name:'Irlande du Nord',   slug:'northern-ireland', flag:'🏴󠁧󠁢󠁮󠁩󠁲󠁿', region:'Europe' },
     };
 
     // Fix antimeridian: SPLIT polygons that cross ±180° into two valid polygons
