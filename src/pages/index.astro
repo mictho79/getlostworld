@@ -1071,7 +1071,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         renderer.render(scene, camera);
       }
       animate();
-      requestAnimationFrame(onResize); // fix initial sizing — svh may not be resolved at initGlobe time
 
       /* ── Fetch TopoJSON, build borders + feature data ── */
       fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
