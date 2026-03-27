@@ -4,7 +4,6 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   site: 'https://terralenses.com',
   output: 'hybrid',
-  trailingSlash: 'always',
   adapter: cloudflare(),
   image: {
     service: passthroughImageService(),
