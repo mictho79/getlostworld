@@ -36,6 +36,18 @@ const countryList = Object.keys(globeData).sort().map(n => ({
   <link rel="alternate" hreflang="en" href="https://terralenses.com/" />
   <link rel="alternate" hreflang="fr" href="https://terralenses.com/fr/" />
   <link rel="alternate" hreflang="x-default" href="https://terralenses.com/" />
+  <meta property="og:title" content="TerraLenses — Get lost in the world" />
+  <meta property="og:description" content="Explore interactive facts, insights and comparisons for every country on Earth. Powered by a beautiful 3D globe." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://terralenses.com/" />
+  <meta property="og:image" content="https://terralenses.com/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="TerraLenses — Get lost in the world" />
+  <meta name="twitter:description" content="Explore interactive facts, insights and comparisons for every country on Earth." />
+  <meta name="twitter:image" content="https://terralenses.com/og-image.png" />
+  <script is:inline defer data-domain="terralenses.com" src="https://plausible.io/js/script.js"></script>
   <script>(function(){var c=localStorage.getItem('lang-choice');if(c)return;var isFr=(navigator.language||'').toLowerCase().startsWith('fr');if(isFr)window.location.replace('/fr'+window.location.pathname);})();</script>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="apple-touch-icon" href="/favicon.svg" />
@@ -47,11 +59,47 @@ const countryList = Object.keys(globeData).sort().map(n => ({
 
     html, body {
       width: 100%; height: 100%;
-      overflow: hidden;
+      overflow-x: hidden;
       font-family: 'Inter', sans-serif;
       background: #060d1a;
       color: #fff;
     }
+    .skip-link {
+      position: absolute; top: -40px; left: 0;
+      background: #060d1a; color: #fff;
+      padding: 8px 16px; text-decoration: none; z-index: 10000; font-size: 13px;
+    }
+    .skip-link:focus { top: 0; }
+    #seo-content {
+      position: relative; z-index: 1;
+      margin-top: 100vh;
+      padding: 64px 48px 80px;
+      background: #060d1a;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    #seo-content h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 28px; font-weight: 600;
+      color: #fff; margin-bottom: 20px;
+    }
+    #seo-content h3 {
+      font-size: 16px; font-weight: 600;
+      color: rgba(147,197,253,0.85); margin: 28px 0 10px;
+    }
+    #seo-content p {
+      font-size: 15px; line-height: 1.75;
+      color: rgba(255,255,255,0.5); margin-bottom: 14px; max-width: 720px;
+    }
+    #seo-content .country-grid {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px;
+    }
+    #seo-content .country-grid a {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px; padding: 8px 14px;
+      color: rgba(255,255,255,0.65); text-decoration: none; font-size: 13px;
+      transition: background 0.15s;
+    }
+    #seo-content .country-grid a:hover { background: rgba(255,255,255,0.08); }
 
     /* ── Globe canvas (full-screen background) ─────────────────── */
     #globe-container {
@@ -439,6 +487,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
   </style>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <!-- Loading -->
   <div id="loading">
@@ -471,7 +520,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
             <circle cx="8.5" cy="8.5" r="5.5"/><path d="M14 14l3.5 3.5"/>
           </svg>
         </span>
-        <input id="search" type="text" placeholder={t.searchCountry} autocomplete="off" spellcheck="false" />
+        <input id="search" type="text" placeholder={t.searchCountry} autocomplete="off" spellcheck="false" aria-label="Search countries" />
         <div id="ac-list"></div>
       </div>
     </div>
@@ -1102,6 +1151,34 @@ const countryList = Object.keys(globeData).sort().map(n => ({
 
   })();
   </script>
+
+  <main id="main-content">
+  <section id="seo-content">
+    <h2>Explore the World with TerraLenses</h2>
+    <p>TerraLenses is an interactive world atlas featuring detailed profiles for 195 countries — capitals, populations, currencies, languages, geography and culture. Navigate through a 3D globe or browse country pages directly to discover each nation from every angle.</p>
+
+    <h3>195 Countries, One Atlas</h3>
+    <p>From Afghanistan to Zimbabwe, every country has a dedicated page with essential data: area, population, official language, time zone, phone code, bordering countries and cultural highlights. The database covers all 193 UN member states as well as key autonomous territories and nations.</p>
+
+    <h3>Compare Any Two Countries</h3>
+    <p>The comparison tool lets you put any two countries side by side across a range of criteria: size, demographics, economy, food, sport and nature. Discover what sets France apart from Germany, Japan from South Korea, or Brazil from Argentina.</p>
+
+    <h3>Popular Countries</h3>
+    <div class="country-grid">
+      <a href="/country/france/">🇫🇷 France</a>
+      <a href="/country/japan/">🇯🇵 Japan</a>
+      <a href="/country/germany/">🇩🇪 Germany</a>
+      <a href="/country/brazil/">🇧🇷 Brazil</a>
+      <a href="/country/india/">🇮🇳 India</a>
+      <a href="/country/china/">🇨🇳 China</a>
+      <a href="/country/italy/">🇮🇹 Italy</a>
+      <a href="/country/spain/">🇪🇸 Spain</a>
+    </div>
+
+    <h3>Browse by Continent</h3>
+    <p>TerraLenses organises countries across 5 continents: <a href="/countries/">Europe (48), Asia (49), Africa (54), Americas (33) and Oceania (13)</a>. Each region brings its own cultural, geographic and linguistic characteristics — all accessible through rich, contextual country profiles.</p>
+  </section>
+  </main>
 
 </body>
 </html>

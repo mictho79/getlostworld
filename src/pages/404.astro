@@ -1,0 +1,55 @@
+---
+import Base from '../layouts/Base.astro';
+import { COUNTRY_VIBES, slugify } from '../lib/countryData.js';
+
+const suggested = ['France', 'Japan', 'Brazil', 'Germany', 'India'];
+---
+<Base
+  title="Page introuvable — TerraLenses"
+  description="Cette page n'existe pas. Explorez nos 195 fiches pays, la carte interactive ou l'outil de comparaison."
+  lang="en"
+  hreflangEn="https://terralenses.com/"
+  hreflangFr="https://terralenses.com/fr/"
+>
+  <main id="main-content" style="min-height:80vh;display:flex;align-items:center;justify-content:center;padding:40px 24px;">
+    <div style="text-align:center;max-width:560px;">
+      <div style="font-size:72px;margin-bottom:24px;">🌍</div>
+      <h1 style="font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:#fff;margin-bottom:12px;">
+        404 — Page introuvable
+      </h1>
+      <p style="font-size:15px;color:rgba(255,255,255,0.5);line-height:1.7;margin-bottom:32px;">
+        Cette page n'existe pas ou a été déplacée. Essayez de rechercher un pays ou revenez à l'accueil.
+      </p>
+
+      <form action="/countries/" method="get" style="display:flex;gap:8px;justify-content:center;margin-bottom:36px;">
+        <input
+          type="text"
+          name="q"
+          placeholder="Rechercher un pays…"
+          aria-label="Rechercher un pays"
+          style="flex:1;max-width:280px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px 14px;color:#fff;font-size:14px;outline:none;"
+        />
+        <button type="submit" style="background:#3b82f6;border:none;border-radius:8px;padding:10px 18px;color:#fff;font-size:14px;cursor:pointer;">
+          Chercher
+        </button>
+      </form>
+
+      <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:36px;">
+        {suggested.map(name => {
+          const vibes = (COUNTRY_VIBES as any)[name];
+          const flag = vibes ? '' : '🌍';
+          return (
+            <a href={`/country/${slugify(name)}/`}
+               style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 16px;color:rgba(255,255,255,0.7);text-decoration:none;font-size:13px;">
+              {name}
+            </a>
+          );
+        })}
+      </div>
+
+      <a href="/" style="display:inline-block;background:#3b82f6;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-size:14px;font-weight:500;">
+        ← Retour à l'accueil
+      </a>
+    </div>
+  </main>
+</Base>

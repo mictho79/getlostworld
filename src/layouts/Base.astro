@@ -37,7 +37,7 @@ const p = lang === 'fr' ? '/fr' : '';
   <meta property="og:description" content={description}>
   <meta property="og:type" content={countryName ? 'article' : 'website'}>
   <meta property="og:url" content={canonical}>
-  <meta property="og:image" content={ogImage ?? '/og-image.png'}>
+  <meta property="og:image" content={ogImage ?? 'https://terralenses.com/og-image.png'}>
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
 
@@ -45,7 +45,10 @@ const p = lang === 'fr' ? '/fr' : '';
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content={title}>
   <meta name="twitter:description" content={description}>
-  <meta name="twitter:image" content={ogImage ?? '/og-image.png'}>
+  <meta name="twitter:image" content={ogImage ?? 'https://terralenses.com/og-image.png'}>
+
+  <!-- Plausible Analytics -->
+  <script is:inline defer data-domain="terralenses.com" src="https://plausible.io/js/script.js"></script>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -61,6 +64,7 @@ const p = lang === 'fr' ? '/fr' : '';
   <slot name="head" />
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Aller au contenu principal</a>
   {hreflangEn && hreflangFr && (
     <div id="lang-switcher">
       <a href={hreflangEn} class={lang === 'en' ? 'active' : ''} onclick="localStorage.setItem('lang-choice','en')">EN</a>
@@ -77,6 +81,10 @@ const p = lang === 'fr' ? '/fr' : '';
     <a href={`${p}/map/`}>{lang === 'fr' ? 'Carte' : 'Map'}</a>
     <span class="sep">·</span>
     <a href={`${p}/compare/`}>{lang === 'fr' ? 'Comparer' : 'Compare'}</a>
+    <span class="sep">·</span>
+    <a href={`${p}/legal/`}>{lang === 'fr' ? 'Mentions légales' : 'Legal'}</a>
+    <span class="sep">·</span>
+    <a href={`${p}/privacy/`}>{lang === 'fr' ? 'Confidentialité' : 'Privacy'}</a>
   </footer>
   <style>
     #lang-switcher {
@@ -110,6 +118,17 @@ const p = lang === 'fr' ? '/fr' : '';
     #site-footer a { color: rgba(255,255,255,0.35); text-decoration: none; }
     #site-footer a:hover { color: rgba(255,255,255,0.7); }
     #site-footer .sep { margin: 0 8px; }
+    .skip-link {
+      position: absolute;
+      top: -40px; left: 0;
+      background: #060d1a;
+      color: #fff;
+      padding: 8px 16px;
+      text-decoration: none;
+      z-index: 10000;
+      font-size: 13px;
+    }
+    .skip-link:focus { top: 0; }
   </style>
 </body>
 </html>

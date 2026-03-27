@@ -942,6 +942,19 @@ export const COUNTRY_NAMES_FR: Record<string, string> = {
   'Fiji':                         'Fidji',
   'Micronesia':                   'Micronésie',
   'Palau':                        'Palaos',
+  // UK nations
+  'England':                      'Angleterre',
+  'Scotland':                     'Écosse',
+  'Wales':                        'Pays de Galles',
+  'Northern Ireland':             'Irlande du Nord',
+  // Africa (missing)
+  'Gambia':                       'Gambie',
+  // Asia (missing)
+  'Brunei':                       'Brunéi',
+  // Caribbean / Americas
+  'Grenada':                      'Grenade',
+  'Saint Vincent and the Grenadines': 'Saint-Vincent-et-les-Grenadines',
+  'Saint Kitts and Nevis':        'Saint-Kitts-et-Nevis',
 };
 
 export function getCountryNameFR(name: string): string {
@@ -971,6 +984,7 @@ const _MASC = new Set([
   'Denmark','Luxembourg','Bhutan','Suriname','Guyana','Liberia','Sierra Leone',
   'Venezuela','Mongolia',
   'Greenland','Montenegro','Kosovo','Belize','Timor-Leste',
+  'Wales','Brunei',
 ]);
 
 /** Returns the French definite article (lowercase) for a country given its English key. */
