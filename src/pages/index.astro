@@ -59,7 +59,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
 
     html, body {
       width: 100%; height: 100%;
-      overflow-x: hidden;
+      overflow: hidden;
       font-family: 'Inter', sans-serif;
       background: #060d1a;
       color: #fff;
@@ -70,36 +70,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       padding: 8px 16px; text-decoration: none; z-index: 10000; font-size: 13px;
     }
     .skip-link:focus { top: 0; }
-    #seo-content {
-      position: relative; z-index: 1;
-      margin-top: 100vh;
-      padding: 64px 48px 80px;
-      background: #060d1a;
-      border-top: 1px solid rgba(255,255,255,0.06);
-    }
-    #seo-content h2 {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 28px; font-weight: 600;
-      color: #fff; margin-bottom: 20px;
-    }
-    #seo-content h3 {
-      font-size: 16px; font-weight: 600;
-      color: rgba(147,197,253,0.85); margin: 28px 0 10px;
-    }
-    #seo-content p {
-      font-size: 15px; line-height: 1.75;
-      color: rgba(255,255,255,0.5); margin-bottom: 14px; max-width: 720px;
-    }
-    #seo-content .country-grid {
-      display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px;
-    }
-    #seo-content .country-grid a {
-      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 8px; padding: 8px 14px;
-      color: rgba(255,255,255,0.65); text-decoration: none; font-size: 13px;
-      transition: background 0.15s;
-    }
-    #seo-content .country-grid a:hover { background: rgba(255,255,255,0.08); }
 
     /* ── Globe canvas (full-screen background) ─────────────────── */
     #globe-container {
@@ -1152,33 +1122,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
   })();
   </script>
 
-  <main id="main-content">
-  <section id="seo-content">
-    <h2>Explore the World with TerraLenses</h2>
-    <p>TerraLenses is an interactive world atlas featuring detailed profiles for 195 countries — capitals, populations, currencies, languages, geography and culture. Navigate through a 3D globe or browse country pages directly to discover each nation from every angle.</p>
-
-    <h3>195 Countries, One Atlas</h3>
-    <p>From Afghanistan to Zimbabwe, every country has a dedicated page with essential data: area, population, official language, time zone, phone code, bordering countries and cultural highlights. The database covers all 193 UN member states as well as key autonomous territories and nations.</p>
-
-    <h3>Compare Any Two Countries</h3>
-    <p>The comparison tool lets you put any two countries side by side across a range of criteria: size, demographics, economy, food, sport and nature. Discover what sets France apart from Germany, Japan from South Korea, or Brazil from Argentina.</p>
-
-    <h3>Popular Countries</h3>
-    <div class="country-grid">
-      <a href="/country/france/">🇫🇷 France</a>
-      <a href="/country/japan/">🇯🇵 Japan</a>
-      <a href="/country/germany/">🇩🇪 Germany</a>
-      <a href="/country/brazil/">🇧🇷 Brazil</a>
-      <a href="/country/india/">🇮🇳 India</a>
-      <a href="/country/china/">🇨🇳 China</a>
-      <a href="/country/italy/">🇮🇹 Italy</a>
-      <a href="/country/spain/">🇪🇸 Spain</a>
-    </div>
-
-    <h3>Browse by Continent</h3>
-    <p>TerraLenses organises countries across 5 continents: <a href="/countries/">Europe (48), Asia (49), Africa (54), Americas (33) and Oceania (13)</a>. Each region brings its own cultural, geographic and linguistic characteristics — all accessible through rich, contextual country profiles.</p>
-  </section>
-  </main>
 
 </body>
 </html>
