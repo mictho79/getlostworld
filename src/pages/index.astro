@@ -959,7 +959,8 @@ const countryList = Object.keys(globeData).sort().map(n => ({
 
       /* ── Card update ── */
       function showCard(f, fly) {
-        setHighlight(f);
+        // On mobile the country card is hidden — skip highlight to avoid orphaned colors on globe
+        if (window.innerWidth > 700) setHighlight(f);
         var p = f.properties;
         document.getElementById('card-flag').textContent = p.flag;
         document.getElementById('card-name').textContent = p.name;
