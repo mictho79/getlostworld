@@ -386,13 +386,17 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
   <script is:inline src="/countries.js"></script>
   <script is:inline>
     const mapEl = document.getElementById('map');
-    const mapW  = mapEl.clientWidth;
-    const worldZoom = Math.log2(mapW * 0.86 / 256);
+    const mapW  = mapEl.clientWidth  || window.innerWidth;
+    const mapH  = mapEl.clientHeight || window.innerHeight;
+    // Portrait mobile: zoom by height so world fills the screen (not tiny with gray below)
+    // Desktop/landscape: zoom by width (larger dim) — same as before
+    const worldZoom    = Math.log2(Math.max(mapW, mapH) * 0.86 / 256);
+    const minWorldZoom = Math.log2(mapW * 0.86 / 256); // allow zooming out to full world width
 
     const map = L.map('map', {
       center: [40, -25],
       zoom: worldZoom,
-      minZoom: worldZoom,
+      minZoom: minWorldZoom,
       maxZoom: 18,
       maxBounds: [[-85.06, -180], [85.06, 180]],
       maxBoundsViscosity: 1.0,
