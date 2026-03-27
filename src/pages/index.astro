@@ -443,6 +443,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         border-right: none;
         border-top: 1px solid rgba(255, 255, 255, 0.06);
         max-height: 48vh;
+        max-height: 48svh; /* svh = small viewport, stable on mobile (ignores address bar) */
         overflow-y: auto;
       }
       #panel-header { padding: 20px 24px 0; }
@@ -452,7 +453,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       #stats { padding: 20px 24px 0; }
       .sep { margin: 20px 24px 0; }
       #spacer, #country-card, #globe-hint, #nav-countries { display: none; }
-      #globe-container { bottom: 48vh; }
+      #globe-container { bottom: 48vh; bottom: 48svh; }
     }
   </style>
 </head>
