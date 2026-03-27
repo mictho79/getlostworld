@@ -88,13 +88,13 @@ export const COUNTRY_EXTRAS = {
 
   // ── B ──────────────────────────────────────────────────────────────────
   Bahamas:        { climate:'Tropical', religion:'Protestant (70%)', hdi:'high',   dishes:['Conch salad','Johnnycake','Cracked conch'], athletes:['Frank Rutherford (athletics)'], landlocked:false },
-  Bahrain:        { climate:'Desert / Arid', religion:'Islam (74%)', hdi:'high',   dishes:['Machboos','Muhammar','Harees'],    athletes:['Rai Benjamin (athletics, naturalised US)'], landlocked:false },
+  Bahrain:        { climate:'Desert / Arid', religion:'Islam (74%)', hdi:'high',   dishes:['Machboos','Muhammar','Harees'],    athletes:['Salwa Eid Naser (athletics, 2019 World 400m Champion)'], landlocked:false },
   Bangladesh:     { climate:'Tropical Monsoon', religion:'Islam (88%)', hdi:'medium', dishes:['Hilsa curry','Panta bhat','Naan khatai'], athletes:['Shakib Al Hasan (cricket)'], landlocked:false },
-  Barbados:       { climate:'Tropical', religion:'Protestant (75%)', hdi:'high',   dishes:['Flying fish & cou-cou','Pudding & souse','Macaroni pie'], athletes:['Rihanna (global icon)','Garfield Sobers (cricket)'], landlocked:false },
+  Barbados:       { climate:'Tropical', religion:'Protestant (75%)', hdi:'high',   dishes:['Flying fish & cou-cou','Pudding & souse','Macaroni pie'], athletes:['Garfield Sobers (cricket)','Obadele Thompson (athletics, Olympic bronze)'], landlocked:false },
   Belarus:        { climate:'Continental / Temperate', religion:'Orthodox Christianity (48%)', hdi:'high',   dishes:['Draniki','Machanka','Khaladnik'], athletes:['Darya Domracheva (biathlon)','Alexander Medved (wrestling)'], landlocked:true  },
   Belgium:        { climate:'Oceanic / Temperate', religion:'Roman Catholic (58%)', hdi:'high',   dishes:['Moules-frites','Carbonnade flamande','Speculoos'], athletes:['Eddy Merckx (cycling)','Kevin De Bruyne (football)'], landlocked:false },
-  Belize:         { climate:'Tropical', religion:'Roman Catholic (40%)', hdi:'medium', dishes:['Rice & beans','Stew chicken','Garnaches'], athletes:['Marion Jones (athletics, born Belize)'], landlocked:false },
-  Benin:          { climate:'Tropical', religion:'Christianity (48%), Islam (24%)', hdi:'low',    dishes:['Akassa','Amiwo','Kuli-kuli'], athletes:['David Douillet (judo, French roots)'], landlocked:false },
+  Belize:         { climate:'Tropical', religion:'Roman Catholic (40%)', hdi:'medium', dishes:['Rice & beans','Stew chicken','Garnaches'], athletes:['Deon McCaulay (football)'], landlocked:false },
+  Benin:          { climate:'Tropical', religion:'Christianity (48%), Islam (24%)', hdi:'low',    dishes:['Akassa','Amiwo','Kuli-kuli'], athletes:['Stéphane Sessègnon (football, Premier League)'], landlocked:false },
   Bhutan:         { climate:'Alpine / Subtropical', religion:'Buddhism (75%)', hdi:'medium', dishes:['Ema datshi','Jasha maru','Red rice'], athletes:['Karma (archery)'], landlocked:true  },
   Bolivia:        { climate:'Tropical / Arid / Alpine', religion:'Roman Catholic (70%)', hdi:'medium', dishes:['Salteña','Anticucho','Chicha'],        athletes:['Marco Antonio Etcheverry (football)'], landlocked:true  },
   'Bosnia and Herzegovina': { climate:'Continental / Mediterranean', religion:'Islam (51%), Orthodox (31%)', hdi:'high', dishes:['Ćevapi','Burek','Begova čorba'], athletes:['Edin Džeko (football)','Mirza Teletović (basketball)'], landlocked:false },
@@ -148,7 +148,7 @@ export const COUNTRY_EXTRAS = {
 
   // ── G ──────────────────────────────────────────────────────────────────
   Gabon:          { climate:'Tropical Rainforest', religion:'Christianity (80%)', hdi:'medium', dishes:['Nyembwe chicken','Bobolo','Bitchanga'], athletes:['Pierre-Emerick Aubameyang'], landlocked:false },
-  Gambia:         { climate:'Tropical', religion:'Islam (96%)', hdi:'medium', dishes:['Benachin','Yassa','Domoda'],        athletes:['Adama Barrow (president & footballer)'], landlocked:false },
+  Gambia:         { climate:'Tropical', religion:'Islam (96%)', hdi:'medium', dishes:['Benachin','Yassa','Domoda'],        athletes:['Gina Bass (athletics, 2016 & 2020 Olympian)'], landlocked:false },
   Georgia:        { climate:'Temperate / Alpine', religion:'Georgian Orthodox (84%)', hdi:'high',   dishes:['Khinkali','Lobiani','Churchkhela'],  athletes:['Zurab Zviadauri (judo)','Levan Saginashvili (strongman)'], landlocked:false },
   Germany:        { climate:'Oceanic / Continental', religion:'Christianity (57%)', hdi:'high',   dishes:['Bratwurst','Pretzels','Black Forest cake'], athletes:['Michael Schumacher','Steffi Graf'], landlocked:false },
   Ghana:          { climate:'Tropical', religion:'Christianity (71%)', hdi:'medium', dishes:['Jollof rice','Kelewele','Fufu'],     athletes:['Tony Yeboah (football)','Azumah Nelson (boxing)'], landlocked:false },
@@ -251,7 +251,7 @@ export const COUNTRY_EXTRAS = {
   Qatar:          { climate:'Desert / Arid', religion:'Islam (67%)', hdi:'high',   dishes:['Machboos','Thareed','Harees'],     athletes:['Mutaz Essa Barshim (high jump)'], landlocked:false },
 
   // ── R ──────────────────────────────────────────────────────────────────
-  'Republic of the Congo': { climate:'Tropical Rainforest', religion:'Christianity (85%)', hdi:'medium', dishes:['Ndolé','Moamba de galinha','Saka-saka'], athletes:['Lacina Traoré (football)'], landlocked:false },
+  'Republic of the Congo': { climate:'Tropical Rainforest', religion:'Christianity (85%)', hdi:'medium', dishes:['Ndolé','Moamba de galinha','Saka-saka'], athletes:['Christopher Maboulou (football)'], landlocked:false },
   Romania:        { climate:'Continental / Temperate', religion:'Orthodox Christianity (81%)', hdi:'high', dishes:['Mămăligă','Sarmale','Mici'], athletes:['Nadia Comăneci (gymnastics)','Gheorghe Hagi (football)'], landlocked:false },
   Russia:         { climate:'Continental / Subarctic', religion:'Orthodox Christianity (41%)', hdi:'high',   dishes:['Pelmeni','Borsch','Beef Stroganoff'], athletes:['Irina Rodnina (skating)','Andrei Arshavin (football)'], landlocked:false },
   Rwanda:         { climate:'Tropical Highland', religion:'Roman Catholic (49%), Protestant (39%)', hdi:'medium', dishes:['Ugali','Isombe','Inyama'], athletes:['Adrien Niyonshuti (cycling)'], landlocked:true  },
@@ -259,18 +259,18 @@ export const COUNTRY_EXTRAS = {
   // ── S ──────────────────────────────────────────────────────────────────
   'Saint Lucia':  { climate:'Tropical', religion:'Roman Catholic (62%)', hdi:'high',   dishes:['Green fig & saltfish','Callaloo soup','Accra'], athletes:['Mary Elizabeth Donat (athletics)'], landlocked:false },
   Samoa:          { climate:'Tropical', religion:'Christian (98%)', hdi:'medium', dishes:['Palusami','Umu','Koko alaisa'],    athletes:['Peter Fatialofa (rugby)','Aukuso Tuilagi (rugby)'], landlocked:false },
-  'San Marino':   { climate:'Mediterranean / Alpine', religion:'Roman Catholic (97%)', hdi:'high', dishes:['Torta tre monti','Piadina','Fagioli con le cotiche'], athletes:['Alex Zanardi (hand-cycling, Italian-San Marinese)'], landlocked:true },
+  'San Marino':   { climate:'Mediterranean / Alpine', religion:'Roman Catholic (97%)', hdi:'high', dishes:['Torta tre monti','Piadina','Fagioli con le cotiche'], athletes:['Alessandra Perilli (shooting, Olympic bronze Tokyo 2020)'], landlocked:true },
   'Saudi Arabia': { climate:'Desert / Arid', religion:'Islam (97%)', hdi:'high',   dishes:['Kabsa','Jareesh','Saleeg'],       athletes:['Sami Al-Jaber (football)'], landlocked:false },
   Scotland:       { climate:'Oceanic / Subarctic', religion:'Non-religious (52%), Church of Scotland (24%)', hdi:'high', dishes:['Cullen Skink','Cranachan','Cock-a-leekie'], athletes:['Andy Murray (tennis)','Kenny Dalglish (football)'], landlocked:false },
   Senegal:        { climate:'Semi-arid / Tropical', religion:'Islam (97%)', hdi:'medium', dishes:['Yassa','Mafé','Ceebu jën'],        athletes:['Sadio Mané (football)','Amadou Dia Bâ (hurdles)'], landlocked:false },
   Serbia:         { climate:'Continental / Temperate', religion:'Orthodox Christianity (85%)', hdi:'high', dishes:['Ćevapi','Ajvar','Sarma'], athletes:['Novak Djokovic (tennis)','Nikola Jokić (basketball)'], landlocked:false },
   Seychelles:     { climate:'Tropical Marine', religion:'Roman Catholic (76%)', hdi:'high',   dishes:['Kari koko','Ladob','Bourzwa fish'], athletes:['Brandon Gomez (swimming)'], landlocked:false },
-  'Sierra Leone': { climate:'Tropical', religion:'Islam (78%), Christianity (21%)', hdi:'low', dishes:['Cassava leaf stew','Groundnut soup','Fufu'], athletes:['Emile Heskey (football, roots)'], landlocked:false },
+  'Sierra Leone': { climate:'Tropical', religion:'Islam (78%), Christianity (21%)', hdi:'low', dishes:['Cassava leaf stew','Groundnut soup','Fufu'], athletes:['Mohamed Kallon (football)'], landlocked:false },
   Singapore:      { climate:'Tropical Rainforest', religion:'Buddhism (31%), Christianity (19%)', hdi:'high', dishes:['Hainanese chicken rice','Laksa','Char kway teow'], athletes:['Joseph Schooling (swimming)','Feng Tianwei (table tennis)'], landlocked:false },
-  Slovakia:       { climate:'Continental / Alpine', religion:'Roman Catholic (55%)', hdi:'high',   dishes:['Bryndzové halušky','Kapustnica','Šúľance'], athletes:['Martina Hingis (tennis, Swiss-Slovak)','Peter Sagan (cycling)'], landlocked:true },
+  Slovakia:       { climate:'Continental / Alpine', religion:'Roman Catholic (55%)', hdi:'high',   dishes:['Bryndzové halušky','Kapustnica','Šúľance'], athletes:['Peter Sagan (cycling)','Marian Hossa (ice hockey)'], landlocked:true },
   Slovenia:       { climate:'Alpine / Continental', religion:'Roman Catholic (58%)', hdi:'high',   dishes:['Idrijski žlikrofi','Potica','Prekmurska gibanica'], athletes:['Primož Roglič (cycling)','Tina Maze (skiing)'], landlocked:false },
   'Solomon Islands': { climate:'Tropical Rainforest', religion:'Christianity (97%)', hdi:'medium', dishes:['Ngali nut','Poi','Kumu'], athletes:['Rex Peki (athletics)'], landlocked:false },
-  Somalia:        { climate:'Arid / Semi-arid', religion:'Islam (100%)', hdi:'low',    dishes:['Bariis iskukaris','Suqaar','Maraq'], athletes:['Mo Farah (athletics, British-Somali)'], landlocked:false },
+  Somalia:        { climate:'Arid / Semi-arid', religion:'Islam (100%)', hdi:'low',    dishes:['Bariis iskukaris','Suqaar','Maraq'], athletes:['Abdi Bile (athletics, 1987 World 1500m Champion)'], landlocked:false },
   'South Africa': { climate:'Semi-arid / Mediterranean / Subtropical', religion:'Christianity (85%)', hdi:'medium', dishes:['Braai','Bunny chow','Bobotie'], athletes:['Oscar Pistorius','Caster Semenya'], landlocked:false },
   'South Korea':  { climate:'Temperate / Continental', religion:'Non-religious (60%), Christianity (29%)', hdi:'high', dishes:['Bibimbap','Tteokbokki','Korean BBQ'], athletes:['Kim Yuna (figure skating)','Park Tae-hwan (swimming)'], landlocked:false },
   'South Sudan':  { climate:'Tropical / Savanna', religion:'Christianity (60%), traditional (33%)', hdi:'low', dishes:['Asida','Ful','Kisra'], athletes:['Guor Marial (marathon)'], landlocked:true },
