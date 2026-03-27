@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { COUNTRY_DATA, slugify } from '../lib/countryData.js';
+import { COUNTRY_VIBES, slugify } from '../lib/countryData.js';
 
 const today = new Date().toISOString().slice(0, 10);
 
@@ -14,19 +14,40 @@ const url = (loc: string, priority: string, changefreq: string, frLoc?: string) 
 
 export const GET: APIRoute = async () => {
   const base = 'https://terralenses.com';
-  const countries = Object.keys(COUNTRY_DATA as any);
+  // Only include countries that have actual pages (COUNTRY_VIBES = source of truth)
+  const countries = Object.keys(COUNTRY_VIBES as any);
 
   const curated = [
+    // Europe vs Europe
     ['france', 'germany'],
+    ['france', 'spain'],
+    ['france', 'italy'],
+    ['germany', 'italy'],
+    ['spain', 'italy'],
+    ['portugal', 'spain'],
+    ['united-kingdom', 'france'],
+    ['netherlands', 'belgium'],
+    // Americas
     ['united-states-of-america', 'canada'],
+    ['brazil', 'argentina'],
+    ['united-states-of-america', 'brazil'],
+    ['mexico', 'colombia'],
+    // Asia vs Asia
     ['japan', 'south-korea'],
     ['india', 'china'],
-    ['brazil', 'argentina'],
+    ['japan', 'china'],
+    ['thailand', 'vietnam'],
+    ['indonesia', 'malaysia'],
+    // Cross-continent popular
+    ['france', 'japan'],
+    ['germany', 'japan'],
+    ['united-states-of-america', 'united-kingdom'],
     ['australia', 'new-zealand'],
-    ['spain', 'italy'],
+    ['canada', 'australia'],
+    // Africa
     ['egypt', 'morocco'],
     ['nigeria', 'ghana'],
-    ['portugal', 'spain'],
+    ['south-africa', 'kenya'],
   ];
 
   const lines = [

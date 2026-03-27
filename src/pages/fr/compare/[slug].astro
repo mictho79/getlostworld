@@ -8,7 +8,7 @@ import {
 } from '../../../lib/countryData.js';
 import { TRAVEL_SCORES, TRAVEL_ADVISORY } from '../../../lib/travelScores.js';
 import { COUNTRY_REGION, COUNTRY_EXTRAS } from '../../../lib/countryExtras.js';
-import { getT, translateRegion } from '../../../i18n/translations';
+import { getT, translateRegion, getCountryNameFR } from '../../../i18n/translations';
 
 const lang = 'fr' as const;
 const t = getT(lang);
@@ -277,8 +277,10 @@ const countriesList = [...new Set([
 // ─── SEO ───────────────────────────────────────────────────────────────────────
 const siteBase  = Astro.site?.href ?? 'https://terralenses.com/';
 const pageUrl   = new URL(`fr/compare/${countryA.slug}-vs-${countryB.slug}/`, siteBase).href;
-const title     = `${countryA.name} vs ${countryB.name} : Comparaison | TerraLenses`;
-const description = `Comparez ${countryA.name} et ${countryB.name} côte à côte : faits clés, scores de voyage, gastronomie, culture, sport et nature. Découvrez les différences et choisissez votre prochaine destination.`;
+const nameFR_A  = getCountryNameFR(countryA.name);
+const nameFR_B  = getCountryNameFR(countryB.name);
+const title     = `${nameFR_A} vs ${nameFR_B} — Comparaison | TerraLenses`;
+const description = `Comparez ${nameFR_A} et ${nameFR_B} côte à côte : faits clés, scores de voyage, gastronomie, culture, sport et nature. Découvrez les différences et choisissez votre prochaine destination.`;
 
 const jsonLd = JSON.stringify({
   "@context": "https://schema.org",
