@@ -91,6 +91,10 @@ const p = lang === 'fr' ? '/fr' : '';
     <span class="sep">·</span>
     <a href={`${p}/privacy/`}>{lang === 'fr' ? 'Confidentialité' : 'Privacy'}</a>
   </footer>
+  <style is:global>
+    /* Content pages need to scroll — override any overflow:hidden from global CSS */
+    html, body { overflow: auto !important; height: auto !important; }
+  </style>
   <style>
     #lang-switcher {
       position: fixed;
