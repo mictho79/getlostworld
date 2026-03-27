@@ -164,6 +164,7 @@ export const COUNTRY_VIBES = {
   "Vanuatu":"Melanesian · Volcanic · Ancient",
   "Andorra":"Alpine · Tiny · Duty-free",
   "Antigua and Barbuda":"Beaches · Sailing · Colonial",
+  "Vatican City":"Sacred · Tiny · Papal",
 };
 
 export const COUNTRY_DATA = {
@@ -364,6 +365,8 @@ export const COUNTRY_DATA = {
   "Vanuatu":{ flag:"🇻🇺", capital:"Port Vila", population:"330,000", language:"Bislama, English, French", sport:"Football / Rugby", fact:"Vanuatu's Tanna Island is home to one of the world's most accessible active volcanoes, Mount Yasur, which has been erupting almost continuously for at least 800 years — and is sacred to local people who believe their ancestors live inside it." },
   "Andorra":{ flag:"🇦🇩", capital:"Andorra la Vella", population:"77,000", language:"Catalan", sport:"Football / Skiing", fact:"Andorra la Vella, at 1,023 m, is the highest capital city in Europe — the entire principality is governed as a co-principality by two heads of state: the President of France and the Bishop of Urgell in Spain." },
   "Antigua and Barbuda":{ flag:"🇦🇬", capital:"Saint John's", population:"97,000", language:"English", sport:"Cricket", fact:"Antigua and Barbuda has 365 beaches — one for every day of the year — and the natural harbour of English Harbour sheltered Nelson's Dockyard, the only working Georgian dockyard in the world, where Admiral Horatio Nelson was once stationed." },
+  "Palau":{ flag:"🇵🇼", capital:"Ngerulmud", population:"18,000", language:"Palauan, English", sport:"Fishing / Diving", fact:"Palau created the world's first shark sanctuary in 2009, banning all commercial shark fishing across its 600,000 km² of ocean — the country's underwater ecosystem is considered one of the seven underwater wonders of the world." },
+  "Vatican City":{ flag:"🇻🇦", capital:"Vatican City", population:"~800", language:"Latin, Italian", sport:"Football", fact:"Vatican City is the world's smallest internationally recognised state at 0.44 km² — it has its own newspaper, radio station, television channel, postal service and is the only country with Latin as an official language." },
 };
 
 // ─── Major cities per country (non-capital) ─────────────────────────────────

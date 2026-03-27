@@ -955,6 +955,8 @@ export const COUNTRY_NAMES_FR: Record<string, string> = {
   'Grenada':                      'Grenade',
   'Saint Vincent and the Grenadines': 'Saint-Vincent-et-les-Grenadines',
   'Saint Kitts and Nevis':        'Saint-Kitts-et-Nevis',
+  // Microstates
+  'Vatican City':                 'Vatican',
 };
 
 export function getCountryNameFR(name: string): string {

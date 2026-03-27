@@ -1,0 +1,266 @@
+---
+export const prerender = false;
+import Base from '../../../layouts/Base.astro';
+import { COUNTRY_VIBES, COUNTRY_DATA, slugify } from '../../../lib/countryData.js';
+import { COUNTRY_STATS } from '../../../lib/countryStats.js';
+import { getCountryNameFR } from '../../../i18n/translations';
+
+const SITE = 'https://terralenses.com';
+
+// ── Helper formatters ────────────────────────────────────────────────────────
+function fmtArea(km2: number): string {
+  return km2.toLocaleString('fr-FR') + ' km²';
+}
+function fmtPop(n: number): string {
+  if (n >= 1e9) return (n / 1e9).toFixed(2).replace(/\.?0+$/, '').replace('.', ',') + ' milliards';
+  if (n >= 1e6) return (n / 1e6).toFixed(1).replace('.', ',') + ' M';
+  if (n >= 1e3) return (n / 1e3).toFixed(0) + ' K';
+  return n.toLocaleString('fr-FR');
+}
+
+// ── Ranking definitions ──────────────────────────────────────────────────────
+interface RankingDef {
+  title: string;
+  h1: string;
+  description: string;
+  metricLabel: string;
+  metricFn: (s: any) => number;
+  fmtFn: (s: any) => string;
+  filterFn?: (s: any) => boolean;
+  limit: number;
+  highlightLimit: number;
+}
+
+const RANKINGS: Record<string, RankingDef> = {
+  'largest-countries': {
+    title:          'Les 30 plus grands pays du monde | TerraLenses',
+    h1:             'Les 30 plus grands pays du monde',
+    description:    'Quels pays occupent le plus de superficie sur Terre ? Des steppes immenses de la Russie aux étendues sauvages du Canada — classés par superficie totale en km².',
+    metricLabel:    'Superficie',
+    metricFn:       s => s.area,
+    fmtFn:          s => fmtArea(s.area),
+    filterFn:       s => s.area > 0,
+    limit:          30,
+    highlightLimit: 10,
+  },
+  'smallest-countries': {
+    title:          'Les plus petits pays du monde | TerraLenses',
+    h1:             'Les plus petits pays du monde',
+    description:    "Les plus petites nations du monde regorgent de culture, d'histoire et de personnalité dans des superficies incroyablement réduites. Explorez les pays indépendants les plus petits.",
+    metricLabel:    'Superficie',
+    metricFn:       s => -s.area,
+    fmtFn:          s => fmtArea(s.area),
+    filterFn:       s => s.area > 0 && s.area < 1000,
+    limit:          20,
+    highlightLimit: 10,
+  },
+  'most-populated': {
+    title:          'Les pays les plus peuplés du monde | TerraLenses',
+    h1:             'Les pays les plus peuplés du monde',
+    description:    'Quels pays abritent le plus de personnes ? Classés par population totale, de l\'Inde et la Chine aux nations plus petites mais très densément peuplées.',
+    metricLabel:    'Population',
+    metricFn:       s => s.pop,
+    fmtFn:          s => fmtPop(s.pop),
+    filterFn:       s => s.pop > 0,
+    limit:          30,
+    highlightLimit: 10,
+  },
+  'most-neighbors': {
+    title:          'Les pays avec le plus de voisins | TerraLenses',
+    h1:             'Les pays avec le plus de frontières terrestres',
+    description:    'Certains pays partagent leurs frontières avec plus d\'une douzaine de nations. Découvrez quels pays ont le plus de voisins et se trouvent au cœur de leur continent.',
+    metricLabel:    'Frontières',
+    metricFn:       s => s.borders,
+    fmtFn:          s => s.borders + (s.borders === 1 ? ' pays' : ' pays'),
+    filterFn:       s => s.borders > 0,
+    limit:          25,
+    highlightLimit: 10,
+  },
+  'island-nations': {
+    title:          'Les nations insulaires du monde | TerraLenses',
+    h1:             'Les nations insulaires du monde',
+    description:    'Des pays entièrement entourés d\'eau, de l\'immense Australie aux minuscules atolls coralliens du Pacifique. Explorez toutes les nations insulaires du monde.',
+    metricLabel:    'Superficie',
+    metricFn:       s => s.area,
+    fmtFn:          s => s.area > 0 ? fmtArea(s.area) : '—',
+    filterFn:       s => s.island === true,
+    limit:          100,
+    highlightLimit: 10,
+  },
+};
+
+const { slug } = Astro.params as { slug: string };
+const def = RANKINGS[slug];
+if (!def) return Astro.redirect('/fr/');
+
+// ── Build ranked list ────────────────────────────────────────────────────────
+interface RankEntry {
+  name: string;
+  nameFR: string;
+  slug: string;
+  flag: string;
+  value: string;
+  raw: number;
+}
+
+const vibesKeys = Object.keys(COUNTRY_VIBES as any);
+const seen = new Set<string>();
+const entries: RankEntry[] = [];
+
+for (const name of vibesKeys) {
+  const s = (COUNTRY_STATS as any)[name];
+  if (!s) continue;
+  if (def.filterFn && !def.filterFn(s)) continue;
+  const countrySlug = slugify(name);
+  if (seen.has(countrySlug)) continue;
+  seen.add(countrySlug);
+  const cd = (COUNTRY_DATA as any)[name] || {};
+  entries.push({
+    name,
+    nameFR: getCountryNameFR(name),
+    slug: countrySlug,
+    flag: cd.flag || '',
+    value: def.fmtFn(s),
+    raw:   def.metricFn(s),
+  });
+}
+
+entries.sort((a, b) => b.raw - a.raw);
+const ranked = entries.slice(0, def.limit);
+
+// ── Map highlight URL ────────────────────────────────────────────────────────
+const highlightSlugs = ranked.slice(0, def.highlightLimit).map(e => e.slug).join(',');
+const hlValues = ranked.slice(0, def.highlightLimit).map(e => e.value).join('|');
+const mapUrl = `/fr/map/?highlight=${highlightSlugs}&from=${slug}&values=${encodeURIComponent(hlValues)}`;
+
+const enUrl = `${SITE}/rankings/${slug}/`;
+const frUrl = `${SITE}/fr/rankings/${slug}/`;
+---
+
+<Base
+  title={def.title}
+  description={def.description}
+  lang="fr"
+  hreflangEn={enUrl}
+  hreflangFr={frUrl}
+>
+  <style is:global>
+    html, body { overflow: auto !important; height: auto !important; }
+  </style>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #0d1117; color: #e2e8f0; line-height: 1.6; }
+
+    .page-wrap { max-width: 860px; margin: 0 auto; padding: 40px 20px 80px; }
+
+    .breadcrumb { font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 32px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .breadcrumb a { color: rgba(255,255,255,0.5); text-decoration: none; }
+    .breadcrumb a:hover { color: rgba(255,255,255,0.9); }
+
+    h1 { font-size: clamp(22px, 4vw, 36px); font-weight: 700; color: #fff; margin-bottom: 12px; }
+    .subtitle { font-size: 15px; color: rgba(255,255,255,0.55); margin-bottom: 32px; max-width: 620px; }
+
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 40px; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 600; text-decoration: none; transition: opacity 0.15s; cursor: pointer; border: none; }
+    .btn-primary { background: linear-gradient(135deg, #3b82f6, #6366f1); color: #fff; }
+    .btn-secondary { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.1); }
+    .btn:hover { opacity: 0.85; }
+
+    .ranking-table { width: 100%; border-collapse: collapse; }
+    .ranking-table th {
+      text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.35);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .ranking-table th:last-child { text-align: right; }
+    .ranking-table td { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); vertical-align: middle; }
+    .ranking-table tr:hover td { background: rgba(255,255,255,0.03); }
+
+    .rank-num { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.3); min-width: 32px; }
+    .rank-num.top3 { color: #fbbf24; }
+
+    .country-cell { display: flex; align-items: center; gap: 12px; }
+    .country-flag { font-size: 22px; line-height: 1; }
+    .country-name { font-size: 15px; font-weight: 500; color: #e2e8f0; text-decoration: none; }
+    .country-name:hover { color: #60a5fa; }
+
+    .metric-val { text-align: right; font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.7); font-variant-numeric: tabular-nums; }
+
+    .other-rankings { margin-top: 48px; padding-top: 28px; border-top: 1px solid rgba(255,255,255,0.07); }
+    .other-rankings-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.09em; color: rgba(255,255,255,0.25); margin-bottom: 14px; }
+    .other-rankings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+    .ork-card {
+      display: block; padding: 14px 16px; border-radius: 10px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+      text-decoration: none; transition: background 0.15s, border-color 0.15s;
+    }
+    .ork-card:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.14); }
+    .ork-title { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.75); line-height: 1.4; }
+
+    .lang-note { margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.07); font-size: 13px; color: rgba(255,255,255,0.35); }
+    .lang-note a { color: rgba(255,255,255,0.5); }
+  </style>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <div class="page-wrap">
+    <nav class="breadcrumb">
+      <a href="/fr/">TerraLenses</a>
+      <span>›</span>
+      <a href="/fr/countries/">Pays</a>
+      <span>›</span>
+      <span>{def.h1}</span>
+    </nav>
+
+    <h1>{def.h1}</h1>
+    <p class="subtitle">{def.description}</p>
+
+    <div class="actions">
+      <a href={mapUrl} class="btn btn-primary">
+        🗺 Voir sur la carte
+      </a>
+      <a href="/fr/countries/" class="btn btn-secondary">
+        Tous les pays →
+      </a>
+    </div>
+
+    <table class="ranking-table" aria-label={def.h1}>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Pays</th>
+          <th>{def.metricLabel}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {ranked.map((entry, i) => (
+          <tr>
+            <td><span class={`rank-num${i < 3 ? ' top3' : ''}`}>{i + 1}</span></td>
+            <td>
+              <div class="country-cell">
+                <span class="country-flag">{entry.flag}</span>
+                <a class="country-name" href={`/fr/country/${entry.slug}/`}>{entry.nameFR}</a>
+              </div>
+            </td>
+            <td><span class="metric-val">{entry.value}</span></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+
+    <div class="other-rankings">
+      <div class="other-rankings-label">Autres classements</div>
+      <div class="other-rankings-grid">
+        {Object.entries(RANKINGS).filter(([s]) => s !== slug).map(([s, d]) => (
+          <a href={`/fr/rankings/${s}/`} class="ork-card">
+            <span class="ork-title">{d.h1}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <p class="lang-note">
+      This page is also available in <a href={`/rankings/${slug}/`}>English</a>.
+    </p>
+  </div>
+</Base>

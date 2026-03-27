@@ -3129,6 +3129,22 @@ export const COUNTRY_INSIGHTS = {
     "sport": "Le rugby à XV n'est pas seulement le sport du Pays de Galles mais sa source d'identité nationale la plus fiable — le Principality Stadium au centre de Cardiff transformant toute la ville les jours de match, avec l'hymne national gallois Hen Wlad Fy Nhadau, le premier hymne jamais chanté par une foule avant un match international en 1905, toujours capable de soulever 74 500 personnes à une émotion collective authentique.",
     "nature": "Le Snowdonia (Eryri) — 2 130 kilomètres carrés de pics glaciaires, de lacs et de terrain ancien — contient la plus haute montagne d'Angleterre et du Pays de Galles tout en restant suffisamment accessible pour que 400 000 personnes gravissent Yr Wyddfa chaque année, un paysage simultanément sauvage et très fréquenté où le chemin de fer de montagne du Snowdon fonctionne depuis 1896."
   },
+  "Palau": {
+    "flag": "🇵🇼",
+    "capital": "Ngerulmud",
+    "population": "18 000",
+    "language": "Palauan, Anglais",
+    "sport": "Pêche / Plongée",
+    "fact": "Palaos a créé le premier sanctuaire de requins au monde en 2009, interdisant toute pêche commerciale au requin dans ses 600 000 km² d'océan — l'écosystème sous-marin du pays est considéré comme l'une des sept merveilles sous-marines du monde."
+  },
+  "Vatican City": {
+    "flag": "🇻🇦",
+    "capital": "Cité du Vatican",
+    "population": "~800",
+    "language": "Latin, Italien",
+    "sport": "Football",
+    "fact": "Le Vatican est le plus petit État internationalement reconnu au monde avec 0,44 km² — il possède son propre journal, une station de radio, une chaîne de télévision, un service postal, et est le seul pays où le latin est langue officielle."
+  },
   "Northern Ireland": {
     "capital": "Belfast a transformé son passé industriel — la ville qui a construit le Titanic et lancé les plus grands navires du monde — en Titanic Quarter, la plus grande régénération de front de mer urbain d'Europe, où un bâtiment en forme de coque du navire attire désormais plus de visiteurs que toute l'île d'Irlande n'en accueillait en l'an 2000.",
     "people": "L'Accord du Vendredi saint de 1998 a mis fin à 30 ans de conflit armé qui a tué plus de 3 500 personnes dans une population de moins de deux millions — une paix négociée contre toute probabilité historique qui est désormais l'un des cadres de résolution des conflits les plus étudiés au monde, son architecture de partage du pouvoir examinée par des nations tentant leurs propres transitions hors de la violence.",

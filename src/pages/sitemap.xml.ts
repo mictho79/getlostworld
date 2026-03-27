@@ -79,6 +79,18 @@ export const GET: APIRoute = async () => {
     )),
     // ── FR curated compare pairs ────────────────────────────
     ...curated.map(([a, b]) => url(`${base}/fr/compare/${a}-vs-${b}/`, '0.6', 'monthly')),
+    // ── EN ranking pages with hreflang ──────────────────────
+    url(`${base}/rankings/largest-countries/`,  '0.8', 'monthly', `${base}/fr/rankings/largest-countries/`),
+    url(`${base}/rankings/most-populated/`,     '0.8', 'monthly', `${base}/fr/rankings/most-populated/`),
+    url(`${base}/rankings/most-neighbors/`,     '0.7', 'monthly', `${base}/fr/rankings/most-neighbors/`),
+    url(`${base}/rankings/island-nations/`,     '0.7', 'monthly', `${base}/fr/rankings/island-nations/`),
+    url(`${base}/rankings/smallest-countries/`, '0.7', 'monthly', `${base}/fr/rankings/smallest-countries/`),
+    // ── FR ranking pages ────────────────────────────────────
+    url(`${base}/fr/rankings/largest-countries/`,  '0.7', 'monthly'),
+    url(`${base}/fr/rankings/most-populated/`,     '0.7', 'monthly'),
+    url(`${base}/fr/rankings/most-neighbors/`,     '0.6', 'monthly'),
+    url(`${base}/fr/rankings/island-nations/`,     '0.6', 'monthly'),
+    url(`${base}/fr/rankings/smallest-countries/`, '0.6', 'monthly'),
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
