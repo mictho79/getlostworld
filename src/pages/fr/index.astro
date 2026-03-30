@@ -516,13 +516,13 @@ const countryList = Object.keys(globeData).sort().map(n => ({
 
     <!-- Stats -->
     <div id="stats">
-      <div class="stat"><div class="stat-num">195</div><div class="stat-lbl">{t.statCountries}</div></div>
-      <div class="stat"><div class="stat-num">7</div><div class="stat-lbl">{t.statContinents}</div></div>
+      <div class="stat"><div class="stat-num">{countryList.length}</div><div class="stat-lbl">{t.statCountries}</div></div>
+      <div class="stat"><div class="stat-num">6</div><div class="stat-lbl">{t.statContinents}</div></div>
       <div class="stat"><div class="stat-num">8B+</div><div class="stat-lbl">{t.statPeople}</div></div>
     </div>
 
     <div id="nav-countries">
-      <a href="/fr/countries/">🌐 Parcourir les 195 pays →</a>
+      <a href="/fr/countries/">🌐 Parcourir les {countryList.length} pays →</a>
     </div>
 
     <div class="sep"></div>

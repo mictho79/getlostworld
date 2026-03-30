@@ -40,7 +40,7 @@ const SITE = 'https://terralenses.com';
 
 <Base
   title="Tous les pays – Faits & Géographie | TerraLenses"
-  description="Explorez les 195 pays du monde. Capitales, populations et géographies de chaque nation sur Terre."
+  description={`Explorez les ${totalCountries} pays du monde. Capitales, populations et géographies de chaque nation sur Terre.`}
   lang="fr"
   hreflangEn={`${SITE}/countries/`}
   hreflangFr={`${SITE}/fr/countries/`}
@@ -150,7 +150,7 @@ const SITE = 'https://terralenses.com';
     <div class="page-header">
       <a href="/fr/" class="back-link">← TerraLenses</a>
       <h1>Explorer tous les pays</h1>
-      <p class="subtitle">{totalCountries} pays répartis sur {CONTINENT_ORDER.length} continents</p>
+      <p class="subtitle">{totalCountries} pays répartis sur 6 continents</p>
     </div>
 
     {CONTINENT_ORDER.map(continent => (
