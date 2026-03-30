@@ -582,13 +582,13 @@ const countryList = Object.keys(globeData).sort().map(n => ({
 
     acList.addEventListener('click', function(e) {
       var item = e.target.closest('.ac-item');
-      if (item) window.location.href = '/fr/country/' + item.dataset.slug;
+      if (item) window.location.href = '/fr/country/' + item.dataset.slug + '/';
     });
 
     searchEl.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
         var first = acList.querySelector('.ac-item');
-        if (first) window.location.href = '/fr/country/' + first.dataset.slug;
+        if (first) window.location.href = '/fr/country/' + first.dataset.slug + '/';
       }
       if (e.key === 'Escape') { acList.innerHTML = ''; }
     });
@@ -1018,7 +1018,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         var local = globe.worldToLocal(hits[0].point.clone());
         var ll    = v3ll(local);
         var f     = findFeature(ll.lat, ll.lng);
-        if (f && f.properties.slug) window.location.href = '/fr/country/' + f.properties.slug;
+        if (f && f.properties.slug) window.location.href = '/fr/country/' + f.properties.slug + '/';
       });
 
       renderer.domElement.addEventListener('mousemove', function(e) {

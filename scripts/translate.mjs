@@ -3,12 +3,16 @@
  * scripts/translate.mjs
  *
  * Translates COUNTRY_VIBES, COUNTRY_DATA.fact, and COUNTRY_INSIGHTS
- * via the DeepL free API and writes language-specific data files.
+ * via the free Google Translate API and writes language-specific data files.
  *
  * Usage:
- *   DEEPL_API_KEY=xxx node scripts/translate.mjs
- *   DEEPL_API_KEY=xxx node scripts/translate.mjs --langs=fr,es
+ *   node scripts/translate.mjs
+ *   node scripts/translate.mjs --langs=fr,es
  *   node scripts/translate.mjs --dry-run
+ *   node scripts/translate.mjs --langs=es --force   (overwrite existing output)
+ *
+ * If rate-limited mid-run, progress is saved in .translate-cache.json
+ * and automatically resumed on the next run.
  *
  * Output:
  *   src/lib/countryData.fr.js
@@ -16,13 +20,17 @@
  *   src/lib/countryData.de.js
  */
 
-import { writeFileSync, existsSync } from 'node:fs';
+import pkg from '@vitalets/google-translate-api';
+const { translate } = pkg;
+const isRateLimit = (err) => err?.message?.includes('Too Many Requests') || err?.statusCode === 429;
+import { writeFileSync, existsSync, readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 // ── Paths ─────────────────────────────────────────────────────────────────────
-const __dir = dirname(fileURLToPath(import.meta.url));
-const ROOT  = resolve(__dir, '..');
+const __dir    = dirname(fileURLToPath(import.meta.url));
+const ROOT     = resolve(__dir, '..');
+const CACHE_FILE = resolve(ROOT, '.translate-cache.json');
 
 // ── CLI args ──────────────────────────────────────────────────────────────────
 const DRY_RUN  = process.argv.includes('--dry-run');
@@ -31,26 +39,17 @@ const LANG_ARG = process.argv.find(a => a.startsWith('--langs='));
 const LANGS    = (LANG_ARG ? LANG_ARG.split('=')[1] : 'fr,es,de')
   .split(',').map(l => l.trim().toUpperCase());
 
-// DeepL language codes (target_lang)
-const DEEPL_LANG = { FR: 'FR', ES: 'ES', DE: 'DE' };
+// Google Translate language codes
+const GOOGLE_LANG = { FR: 'fr', ES: 'es', DE: 'de' };
 
 // ── Config ────────────────────────────────────────────────────────────────────
-const API_KEY    = process.env.DEEPL_API_KEY;
-const DEEPL_URL  = 'https://api-free.deepl.com/v2/translate';
-const BATCH_SIZE = 50;   // max texts per API call (DeepL supports up to 50)
-const DELAY_MS   = 400;  // ms between batches — stay within free tier limits
-const MAX_RETRY  = 3;    // retries on transient errors (429, 5xx)
-const RETRY_MS   = 2000; // base delay before retry (doubles each attempt)
+const DELAY_MS       = 600;   // ms between requests
+const RATELIMIT_WAIT = 90_000; // ms to wait after a 429 (90 seconds)
+const MAX_RETRY      = 4;
 
 // ── Validate ──────────────────────────────────────────────────────────────────
-if (!API_KEY && !DRY_RUN) {
-  console.error('\n❌  DEEPL_API_KEY env variable is required.');
-  console.error('    Get a free key at https://www.deepl.com/pro-api');
-  console.error('    Or run with --dry-run to estimate usage without calling the API.\n');
-  process.exit(1);
-}
 for (const l of LANGS) {
-  if (!DEEPL_LANG[l]) {
+  if (!GOOGLE_LANG[l]) {
     console.error(`❌  Unknown language "${l}". Supported: fr, es, de`);
     process.exit(1);
   }
@@ -68,22 +67,15 @@ const { COUNTRY_VIBES, COUNTRY_DATA, COUNTRY_INSIGHTS } =
   await import(pathToFileURL(srcPath).href);
 
 // ── Build translation queue ───────────────────────────────────────────────────
-// One flat array of { section, country, field, value } so we can translate
-// everything in a single pass per language and reconstruct afterwards.
 const queue = [];
 const INSIGHT_FIELDS = ['capital', 'people', 'food', 'sport', 'nature'];
 
-// 1. COUNTRY_VIBES  — short adjective phrases, e.g. "Ancient · Rugged · Proud"
 for (const [country, value] of Object.entries(COUNTRY_VIBES)) {
   if (value) queue.push({ section: 'vibes', country, field: null, value });
 }
-
-// 2. COUNTRY_DATA.fact  — one standalone "did you know" sentence per country
 for (const [country, data] of Object.entries(COUNTRY_DATA)) {
   if (data?.fact) queue.push({ section: 'fact', country, field: null, value: data.fact });
 }
-
-// 3. COUNTRY_INSIGHTS  — 2–5 prose paragraphs per country
 for (const [country, ins] of Object.entries(COUNTRY_INSIGHTS)) {
   for (const field of INSIGHT_FIELDS) {
     if (ins?.[field]) queue.push({ section: 'insight', country, field, value: ins[field] });
@@ -96,81 +88,92 @@ if (queue.length === 0) {
 }
 
 const totalChars = queue.reduce((n, q) => n + q.value.length, 0);
-const batchCount = Math.ceil(queue.length / BATCH_SIZE);
-
 console.log(`\n📊 Strings to translate  : ${queue.length.toLocaleString()}`);
 console.log(`📏 Characters per lang   : ~${totalChars.toLocaleString()}`);
-console.log(`📏 Total API characters  : ~${(totalChars * LANGS.length).toLocaleString()} (${LANGS.length} languages)`);
-console.log(`🌍 Target languages      : ${LANGS.map(l => DEEPL_LANG[l]).join(', ')}`);
-console.log(`📦 Batch size            : ${BATCH_SIZE}`);
-console.log(`🔢 API calls per language: ${batchCount} (${queue.length} strings ÷ ${BATCH_SIZE})`);
-
-if (totalChars * LANGS.length > 450_000) {
-  console.warn('\n⚠️  WARNING: Estimated usage exceeds 450 000 characters.');
-  console.warn('   The DeepL free tier allows 500 000 chars/month.');
-  console.warn('   Use --langs=fr to translate one language at a time if needed.\n');
-} else {
-  console.log('');
-}
+console.log(`🌍 Target languages      : ${LANGS.map(l => GOOGLE_LANG[l]).join(', ')}`);
+console.log(`⏱  Estimated time/lang   : ~${Math.round(queue.length * DELAY_MS / 1000)}s\n`);
 
 if (DRY_RUN) {
   console.log('🚧 Dry-run mode — no API calls made.\n');
   process.exit(0);
 }
 
-// ── DeepL API helpers ─────────────────────────────────────────────────────────
-async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-async function callDeepL(texts, targetLang, attempt = 1) {
-  const res = await fetch(DEEPL_URL, {
-    method: 'POST',
-    headers: {
-      'Authorization': `DeepL-Auth-Key ${API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      text:                texts,
-      source_lang:         'EN',
-      target_lang:         targetLang,
-      preserve_formatting: true,
-    }),
-  });
-
-  // Retry on rate-limit or server errors
-  if ((res.status === 429 || res.status >= 500) && attempt <= MAX_RETRY) {
-    const wait = RETRY_MS * attempt;
-    console.warn(`\n  ⚠️  HTTP ${res.status} — retrying in ${wait}ms (attempt ${attempt}/${MAX_RETRY})…`);
-    await sleep(wait);
-    return callDeepL(texts, targetLang, attempt + 1);
-  }
-
-  if (!res.ok) {
-    const body = await res.text().catch(() => '');
-    throw new Error(`DeepL API error ${res.status}: ${body}`);
-  }
-
-  const json = await res.json();
-  return json.translations.map(t => t.text);
+// ── Cache helpers ─────────────────────────────────────────────────────────────
+function loadCache() {
+  try { return existsSync(CACHE_FILE) ? JSON.parse(readFileSync(CACHE_FILE, 'utf8')) : {}; }
+  catch { return {}; }
+}
+function saveCache(cache) {
+  writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 2), 'utf8');
+}
+function deleteCache() {
+  try { if (existsSync(CACHE_FILE)) writeFileSync(CACHE_FILE, '{}', 'utf8'); } catch {}
 }
 
-async function translateAll(items, targetLang) {
-  const texts  = items.map(i => i.value);
-  const out    = [];
-  const batches = Math.ceil(texts.length / BATCH_SIZE);
+// ── Google Translate helpers ──────────────────────────────────────────────────
+async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-  for (let b = 0; b < batches; b++) {
-    const start = b * BATCH_SIZE;
-    const slice = texts.slice(start, start + BATCH_SIZE);
-    const pct   = Math.round(((b + 1) / batches) * 100);
+async function callGoogle(text, targetLang, attempt = 1) {
+  try {
+    const result = await translate(text, { from: 'en', to: targetLang });
+    return result.text;
+  } catch (err) {
+    if (isRateLimit(err)) {
+      if (attempt <= MAX_RETRY) {
+        console.warn(`\n  ⚠️  Rate limited — waiting ${RATELIMIT_WAIT / 1000}s before retry (attempt ${attempt}/${MAX_RETRY})…`);
+        await sleep(RATELIMIT_WAIT);
+        return callGoogle(text, targetLang, attempt + 1);
+      }
+      throw new Error('Rate limit exceeded after max retries. Re-run the script to resume from checkpoint.');
+    }
+    if (attempt <= MAX_RETRY) {
+      await sleep(2000 * attempt);
+      return callGoogle(text, targetLang, attempt + 1);
+    }
+    throw err;
+  }
+}
 
-    process.stdout.write(`  [${String(b + 1).padStart(String(batches).length)}/${batches}] ${pct.toString().padStart(3)}%  `);
+async function translateAll(items, targetLang, langKey) {
+  const cache  = loadCache();
+  if (!cache[langKey]) cache[langKey] = {};
 
-    const translated = await callDeepL(slice, targetLang);
-    out.push(...translated);
+  const out    = new Array(items.length);
+  const total  = items.length;
+  const padLen = String(total).length;
+  let   done   = 0;
 
-    process.stdout.write(`✓  (${slice.length} strings, ~${slice.reduce((n, s) => n + s.length, 0).toLocaleString()} chars)\n`);
+  for (let i = 0; i < total; i++) {
+    const { value } = items[i];
+    const cacheKey  = `${i}`;
 
-    if (b < batches - 1) await sleep(DELAY_MS);
+    // Resume from cache if available
+    if (cache[langKey][cacheKey] !== undefined) {
+      out[i] = cache[langKey][cacheKey];
+      done++;
+      continue;
+    }
+
+    const pct = Math.round(((i + 1) / total) * 100);
+    process.stdout.write(`  [${String(i + 1).padStart(padLen)}/${total}] ${pct.toString().padStart(3)}%  `);
+
+    const translated = await callGoogle(value, targetLang);
+    out[i] = translated;
+
+    // Save to cache immediately
+    cache[langKey][cacheKey] = translated;
+    saveCache(cache);
+    done++;
+
+    process.stdout.write(`✓\n`);
+
+    if (i < total - 1) await sleep(DELAY_MS);
+  }
+
+  if (done === total) {
+    // Clear this lang from cache on success
+    delete cache[langKey];
+    saveCache(cache);
   }
 
   return out;
@@ -194,7 +197,6 @@ function reconstruct(translated) {
     }
   }
 
-  // Build COUNTRY_DATA with translated facts, all other fields unchanged
   const countryData = {};
   for (const [name, data] of Object.entries(COUNTRY_DATA)) {
     countryData[name] = facts[name] ? { ...data, fact: facts[name] } : { ...data };
@@ -209,7 +211,7 @@ function toJsModule(lang, vibes, countryData, insights) {
   return [
     `// Auto-generated by scripts/translate.mjs — do not edit manually.`,
     `// Source: EN → ${lang}  (generated ${date})`,
-    `// Re-run the script to update: DEEPL_API_KEY=xxx node scripts/translate.mjs --langs=${lang.toLowerCase()}`,
+    `// Re-run the script to update: node scripts/translate.mjs --langs=${lang.toLowerCase()}`,
     ``,
     `export const COUNTRY_VIBES = ${JSON.stringify(vibes, null, 2)};`,
     ``,
@@ -222,22 +224,29 @@ function toJsModule(lang, vibes, countryData, insights) {
 
 // ── Main loop — one language at a time ────────────────────────────────────────
 for (const lang of LANGS) {
-  const dlLang  = DEEPL_LANG[lang];
+  const glLang  = GOOGLE_LANG[lang];
   const outPath = resolve(ROOT, `src/lib/countryData.${lang.toLowerCase()}.js`);
+  const langKey = lang; // cache key
 
   if (existsSync(outPath) && !FORCE) {
-    console.log(`⏭️  ${outPath.replace(ROOT + '/', '')} already exists — skipping (use --force to overwrite)\n`);
-    continue;
+    // Check if there's a partial cache for this lang — if so, resume
+    const cache = loadCache();
+    if (!cache[langKey]) {
+      console.log(`⏭️  ${lang.toLowerCase()} already exists — skipping (use --force to overwrite)\n`);
+      continue;
+    }
+    console.log(`♻️  Resuming partial translation for ${lang}…`);
   }
 
-  console.log(`\n🔄 Translating to ${dlLang}…`);
+  console.log(`\n🔄 Translating to ${glLang.toUpperCase()}…`);
   const t0 = Date.now();
 
   let translated;
   try {
-    translated = await translateAll(queue, dlLang);
+    translated = await translateAll(queue, glLang, langKey);
   } catch (err) {
-    console.error(`\n❌  Translation failed for ${lang}: ${err.message}`);
+    console.error(`\n❌  ${err.message}`);
+    console.error('    Re-run the same command to resume from the checkpoint.\n');
     process.exit(1);
   }
 
@@ -248,7 +257,8 @@ for (const lang of LANGS) {
   const src = toJsModule(lang, vibes, countryData, insights);
 
   writeFileSync(outPath, src, 'utf8');
-  console.log(`  ✅  Wrote ${outPath.replace(ROOT + '/', '')}`);
+  console.log(`  ✅  Wrote ${lang.toLowerCase()}`);
 }
 
+deleteCache();
 console.log('\n🎉 Done!\n');

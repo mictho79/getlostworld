@@ -852,13 +852,13 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
             }
             if (foundId) {
               const info = COUNTRY_ID_MAP[+foundId] || UK_NATIONS_INFO[foundId];
-              if (info && info.slug) window.location.href = '/country/' + info.slug;
+              if (info && info.slug) window.location.href = '/country/' + info.slug + '/';
             }
           } else {
             // Desktop: use hover state set by mousemove
             if (!hoveredId) return;
             const info = COUNTRY_ID_MAP[+hoveredId] || UK_NATIONS_INFO[hoveredId];
-            if (info) window.location.href = '/country/' + info.slug;
+            if (info) window.location.href = '/country/' + info.slug + '/';
           }
         });
       });
