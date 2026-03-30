@@ -73,6 +73,7 @@ if (!countryA || !countryB) return Astro.redirect('/');
 const SITE = 'https://terralenses.com';
 const enUrl = `${SITE}/compare/${slug}/`;
 const frUrl = `${SITE}/fr/compare/${slug}/`;
+const esUrl = `${SITE}/es/compare/${slug}/`;
 
 const ciA = countryA.insights as Record<string,string>;
 const ciB = countryB.insights as Record<string,string>;
@@ -294,7 +295,7 @@ const jsonLd = JSON.stringify({
 });
 ---
 
-<Base title={title} description={description} lang="en" hreflangEn={enUrl} hreflangFr={frUrl}>
+<Base title={title} description={description} lang="en" hreflangEn={enUrl} hreflangFr={frUrl} hreflangEs={esUrl}>
 
   <Fragment slot="head">
     <script type="application/ld+json" set:html={jsonLd} />

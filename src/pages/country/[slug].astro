@@ -29,6 +29,7 @@ if (SLUG_ALIASES[slug as string]) return Astro.redirect(SLUG_ALIASES[slug as str
 const SITE = 'https://terralenses.com';
 const enUrl = `${SITE}/country/${slug}/`;
 const frUrl = `${SITE}/fr/country/${slug}/`;
+const esUrl = `${SITE}/es/country/${slug}/`;
 
 // ─── Language ──────────────────────────────────────────────────────────────────
 const lang = 'en' as const;
@@ -266,7 +267,7 @@ const jsonLd = JSON.stringify({
 });
 ---
 
-<Base title={title} description={description} countryName={country.name} lang="en" hreflangEn={enUrl} hreflangFr={frUrl}>
+<Base title={title} description={description} countryName={country.name} lang="en" hreflangEn={enUrl} hreflangFr={frUrl} hreflangEs={esUrl}>
 
   <Fragment slot="head">
     <script type="application/ld+json" set:html={jsonLd} />

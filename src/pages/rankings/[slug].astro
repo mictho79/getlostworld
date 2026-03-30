@@ -133,6 +133,7 @@ const mapUrl = `/map/?highlight=${highlightSlugs}&from=${slug}&values=${encodeUR
 
 const enUrl = `${SITE}/rankings/${slug}/`;
 const frUrl = `${SITE}/fr/rankings/${slug}/`;
+const esUrl = `${SITE}/es/rankings/${slug}/`;
 ---
 
 <Base
@@ -141,6 +142,7 @@ const frUrl = `${SITE}/fr/rankings/${slug}/`;
   lang="en"
   hreflangEn={enUrl}
   hreflangFr={frUrl}
+  hreflangEs={esUrl}
 >
   <style is:global>
     html, body { overflow: auto !important; height: auto !important; }
