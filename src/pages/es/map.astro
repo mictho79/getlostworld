@@ -1,9 +1,9 @@
 ---
 export const prerender = false;
 import { COUNTRY_DATA as DATA_EN } from '../../lib/countryData.js';
-import { getT, COUNTRY_NAMES_FR } from '../../i18n/translations';
+import { getT, COUNTRY_NAMES_ES } from '../../i18n/translations';
 
-const lang = 'fr' as const;
+const lang = 'es' as const;
 const t = getT(lang);
 
 const highlightParam = Astro.url.searchParams.get('highlight') || '';
@@ -13,8 +13,9 @@ const valuesParam = Astro.url.searchParams.get('values') || '';
 const highlightValues = valuesParam ? valuesParam.split('|') : [];
 
 let countryDataSrc: typeof DATA_EN = DATA_EN;
-const fr = await import('../../lib/countryData.fr.js');
-countryDataSrc = { ...(DATA_EN as any), ...(fr.COUNTRY_DATA as any) };
+const es = await import('../../lib/countryData.es.js');
+const _esData = Object.keys((es as any).COUNTRY_DATA || {}).length ? (es as any).COUNTRY_DATA : {};
+countryDataSrc = { ...(DATA_EN as any), ..._esData };
 
 // Extract just the fact field per country for the sidebar
 const sidebarFacts: Record<string, string> = {};
@@ -34,13 +35,13 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
 }
 ---
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Carte du monde – Explorez chaque pays | TerraLenses</title>
-  <meta name="description" content="Carte du monde interactive. Cliquez sur un pays pour explorer ses faits, culture, géographie et plus." />
-  <link rel="canonical" href="https://terralenses.com/fr/map/" />
+  <title>Mapa del mundo – Explora cada país | TerraLenses</title>
+  <meta name="description" content="Mapa del mundo interactivo. Haz clic en un país para explorar sus datos, cultura, geografía y más." />
+  <link rel="canonical" href="https://terralenses.com/es/map/" />
   <meta name="google-site-verification" content="jncrLZewF1YuN4wAuQFWpmCTFcOhhZjQCeyAdK03Bcc" />
   <link rel="alternate" hreflang="en" href="https://terralenses.com/map/" />
   <link rel="alternate" hreflang="fr" href="https://terralenses.com/fr/map/" />
@@ -317,21 +318,21 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
   <div id="mobile-logo">TerraLenses</div>
 
   <!-- Lang switcher -->
-  <div id="lang-sw"><a href="/map/" onclick="localStorage.setItem('lang-choice','en')">EN</a><span>/</span><a href="/fr/map/" class="active" onclick="localStorage.setItem('lang-choice','fr')">FR</a></div>
+  <div id="lang-sw"><a href="/map/" onclick="localStorage.setItem('lang-choice','en')">EN</a><span>/</span><a href="/fr/map/" onclick="localStorage.setItem('lang-choice','fr')">FR</a><span>/</span><a href="/es/map/" class="active" onclick="localStorage.setItem('lang-choice','es')">ES</a></div>
 
   <aside id="sidebar">
 
     <div id="sb-welcome">
       <div class="sb-globe">🌍</div>
       <div class="sb-welcome-title">TerraLenses</div>
-      <div class="sb-welcome-sub">Survolez un pays pour le découvrir</div>
+      <div class="sb-welcome-sub">Pasa el cursor sobre un país para descubrirlo</div>
       <div class="sb-rnk-section">
-        <div class="sb-rnk-label">Classements</div>
-        <a class="sb-rnk-link" href="/fr/rankings/largest-countries/">🌍 Plus grands pays</a>
-        <a class="sb-rnk-link" href="/fr/rankings/most-populated/">👥 Plus peuplés</a>
-        <a class="sb-rnk-link" href="/fr/rankings/most-neighbors/">🤝 Plus de voisins</a>
-        <a class="sb-rnk-link" href="/fr/rankings/island-nations/">🏝 Nations insulaires</a>
-        <a class="sb-rnk-link" href="/fr/rankings/smallest-countries/">🔬 Plus petits pays</a>
+        <div class="sb-rnk-label">Rankings</div>
+        <a class="sb-rnk-link" href="/es/rankings/largest-countries/">🌍 Países más grandes</a>
+        <a class="sb-rnk-link" href="/es/rankings/most-populated/">👥 Más poblados</a>
+        <a class="sb-rnk-link" href="/es/rankings/most-neighbors/">🤝 Más vecinos</a>
+        <a class="sb-rnk-link" href="/es/rankings/island-nations/">🏝 Naciones insulares</a>
+        <a class="sb-rnk-link" href="/es/rankings/smallest-countries/">🔬 Países más pequeños</a>
       </div>
     </div>
 
@@ -393,7 +394,7 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
   <div id="map"></div>
 
   <script set:html={`window.SIDEBAR_FACTS = ${JSON.stringify(sidebarFacts)};`}></script>
-  <script set:html={`window.COUNTRY_NAMES_FR_MAP = ${JSON.stringify(COUNTRY_NAMES_FR)};`}></script>
+  <script set:html={`window.COUNTRY_NAMES_ES_MAP = ${JSON.stringify(COUNTRY_NAMES_ES)};`}></script>
   <script set:html={`window._HIGHLIGHT=${JSON.stringify(highlightSlugs)};window._FROM=${JSON.stringify(fromParam)};window._HL_VALUES=${JSON.stringify(highlightValues)};`}></script>
   <script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script is:inline src="/topojson.min.js"></script>
@@ -429,10 +430,10 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
       Americas: 'linear-gradient(90deg,#8b5cf6,#3b82f6)',
       Oceania:  'linear-gradient(90deg,#06b6d4,#10b981)',
     };
-    const REGION_FR = { Europe:'Europe', Asia:'Asie', Africa:'Afrique', Americas:'Amériques', Oceania:'Océanie' };
+    const REGION_FR = { Europe:'Europa', Asia:'Asia', Africa:'África', Americas:'Américas', Oceania:'Oceanía' };
 
     function showCountry(info, data) {
-      const nameFR = (window.COUNTRY_NAMES_FR_MAP && window.COUNTRY_NAMES_FR_MAP[info.name]) || info.name;
+      const nameFR = (window.COUNTRY_NAMES_ES_MAP && window.COUNTRY_NAMES_ES_MAP[info.name]) || info.name;
       document.getElementById('sb-welcome').classList.add('hidden');
       document.getElementById('sb-country').classList.add('visible');
       document.getElementById('sb-accent').style.background = ACCENT[info.region] || ACCENT.Europe;
@@ -478,14 +479,14 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
       document.getElementById('sb-welcome').style.display = 'none';
       panel.classList.add('active');
       const FROM_LABELS = {
-        'largest-countries': '30 plus grands pays',
-        'smallest-countries': 'Plus petits pays',
-        'most-populated':    'Plus peuplés',
-        'most-neighbors':    'Plus de voisins',
-        'island-nations':    'Nations insulaires',
+        'largest-countries': '30 países más grandes',
+        'smallest-countries': 'Países más pequeños',
+        'most-populated':    'Más poblados',
+        'most-neighbors':    'Más vecinos',
+        'island-nations':    'Naciones insulares',
       };
-      const title = FROM_LABELS[window._FROM] || hlArray.length + ' pays';
-      const linkUrl = window._FROM ? `/fr/rankings/${window._FROM}/` : '/fr/rankings/';
+      const title = FROM_LABELS[window._FROM] || hlArray.length + ' países';
+      const linkUrl = window._FROM ? `/es/rankings/${window._FROM}/` : '/es/rankings/';
       const values = window._HL_VALUES || [];
       const total = hlArray.length;
       let items = '';
@@ -496,10 +497,10 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
         const color = `hsl(${h},85%,65%)`;
         const cardBg = `hsla(${h},60%,40%,0.12)`;
         const cardHover = `hsla(${h},60%,40%,0.25)`;
-        const nameFR = (window.COUNTRY_NAMES_FR_MAP && window.COUNTRY_NAMES_FR_MAP[info.name]) || info.name || slug;
+        const nameFR = (window.COUNTRY_NAMES_ES_MAP && window.COUNTRY_NAMES_ES_MAP[info.name]) || info.name || slug;
         const value = values[i] || '';
         items +=
-          `<a href="/fr/country/${slug}/" style="display:flex;align-items:center;gap:9px;padding:9px 12px;text-decoration:none;margin:3px 10px;border-radius:8px;background:${cardBg};border:1px solid hsla(${h},60%,50%,0.15);" onmouseover="this.style.background='${cardHover}'" onmouseout="this.style.background='${cardBg}'">` +
+          `<a href="/es/country/${slug}/" style="display:flex;align-items:center;gap:9px;padding:9px 12px;text-decoration:none;margin:3px 10px;border-radius:8px;background:${cardBg};border:1px solid hsla(${h},60%,50%,0.15);" onmouseover="this.style.background='${cardHover}'" onmouseout="this.style.background='${cardBg}'">` +
             `<span style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.28);min-width:18px;text-align:right;flex-shrink:0;">${i+1}</span>` +
             `<div style="width:11px;height:11px;border-radius:3px;background:${color};flex-shrink:0;box-shadow:0 0 6px ${color};"></div>` +
             `<span style="font-size:20px;line-height:1;flex-shrink:0;">${info.flag||''}</span>` +
@@ -512,7 +513,7 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
       panel.innerHTML =
         `<div style="padding:14px 14px 10px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06);">` +
           `<div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:5px;">${title}</div>` +
-          `<a href="${linkUrl}" style="font-size:11px;color:rgba(255,255,255,0.4);text-decoration:none;">← Voir la liste</a>` +
+          `<a href="${linkUrl}" style="font-size:11px;color:rgba(255,255,255,0.4);text-decoration:none;">← Ver la lista</a>` +
         `</div>` +
         `<div style="flex:1;overflow-y:auto;padding:6px 0 16px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.12) transparent;">${items}</div>`;
     }
@@ -559,10 +560,10 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
 
     // UK constituent nations info (used instead of COUNTRY_ID_MAP for UK features)
     const UK_NATIONS_INFO = {
-      'england':          { name:'Angleterre',        slug:'england',          flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', region:'Europe' },
-      'scotland':         { name:'Écosse',            slug:'scotland',         flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', region:'Europe' },
-      'wales':            { name:'Pays de Galles',    slug:'wales',            flag:'🏴󠁧󠁢󠁷󠁬󠁳󠁿', region:'Europe' },
-      'northern-ireland': { name:'Irlande du Nord',   slug:'northern-ireland', flag:'🏴󠁧󠁢󠁮󠁩󠁲󠁿', region:'Europe' },
+      'england':          { name:'Inglaterra',        slug:'england',          flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', region:'Europe' },
+      'scotland':         { name:'Escocia',           slug:'scotland',         flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', region:'Europe' },
+      'wales':            { name:'Gales',             slug:'wales',            flag:'🏴󠁧󠁢󠁷󠁬󠁳󠁿', region:'Europe' },
+      'northern-ireland': { name:'Irlanda del Norte', slug:'northern-ireland', flag:'🏴󠁧󠁢󠁮󠁩󠁲󠁿', region:'Europe' },
     };
 
     // Fix antimeridian: SPLIT polygons that cross ±180° into two valid polygons
@@ -858,13 +859,13 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
             }
             if (foundId) {
               const info = COUNTRY_ID_MAP[+foundId] || UK_NATIONS_INFO[foundId];
-              if (info && info.slug) window.location.href = '/fr/country/' + info.slug;
+              if (info && info.slug) window.location.href = '/es/country/' + info.slug;
             }
           } else {
             // Desktop: use hover state set by mousemove
             if (!hoveredId) return;
             const info = COUNTRY_ID_MAP[+hoveredId] || UK_NATIONS_INFO[hoveredId];
-            if (info) window.location.href = '/fr/country/' + info.slug;
+            if (info) window.location.href = '/es/country/' + info.slug;
           }
         });
       });

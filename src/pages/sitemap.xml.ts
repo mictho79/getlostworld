@@ -3,12 +3,20 @@ import { COUNTRY_VIBES, slugify } from '../lib/countryData.js';
 
 const today = new Date().toISOString().slice(0, 10);
 
-const url = (loc: string, priority: string, changefreq: string, frLoc?: string) => {
-  const hreflang = frLoc
-    ? `\n    <xhtml:link rel="alternate" hreflang="en" href="${loc}"/>` +
+const url = (loc: string, priority: string, changefreq: string, frLoc?: string, esLoc?: string) => {
+  let hreflang = '';
+  if (frLoc && esLoc) {
+    hreflang =
+      `\n    <xhtml:link rel="alternate" hreflang="en" href="${loc}"/>` +
       `\n    <xhtml:link rel="alternate" hreflang="fr" href="${frLoc}"/>` +
-      `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${loc}"/>`
-    : '';
+      `\n    <xhtml:link rel="alternate" hreflang="es" href="${esLoc}"/>` +
+      `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${loc}"/>`;
+  } else if (frLoc) {
+    hreflang =
+      `\n    <xhtml:link rel="alternate" hreflang="en" href="${loc}"/>` +
+      `\n    <xhtml:link rel="alternate" hreflang="fr" href="${frLoc}"/>` +
+      `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${loc}"/>`;
+  }
   return `  <url><loc>${loc}</loc><lastmod>${today}</lastmod><changefreq>${changefreq}</changefreq><priority>${priority}</priority>${hreflang}\n  </url>`;
 };
 
@@ -52,13 +60,13 @@ export const GET: APIRoute = async () => {
 
   const lines = [
     // ── Pages statiques avec hreflang ───────────────────────
-    url(base + '/',           '1.0', 'weekly',  base + '/fr/'),
-    url(base + '/map/',       '0.9', 'weekly',  base + '/fr/map/'),
-    url(base + '/compare/',   '0.8', 'weekly',  base + '/fr/compare/'),
-    url(base + '/countries/', '0.8', 'weekly',  base + '/fr/countries/'),
-    url(base + '/legal/',     '0.3', 'yearly',  base + '/fr/legal/'),
-    url(base + '/privacy/',   '0.3', 'yearly',  base + '/fr/privacy/'),
-    url(base + '/contact/',   '0.3', 'yearly',  base + '/fr/contact/'),
+    url(base + '/',           '1.0', 'weekly',  base + '/fr/',           base + '/es/'),
+    url(base + '/map/',       '0.9', 'weekly',  base + '/fr/map/',       base + '/es/map/'),
+    url(base + '/compare/',   '0.8', 'weekly',  base + '/fr/compare/',   base + '/es/compare/'),
+    url(base + '/countries/', '0.8', 'weekly',  base + '/fr/countries/', base + '/es/countries/'),
+    url(base + '/legal/',     '0.3', 'yearly',  base + '/fr/legal/',     base + '/es/legal/'),
+    url(base + '/privacy/',   '0.3', 'yearly',  base + '/fr/privacy/',   base + '/es/privacy/'),
+    url(base + '/contact/',   '0.3', 'yearly',  base + '/fr/contact/',   base + '/es/contact/'),
     // ── FR static (alternate, no hreflang duplication) ──────
     url(base + '/fr/',           '0.9', 'weekly'),
     url(base + '/fr/map/',       '0.8', 'weekly'),
@@ -67,32 +75,52 @@ export const GET: APIRoute = async () => {
     url(base + '/fr/legal/',     '0.3', 'yearly'),
     url(base + '/fr/privacy/',   '0.3', 'yearly'),
     url(base + '/fr/contact/',   '0.3', 'yearly'),
+    // ── ES static ───────────────────────────────────────────
+    url(base + '/es/',           '0.9', 'weekly'),
+    url(base + '/es/map/',       '0.8', 'weekly'),
+    url(base + '/es/compare/',   '0.7', 'weekly'),
+    url(base + '/es/countries/', '0.7', 'weekly'),
+    url(base + '/es/legal/',     '0.3', 'yearly'),
+    url(base + '/es/privacy/',   '0.3', 'yearly'),
+    url(base + '/es/contact/',   '0.3', 'yearly'),
     // ── EN country pages with hreflang ──────────────────────
     ...countries.map(c => url(
       `${base}/country/${slugify(c)}/`, '0.8', 'monthly',
-      `${base}/fr/country/${slugify(c)}/`
+      `${base}/fr/country/${slugify(c)}/`,
+      `${base}/es/country/${slugify(c)}/`
     )),
     // ── FR country pages ────────────────────────────────────
     ...countries.map(c => url(`${base}/fr/country/${slugify(c)}/`, '0.7', 'monthly')),
+    // ── ES country pages ────────────────────────────────────
+    ...countries.map(c => url(`${base}/es/country/${slugify(c)}/`, '0.7', 'monthly')),
     // ── EN curated compare pairs with hreflang ──────────────
     ...curated.map(([a, b]) => url(
       `${base}/compare/${a}-vs-${b}/`, '0.7', 'monthly',
-      `${base}/fr/compare/${a}-vs-${b}/`
+      `${base}/fr/compare/${a}-vs-${b}/`,
+      `${base}/es/compare/${a}-vs-${b}/`
     )),
     // ── FR curated compare pairs ────────────────────────────
     ...curated.map(([a, b]) => url(`${base}/fr/compare/${a}-vs-${b}/`, '0.6', 'monthly')),
+    // ── ES curated compare pairs ────────────────────────────
+    ...curated.map(([a, b]) => url(`${base}/es/compare/${a}-vs-${b}/`, '0.6', 'monthly')),
     // ── EN ranking pages with hreflang ──────────────────────
-    url(`${base}/rankings/largest-countries/`,  '0.8', 'monthly', `${base}/fr/rankings/largest-countries/`),
-    url(`${base}/rankings/most-populated/`,     '0.8', 'monthly', `${base}/fr/rankings/most-populated/`),
-    url(`${base}/rankings/most-neighbors/`,     '0.7', 'monthly', `${base}/fr/rankings/most-neighbors/`),
-    url(`${base}/rankings/island-nations/`,     '0.7', 'monthly', `${base}/fr/rankings/island-nations/`),
-    url(`${base}/rankings/smallest-countries/`, '0.7', 'monthly', `${base}/fr/rankings/smallest-countries/`),
+    url(`${base}/rankings/largest-countries/`,  '0.8', 'monthly', `${base}/fr/rankings/largest-countries/`,  `${base}/es/rankings/largest-countries/`),
+    url(`${base}/rankings/most-populated/`,     '0.8', 'monthly', `${base}/fr/rankings/most-populated/`,     `${base}/es/rankings/most-populated/`),
+    url(`${base}/rankings/most-neighbors/`,     '0.7', 'monthly', `${base}/fr/rankings/most-neighbors/`,     `${base}/es/rankings/most-neighbors/`),
+    url(`${base}/rankings/island-nations/`,     '0.7', 'monthly', `${base}/fr/rankings/island-nations/`,     `${base}/es/rankings/island-nations/`),
+    url(`${base}/rankings/smallest-countries/`, '0.7', 'monthly', `${base}/fr/rankings/smallest-countries/`, `${base}/es/rankings/smallest-countries/`),
     // ── FR ranking pages ────────────────────────────────────
     url(`${base}/fr/rankings/largest-countries/`,  '0.7', 'monthly'),
     url(`${base}/fr/rankings/most-populated/`,     '0.7', 'monthly'),
     url(`${base}/fr/rankings/most-neighbors/`,     '0.6', 'monthly'),
     url(`${base}/fr/rankings/island-nations/`,     '0.6', 'monthly'),
     url(`${base}/fr/rankings/smallest-countries/`, '0.6', 'monthly'),
+    // ── ES ranking pages ────────────────────────────────────
+    url(`${base}/es/rankings/largest-countries/`,  '0.7', 'monthly'),
+    url(`${base}/es/rankings/most-populated/`,     '0.7', 'monthly'),
+    url(`${base}/es/rankings/most-neighbors/`,     '0.6', 'monthly'),
+    url(`${base}/es/rankings/island-nations/`,     '0.6', 'monthly'),
+    url(`${base}/es/rankings/smallest-countries/`, '0.6', 'monthly'),
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

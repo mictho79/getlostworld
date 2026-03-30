@@ -3,14 +3,18 @@ export const prerender = false;
 import { COUNTRY_VIBES as VIBES_EN, COUNTRY_DATA as DATA_EN, slugify } from '../../lib/countryData.js';
 import { getT } from '../../i18n/translations';
 
-const lang = 'fr' as const;
+const lang = 'es' as const;
 const t    = getT(lang);
 
 let vibesSrc: typeof VIBES_EN = VIBES_EN;
 let dataSrc:  typeof DATA_EN  = DATA_EN;
-const fr = await import('../../lib/countryData.fr.js');
-vibesSrc = (fr as any).COUNTRY_VIBES;
-dataSrc  = (fr as any).COUNTRY_DATA;
+const es = await import('../../lib/countryData.es.js');
+vibesSrc = Object.keys((es as any).COUNTRY_VIBES || {}).length
+  ? (es as any).COUNTRY_VIBES
+  : VIBES_EN;
+dataSrc  = Object.keys((es as any).COUNTRY_DATA  || {}).length
+  ? (es as any).COUNTRY_DATA
+  : DATA_EN;
 
 // Build enriched country payload for the globe — always iterate EN keys so new nations are included
 const globeData: Record<string, { vibe: string; fact: string; slug: string }> = {};
@@ -28,28 +32,28 @@ const countryList = Object.keys(globeData).sort().map(n => ({
 }));
 ---
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TerraLenses — Perdez-vous dans le monde</title>
-  <meta name="description" content="Explorez 195 pays — cultures, paysages, faits et comparaisons." />
+  <title>TerraLenses — Piérdete en el mundo</title>
+  <meta name="description" content="Explora 195 países — culturas, paisajes, datos y comparaciones." />
   <meta name="google-site-verification" content="jncrLZewF1YuN4wAuQFWpmCTFcOhhZjQCeyAdK03Bcc" />
-  <link rel="canonical" href="https://terralenses.com/fr/" />
+  <link rel="canonical" href="https://terralenses.com/es/" />
   <link rel="alternate" hreflang="en" href="https://terralenses.com/" />
   <link rel="alternate" hreflang="fr" href="https://terralenses.com/fr/" />
   <link rel="alternate" hreflang="es" href="https://terralenses.com/es/" />
   <link rel="alternate" hreflang="x-default" href="https://terralenses.com/" />
-  <meta property="og:title" content="TerraLenses — Perdez-vous dans le monde" />
-  <meta property="og:description" content="Explorez 195 pays — cultures, paysages, faits et comparaisons. Globe interactif 3D." />
+  <meta property="og:title" content="TerraLenses — Piérdete en el mundo" />
+  <meta property="og:description" content="Explora 195 países — culturas, paisajes, datos y comparaciones. Globo interactivo 3D." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://terralenses.com/fr/" />
+  <meta property="og:url" content="https://terralenses.com/es/" />
   <meta property="og:image" content="https://terralenses.com/og-image.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="TerraLenses — Perdez-vous dans le monde" />
-  <meta name="twitter:description" content="Explorez 195 pays — cultures, paysages, faits et comparaisons." />
+  <meta name="twitter:title" content="TerraLenses — Piérdete en el mundo" />
+  <meta name="twitter:description" content="Explora 195 países — culturas, paisajes, datos y comparaciones." />
   <meta name="twitter:image" content="https://terralenses.com/og-image.png" />
   <script is:inline defer data-domain="terralenses.com" src="https://plausible.io/js/script.js"></script>
   <script is:inline async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4020973443671350" crossorigin="anonymous"></script>
@@ -75,14 +79,12 @@ const countryList = Object.keys(globeData).sort().map(n => ({
     }
     .skip-link:focus { top: 0; }
 
-    /* ── Globe canvas (full-screen background) ─────────────────── */
     #globe-container {
       position: fixed;
       inset: 0;
       z-index: 0;
     }
 
-    /* ── Left panel ───────────────────────────────────────────── */
     #panel {
       position: fixed;
       top: 0; left: 0; bottom: 0;
@@ -99,7 +101,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
     }
     #panel::-webkit-scrollbar { display: none; }
 
-    /* ── Panel header ─────────────────────────────────────────── */
     #panel-header {
       padding: 44px 36px 0;
       flex-shrink: 0;
@@ -154,7 +155,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       margin-bottom: 36px;
     }
 
-    /* ── Search ───────────────────────────────────────────────── */
     #search-wrapper {
       padding: 0 36px;
       flex-shrink: 0;
@@ -220,9 +220,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
     .ac-item:last-child { border-bottom: none; }
     .ac-item:hover { background: rgba(59, 130, 246, 0.12); }
     .ac-name { font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.88); }
-    .ac-vibe { font-size: 11px; color: rgba(255, 255, 255, 0.25); text-align: right; max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* ── CTA button ───────────────────────────────────────────── */
     #cta-wrap {
       padding: 14px 36px 0;
       flex-shrink: 0;
@@ -253,7 +251,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
     }
     #cta:active { transform: translateY(0); }
 
-    /* ── Stats row ────────────────────────────────────────────── */
     #stats {
       display: flex;
       padding: 28px 36px 0;
@@ -281,7 +278,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       letter-spacing: 0.09em;
     }
 
-    /* ── Divider ──────────────────────────────────────────────── */
     .sep {
       height: 1px;
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.055), transparent);
@@ -289,7 +285,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       flex-shrink: 0;
     }
 
-    /* ── All countries link ───────────────────────────────────── */
     #nav-countries {
       padding: 12px 36px 0;
       flex-shrink: 0;
@@ -305,10 +300,8 @@ const countryList = Object.keys(globeData).sort().map(n => ({
     }
     #nav-countries a:hover { color: rgba(255,255,255,0.65); }
 
-    /* ── Spacer ───────────────────────────────────────────────── */
     #spacer { flex: 1; min-height: 0; }
 
-    /* ── Country card (slides up from bottom) ─────────────────── */
     #country-card {
       margin: 0 20px 24px;
       padding: 20px 22px 18px;
@@ -386,7 +379,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
     #card-link::after { content: '→'; display: inline-block; transition: transform 0.2s; }
     #card-link:hover::after { transform: translateX(3px); }
 
-    /* ── Globe hint (bottom-right) ────────────────────────────── */
     #globe-hint {
       position: fixed;
       bottom: 20px; right: 20px;
@@ -402,7 +394,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       letter-spacing: 0.02em;
     }
 
-    /* ── Loading overlay ──────────────────────────────────────── */
     #loading {
       position: fixed;
       inset: 0;
@@ -433,14 +424,12 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       text-transform: uppercase;
     }
 
-    /* ── Lang switcher ────────────────────────────────────────── */
     #lang-sw { position:fixed; top:14px; right:16px; z-index:9999; font-size:11px; font-weight:600; background:rgba(6,13,26,0.82); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:5px 10px; display:flex; gap:5px; align-items:center; letter-spacing:0.04em; }
     #lang-sw a { color:rgba(255,255,255,0.3); text-decoration:none; transition:color 0.15s; }
     #lang-sw a.active { color:rgba(255,255,255,0.92); }
     #lang-sw a:hover { color:rgba(255,255,255,0.7); }
     #lang-sw span { color:rgba(255,255,255,0.12); }
 
-    /* ── Responsive ───────────────────────────────────────────── */
     @media (max-width: 700px) {
       #panel {
         width: 100%;
@@ -448,7 +437,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         border-right: none;
         border-top: 1px solid rgba(255, 255, 255, 0.06);
         max-height: 48vh;
-        max-height: 48svh; /* svh = small viewport, stable on mobile (ignores address bar) */
+        max-height: 48svh;
         overflow-y: auto;
       }
       #panel-header { padding: 20px 24px 0; }
@@ -464,32 +453,33 @@ const countryList = Object.keys(globeData).sort().map(n => ({
 </head>
 <body>
 
-  <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+  <a href="#main-content" class="skip-link">Ir al contenido principal</a>
 
-  <!-- Loading -->
   <div id="loading">
     <div class="ld-ring"></div>
-    <div class="ld-text">Chargement&hellip;</div>
+    <div class="ld-text">Cargando&hellip;</div>
   </div>
 
-  <!-- Globe (fills full screen as background layer) -->
   <div id="globe-container"></div>
 
-  <!-- Lang switcher -->
-  <div id="lang-sw"><a href="/" onclick="localStorage.setItem('lang-choice','en')">EN</a><span>/</span><a href="/fr/" class="active" onclick="localStorage.setItem('lang-choice','fr')">FR</a></div>
+  <div id="lang-sw">
+    <a href="/" onclick="localStorage.setItem('lang-choice','en')">EN</a>
+    <span>/</span>
+    <a href="/fr/" onclick="localStorage.setItem('lang-choice','fr')">FR</a>
+    <span>/</span>
+    <a href="/es/" class="active" onclick="localStorage.setItem('lang-choice','es')">ES</a>
+  </div>
 
-  <!-- Left panel -->
   <aside id="panel">
     <div id="panel-header">
       <div class="site-badge">
         <div class="badge-dot"></div>
         TerraLenses
       </div>
-      <h1 id="site-title">Perdez-vous <br>dans <em>le monde</em></h1>
+      <h1 id="site-title">Piérdete <br>en <em>el mundo</em></h1>
       <p id="tagline">{t.tagline}</p>
     </div>
 
-    <!-- Search -->
     <div id="search-wrapper">
       <div id="search-box">
         <span class="search-icon">
@@ -497,14 +487,13 @@ const countryList = Object.keys(globeData).sort().map(n => ({
             <circle cx="8.5" cy="8.5" r="5.5"/><path d="M14 14l3.5 3.5"/>
           </svg>
         </span>
-        <input id="search" type="text" placeholder={t.searchCountry} autocomplete="off" spellcheck="false" aria-label="Rechercher un pays" />
+        <input id="search" type="text" placeholder={t.searchCountry} autocomplete="off" spellcheck="false" aria-label="Buscar un país" />
         <div id="ac-list"></div>
       </div>
     </div>
 
-    <!-- CTA -->
     <div id="cta-wrap">
-      <a href="/fr/map/" id="cta">
+      <a href="/es/map/" id="cta">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"/>
           <line x1="2" y1="12" x2="22" y2="12"/>
@@ -514,7 +503,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       </a>
     </div>
 
-    <!-- Stats -->
     <div id="stats">
       <div class="stat"><div class="stat-num">195</div><div class="stat-lbl">{t.statCountries}</div></div>
       <div class="stat"><div class="stat-num">7</div><div class="stat-lbl">{t.statContinents}</div></div>
@@ -522,13 +510,12 @@ const countryList = Object.keys(globeData).sort().map(n => ({
     </div>
 
     <div id="nav-countries">
-      <a href="/fr/countries/">🌐 Parcourir les 195 pays →</a>
+      <a href="/es/countries/">🌐 Explorar los 195 países →</a>
     </div>
 
     <div class="sep"></div>
     <div id="spacer"></div>
 
-    <!-- Country card -->
     <div id="country-card">
       <div id="card-header">
         <span id="card-flag">🌍</span>
@@ -542,13 +529,10 @@ const countryList = Object.keys(globeData).sort().map(n => ({
     </div>
   </aside>
 
-  <!-- Globe hint -->
   <div id="globe-hint">{t.clickToExplore}</div>
 
-  <!-- Data injected from server -->
   <script set:html={`window._GD=${JSON.stringify(globeData)};window._CL=${JSON.stringify(countryList)};window._UI=${JSON.stringify({discoverLabel:t.discoverLabel})};`}></script>
 
-  <!-- Static deps loaded synchronously before paint -->
   <script is:inline src="/topojson.min.js"></script>
   <script is:inline src="/countries.js"></script>
 
@@ -559,7 +543,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
     var GD = window._GD || {};
     var CL = window._CL || [];
 
-    /* ── Search autocomplete ─────────────────────────────────── */
     var searchEl = document.getElementById('search');
     var acList   = document.getElementById('ac-list');
 
@@ -582,13 +565,13 @@ const countryList = Object.keys(globeData).sort().map(n => ({
 
     acList.addEventListener('click', function(e) {
       var item = e.target.closest('.ac-item');
-      if (item) window.location.href = '/fr/country/' + item.dataset.slug;
+      if (item) window.location.href = '/es/country/' + item.dataset.slug;
     });
 
     searchEl.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
         var first = acList.querySelector('.ac-item');
-        if (first) window.location.href = '/fr/country/' + first.dataset.slug;
+        if (first) window.location.href = '/es/country/' + first.dataset.slug;
       }
       if (e.key === 'Escape') { acList.innerHTML = ''; }
     });
@@ -597,7 +580,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       if (!e.target.closest('#search-box')) acList.innerHTML = '';
     });
 
-    /* ── Lazy-load Three.js after first paint ────────────────── */
     var container = document.getElementById('globe-container');
     var loading   = document.getElementById('loading');
 
@@ -611,7 +593,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       });
     });
 
-    /* ── Three.js globe ──────────────────────────────────────── */
     function initGlobe() {
       var W = container.clientWidth;
       var H = container.clientHeight;
@@ -627,9 +608,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       renderer.domElement.style.cssText = 'position:absolute;inset:0;display:block;';
       container.appendChild(renderer.domElement);
 
-      /* ── Globe sphere — custom shader: ocean gradient + specular ── */
-      /* At globe.rotation.y = 0, lng = -90° faces the camera (+Z).   */
-      /* tgtRotY formula: -(lng * π/180) - π/2                         */
       var globeMesh = new THREE.Mesh(
         new THREE.SphereGeometry(1, 64, 64),
         new THREE.ShaderMaterial({
@@ -647,14 +625,10 @@ const countryList = Object.keys(globeData).sort().map(n => ({
             'varying vec3 vN;',
             'varying vec3 vV;',
             'void main(){',
-            /* Fresnel: 0 at centre, 1 at limb — drives edge darkening */
             '  float f=pow(1.0-max(0.0,dot(vN,vV)),2.8);',
-            /* Ocean: #0d0514 deep purple-dark at centre → darker purple at limb */
             '  vec3 col=mix(vec3(0.051,0.020,0.078),vec3(0.027,0.008,0.063),f);',
-            /* Subtle diffuse fill — purple tint */
             '  vec3 L=normalize(vec3(-0.65,0.70,0.40));',
             '  col+=vec3(0.010,0.008,0.035)*max(0.0,dot(vN,L));',
-            /* Soft specular highlight — upper left */
             '  vec3 H=normalize(L+vV);',
             '  col+=vec3(0.08,0.05,0.18)*pow(max(0.0,dot(vN,H)),110.0);',
             '  gl_FragColor=vec4(col,1.0);',
@@ -667,19 +641,16 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       globe.rotation.z = 23.5 * Math.PI / 180;
       scene.add(globe);
 
-      /* ── Atmosphere — thin blue halo, barely visible ── */
       globe.add(new THREE.Mesh(
         new THREE.SphereGeometry(1.016, 32, 32),
         new THREE.MeshBasicMaterial({ color: 0x8844ff, transparent: true, opacity: 0.08, side: THREE.BackSide })
       ));
 
-      /* Lights for atmosphere spheres (globe itself uses the shader above) */
       scene.add(new THREE.AmbientLight(0xffffff, 0.6));
       var sun = new THREE.DirectionalLight(0x88aaff, 0.9);
       sun.position.set(5, 3, 5);
       scene.add(sun);
 
-      /* ── Stars ── */
       (function() {
         var pos = [];
         for (var i = 0; i < 2500; i++) {
@@ -697,7 +668,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         ));
       })();
 
-      /* ── Coordinate helpers ── */
       function ll3(lat, lng, r) {
         r = r || 1.002;
         var phi   = (90 - lat)  * Math.PI / 180;
@@ -716,7 +686,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         return { lat: lat, lng: th * 180 / Math.PI - 180 };
       }
 
-      /* ── Lat/lng grid — every 30° ── */
       (function() {
         var pos   = [];
         var steps = 64;
@@ -743,7 +712,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         })));
       })();
 
-      /* ── Cloud layer — canvas texture, separate node drifts slower ── */
       var cloudNode = new THREE.Object3D();
       var cloudLag  = 0;
       (function() {
@@ -768,10 +736,9 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         scene.add(cloudNode);
       })();
 
-      /* ── State ── */
       var bboxes    = {};
       var features  = [];
-      var hlObjects = []; /* [border, innerGlow, outerGlow] */
+      var hlObjects = [];
       var autoTimer = null;
       var tgtRotY   = 0;
       var tgtRotX   = 0;
@@ -779,7 +746,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       var raycaster = new THREE.Raycaster();
       var mouse     = new THREE.Vector2();
 
-      /* ── Point-in-polygon ── */
       function ptInRing(lng, lat, ring) {
         var inside = false;
         for (var i = 0, j = ring.length - 1; i < ring.length; j = i++) {
@@ -811,7 +777,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         return best;
       }
 
-      /* ── Line geometry helpers ── */
       function ringToPos(ring, r) {
         var pos = [];
         for (var j = 0; j < ring.length - 1; j++) {
@@ -838,7 +803,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         return out;
       }
 
-      /* ── Polygon helpers — shared by setHighlight + buildLandLayer ── */
       function unwrap(ring) {
         var out = [[ring[0][0], ring[0][1]]];
         for (var i = 1; i < ring.length; i++) {
@@ -862,7 +826,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       }
       function norm(l) { return ((l % 360) + 540) % 360 - 180; }
 
-      /* ── Grid-sampled highlight — correct for concave + antimeridian polygons ── */
       function setHighlight(f) {
         for (var k = 0; k < hlObjects.length; k++) globe.remove(hlObjects[k]);
         hlObjects = [];
@@ -871,14 +834,13 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         if (!g) return;
         var polys = g.type === 'MultiPolygon' ? g.coordinates : [g.coordinates];
 
-        var STEP = 0.5; /* degrees — finer than 110m TopoJSON resolution */
+        var STEP = 0.5;
         var fillVerts = [], fillIdx = [], vIdx = 0;
 
         for (var pi = 0; pi < polys.length; pi++) {
           var poly   = polys[pi];
           var outer  = unwrap(poly[0]);
 
-          /* Bbox of unwrapped outer ring */
           var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
           for (var j = 0; j < outer.length; j++) {
             if (outer[j][0] < x0) x0 = outer[j][0];
@@ -888,11 +850,9 @@ const countryList = Object.keys(globeData).sort().map(n => ({
           }
           y0 = Math.max(y0, -89); y1 = Math.min(y1, 89);
 
-          /* Unwrap holes */
           var holes = [];
           for (var h = 1; h < poly.length; h++) holes.push(unwrap(poly[h]));
 
-          /* Scan grid — every cell whose centre falls inside the polygon */
           for (var la = y0; la < y1; la += STEP) {
             var cLa = la + STEP * 0.5;
             for (var lo = x0; lo < x1; lo += STEP) {
@@ -904,7 +864,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
               }
               if (inHole) continue;
 
-              /* Map quad corners to sphere at r = 1.0015 (above base land layer) */
               var va = ll3(la,        norm(lo),        1.0015);
               var vb = ll3(la,        norm(lo + STEP), 1.0015);
               var vc = ll3(la + STEP, norm(lo + STEP), 1.0015);
@@ -929,7 +888,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
           hlObjects.push(fillMesh);
         }
 
-        /* Line border layers */
         var rings  = featureAllRings(f);
         var layers = [
           [1.003, 0xf0a500, 0.95],
@@ -951,7 +909,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         }
       }
 
-      /* ── Centroid of largest ring ── */
       function centroid(f) {
         var g     = f.geometry;
         var polys = g.type === 'MultiPolygon' ? g.coordinates : [g.coordinates];
@@ -963,9 +920,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         return { lat: la / best.length, lng: lo / best.length };
       }
 
-      /* ── Card update ── */
       function showCard(f, fly) {
-        // On mobile the country card is hidden — skip highlight to avoid orphaned colors on globe
         if (window.innerWidth > 700) setHighlight(f);
         var p = f.properties;
         document.getElementById('card-flag').textContent = p.flag;
@@ -973,17 +928,13 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         document.getElementById('card-vibe').textContent = p.vibe;
         document.getElementById('card-fact').textContent = p.fact;
         var lnk = document.getElementById('card-link');
-        lnk.href        = '/fr/country/' + p.slug;
+        lnk.href        = '/es/country/' + p.slug;
         lnk.textContent = window._UI.discoverLabel + ' ' + p.name;
         document.getElementById('country-card').classList.add('visible');
 
         if (fly) {
           var c  = centroid(f);
-          /* Globe rotation needed to bring c.lng to face the camera.
-             At rotation.y = 0, lng = -90° faces camera (+Z axis).
-             Formula: tgtY = -(lng * π/180) - π/2                    */
           var tY = -(c.lng * Math.PI / 180) - Math.PI * 0.5;
-          /* Shortest path from current rotation */
           var dY = tY - globe.rotation.y;
           while (dY >  Math.PI) dY -= 2 * Math.PI;
           while (dY < -Math.PI) dY += 2 * Math.PI;
@@ -993,7 +944,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         }
       }
 
-      /* ── Auto-fly ── */
       var vibeFeatures = [];
 
       function flyRandom() {
@@ -1007,7 +957,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         autoTimer = setTimeout(flyRandom, delay);
       }
 
-      /* ── Interaction ── */
       renderer.domElement.addEventListener('click', function(e) {
         var rect = renderer.domElement.getBoundingClientRect();
         mouse.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1;
@@ -1018,7 +967,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         var local = globe.worldToLocal(hits[0].point.clone());
         var ll    = v3ll(local);
         var f     = findFeature(ll.lat, ll.lng);
-        if (f && f.properties.slug) window.location.href = '/fr/country/' + f.properties.slug;
+        if (f && f.properties.slug) window.location.href = '/es/country/' + f.properties.slug;
       });
 
       renderer.domElement.addEventListener('mousemove', function(e) {
@@ -1040,7 +989,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       }
       window.addEventListener('resize', onResize);
 
-      /* ── Render loop ── */
       function animate() {
         requestAnimationFrame(animate);
 
@@ -1059,13 +1007,11 @@ const countryList = Object.keys(globeData).sort().map(n => ({
           tgtRotY = globe.rotation.y;
         }
 
-        /* Cloud node tracks globe rotation, drifts slightly in Y */
         cloudNode.rotation.x = globe.rotation.x;
         cloudNode.rotation.z = globe.rotation.z;
         cloudNode.rotation.y = globe.rotation.y - cloudLag;
         if (!flying) cloudLag += 0.00008;
 
-        /* Pulse the inner + outer glow layers */
         if (hlObjects.length >= 3) {
           var p = 0.5 + 0.5 * Math.sin(Date.now() * 0.003);
           var off = hlObjects.length === 4 ? 1 : 0;
@@ -1077,13 +1023,11 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       }
       animate();
 
-      /* ── Fetch TopoJSON, build borders + feature data ── */
       fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
         .then(function(r) { return r.json(); })
         .then(function(world) {
           var idMap = window.COUNTRY_ID_MAP || {};
 
-          /* All-borders — single LineSegments, white at low opacity */
           var mesh   = topojson.mesh(world, world.objects.countries);
           var allPos = ringToLines(mesh.coordinates, 1.002);
           var bg     = new THREE.BufferGeometry();
@@ -1092,7 +1036,6 @@ const countryList = Object.keys(globeData).sort().map(n => ({
             new THREE.LineBasicMaterial({ color: 0x9966cc, transparent: true, opacity: 0.45 })
           ));
 
-          /* Per-feature: metadata + bbox for click detection */
           var geojson = topojson.feature(world, world.objects.countries);
           features = geojson.features.map(function(f) {
             var info = idMap[+f.id];
@@ -1128,11 +1071,10 @@ const countryList = Object.keys(globeData).sort().map(n => ({
           console.error('Globe data failed:', err);
           loading.classList.add('fade');
         });
-    } /* end initGlobe */
+    }
 
   })();
   </script>
-
 
 </body>
 </html>

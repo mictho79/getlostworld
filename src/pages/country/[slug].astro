@@ -188,8 +188,10 @@ if (country.capital !== '—') {
   const cityLine = otherCities.length
     ? `${t.capBeyond}${otherCities.join(', ')}${t.capCitiesHub}`
     : '';
-  insights.push({ icon: '🏛', title: t.insightCapital,
-    text: `${country.capital}${t.capServes}${country.name}${country.subregion ? `${t.capPositionedIn}${tr(country.subregion)}` : ''}${t.capSeat}${cityLine}${ci.capital ? ' ' + ci.capital : ''}` });
+  const capText = `${cityLine}${ci.capital ? ' ' + ci.capital : ''}`.trimStart();
+  if (capText) {
+    insights.push({ icon: '🏛', title: t.insightCapital, text: capText });
+  }
 }
 
 if (country.population !== '—') {
@@ -199,46 +201,44 @@ if (country.population !== '—') {
     ? ` ${plural ? t.popLangsAre : t.popLangIs}${langs}${plural ? t.popLangReflect : t.popLangReflects}`
     : '';
   const callNote = country.callingCode !== '—' ? `${t.popInternationally}${country.name}${t.popDialCode}${country.callingCode}${t.popDialCodeEnd}` : '';
-  insights.push({ icon: '👥', title: t.insightPeople,
-    text: `${t.aboutPopApprox.trimStart()}${country.population}, ${country.name}${t.popVibrant}${langNote}${callNote}${ci.people ? ' ' + ci.people : ''}` });
+  const peopleText = `${langNote}${callNote}${ci.people ? ' ' + ci.people : ''}`.trimStart();
+  if (peopleText) {
+    insights.push({ icon: '👥', title: t.insightPeople, text: peopleText });
+  }
 }
 
 if (country.area !== '—') {
-  const loc = country.subregion
-    ? `${t.geoInThe}${tr(country.subregion)}${t.geoSubregionOf}${tr(country.region)}`
-    : country.region ? `${t.geoIn}${tr(country.region)}` : '';
   const coords = country.latlng[0] !== 0 || country.latlng[1] !== 0
     ? `${t.geoGeoCentred}${Math.abs(country.latlng[0]).toFixed(1)}°${country.latlng[0] >= 0 ? 'N' : 'S'}, ${Math.abs(country.latlng[1]).toFixed(1)}°${country.latlng[1] >= 0 ? 'E' : 'W'},`
     : '';
   const drive = country.drivingSide !== '—'
     ? `${country.drivingSide === 'Left' ? t.geoLeftHandRule : t.geoRightHandRule}${tr(country.region) || 'regional'}${t.geoConvention}`
     : '';
-  insights.push({ icon: '🗺', title: t.insightGeography,
-    text: `${country.name}${t.geoSpans}${country.area} km²${loc ? `, ${loc}` : ''}.${coords}${t.geoDiverseLandscapes}${drive}` });
+  const geoText = `${coords}${t.geoDiverseLandscapes}${drive}`.trimStart();
+  if (geoText) {
+    insights.push({ icon: '🗺', title: t.insightGeography, text: geoText });
+  }
 }
 
 if (country.currency !== '—') {
   const tzNote = country.timezone !== '—'
     ? `${t.econBusiness}${country.timezone}${t.econAligning}`
     : '';
-  insights.push({ icon: '💱', title: t.insightEconomy,
-    text: `${t.econCurrencyIs}${country.currency}${t.econUsedFor}${t.econShapedPre}${country.name}${t.econShapedPost}${tzNote}` });
+  if (tzNote) {
+    insights.push({ icon: '💱', title: t.insightEconomy, text: tzNote.trimStart() });
+  }
 }
 
-if (country.dish) {
-  insights.push({ icon: '🍽', title: t.insightFood,
-    text: `${t.foodEmblem}${country.name}${t.foodIs}${country.dish}. ${ci.food ? ci.food : `${t.foodCulture}${country.name}${t.foodTied}`}` });
+if (ci.food) {
+  insights.push({ icon: '🍽', title: t.insightFood, text: ci.food });
 }
 
-if (country.sport !== '—') {
-  insights.push({ icon: '🏅', title: t.insightSport,
-    text: `${country.sport}${t.sportHolds}${country.name}${t.sportNatId}${ci.sport ? ci.sport : `${t.sportIn}${country.name}${t.sportBeyond}`}` });
+if (ci.sport) {
+  insights.push({ icon: '🏅', title: t.insightSport, text: ci.sport });
 }
 
-if (country.peak) {
-  const elev = country.peak.elevation.toLocaleString('en-US');
-  insights.push({ icon: '⛰', title: t.insightNature,
-    text: `${t.natureHighest}${country.name}${t.natureIs}${country.peak.name}${t.natureRising}${elev}${t.natureMetres}${ci.nature ? ci.nature : t.natureEmbodies}` });
+if (country.peak && ci.nature) {
+  insights.push({ icon: '⛰', title: t.insightNature, text: ci.nature });
 }
 
 const jsonLd = JSON.stringify({
@@ -353,19 +353,6 @@ const jsonLd = JSON.stringify({
         {t.compareWithAnother}
       </button>
     </div>
-
-    <!-- About -->
-    <section class="cp-section">
-      <h2 class="cp-section-label">{t.aboutSection} {country.name}</h2>
-      <p class="cp-about">
-        <strong>{country.name}</strong>{country.officialName !== country.name ? ` (${t.aboutOfficially} ${country.officialName})` : ''}{country.subregion ? `${t.aboutIsCountryLocatedIn}${tr(country.subregion)}.` : country.region ? `${t.aboutIsCountryIn}${tr(country.region)}.` : t.aboutIsCountry}
-        {country.capital !== '—' && <>{t.aboutCapitalIs}<strong>{country.capital}</strong>{`${country.cities.length > 0 ? `${t.aboutWithOtherCities}${country.cities.slice(0, 2).map((c: {name:string}) => c.name).join(` ${t.andConj} `)}` : ''}.`}</>}
-        {country.population !== '—' && <>{t.aboutPopApprox}<strong>{country.population}</strong>{country.language !== '—' ? <>{country.language.includes(',') ? t.aboutMainLangsAre : t.aboutMainLangIs}<strong>{country.language}</strong>{'.'}</> : '.'}</>}
-        {country.area !== '—' && <>{t.aboutCoversArea}<strong>{country.area} km²</strong>{'.'}</>}
-        {country.currency !== '—' && <>{t.aboutOfficialCurrency}<strong>{country.currency}</strong>{'.'}</>}
-        {country.drivingSide !== '—' && (country.drivingSide === 'Left' ? t.aboutDrivesLeft : t.aboutDrivesRight)}
-      </p>
-    </section>
 
     <!-- Did you know -->
     {country.fact && (

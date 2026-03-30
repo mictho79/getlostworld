@@ -8,22 +8,22 @@ export async function getStaticPaths() {
 import { COUNTRY_CCN3 } from '../../../lib/countryCodes.js';
 import { TRAVEL_ADVISORY } from '../../../lib/travelScores.js';
 import { geojsonToSvgPath } from '../../../lib/geojsonSvg.js';
-import { getT, translateRegion, getCountryNameFR, translateLangs, translateCurrencyName, translateSportFR, translateDishFR, artFR, withArticleFR, deArticleFR, isPlural } from '../../../i18n/translations';
+import { getT, translateRegion, getCountryNameES, translateLangsES, translateCurrencyNameES, translateSportES, translateDishES, artES, withArticleES, deArticleES, isPluralES } from '../../../i18n/translations';
 
 // ─── Slug aliases ──────────────────────────────────────────────────────────────
 const SLUG_ALIASES: Record<string,string> = {
-  'united-states':   '/fr/country/united-states-of-america/',
-  'usa':             '/fr/country/united-states-of-america/',
-  'uk':              '/fr/country/england/',
-  'united-kingdom':  '/fr/country/england/',
-  'czechia':         '/fr/country/czech-republic/',
-  'dr-congo':        '/fr/country/democratic-republic-of-the-congo/',
-  'ivory-coast':     '/fr/country/cote-divoire/',
-  'cape-verde':      '/fr/country/cabo-verde/',
+  'united-states':   '/es/country/united-states-of-america/',
+  'usa':             '/es/country/united-states-of-america/',
+  'uk':              '/es/country/england/',
+  'united-kingdom':  '/es/country/england/',
+  'czechia':         '/es/country/czech-republic/',
+  'dr-congo':        '/es/country/democratic-republic-of-the-congo/',
+  'ivory-coast':     '/es/country/cote-divoire/',
+  'cape-verde':      '/es/country/cabo-verde/',
 };
 
 const { slug } = Astro.params;
-if (!slug) return Astro.redirect('/fr/');
+if (!slug) return Astro.redirect('/es/');
 if (SLUG_ALIASES[slug as string]) return Astro.redirect(SLUG_ALIASES[slug as string], 301);
 
 const SITE = 'https://terralenses.com';
@@ -32,20 +32,14 @@ const frUrl = `${SITE}/fr/country/${slug}/`;
 const esUrl = `${SITE}/es/country/${slug}/`;
 
 // ─── Language ─────────────────────────────────────────────────────────────────
-const lang = 'fr' as const;
+const lang = 'es' as const;
 const t = getT(lang);
 const tr = (r: string) => translateRegion(r, lang);
 
-const fr = await import('../../../lib/countryData.fr.js');
-const countryVibes    = { ...(VIBES_EN    as any), ...(fr.COUNTRY_VIBES    as any) };
-const countryDataSrc  = { ...(DATA_EN     as any), ...(fr.COUNTRY_DATA     as any) };
-const countryInsights = { ...(INSIGHTS_EN as any), ...(fr.COUNTRY_INSIGHTS as any) };
-
-// ─── Helpers ───────────────────────────────────────────────────────────────────
-// Returns "d'" before a vowel, "de " otherwise (French elision rule)
-function deOrD(s: string): string {
-  return /^[AEIOUÉÈÊËÀÂÎÏÙÛŒÆ]/i.test(s) ? "d'" : "de ";
-}
+const es = await import('../../../lib/countryData.es.js');
+const countryVibes    = { ...(VIBES_EN    as any), ...((es as any).COUNTRY_VIBES    || {}) };
+const countryDataSrc  = { ...(DATA_EN     as any), ...((es as any).COUNTRY_DATA     || {}) };
+const countryInsights = { ...(INSIGHTS_EN as any), ...((es as any).COUNTRY_INSIGHTS || {}) };
 
 function formatPop(n: number): string {
   if (!n) return '—';
@@ -60,11 +54,11 @@ function formatCurrency(c: any): string {
   if (!vals.length) return '—';
   return vals.map((v: any) => `${v.name}${v.symbol ? ' (' + v.symbol + ')' : ''}`).join(', ');
 }
-function formatCurrencyFR(c: any): string {
+function formatCurrencyES(c: any): string {
   if (!c) return '—';
   const vals = Object.values(c) as any[];
   if (!vals.length) return '—';
-  return vals.map((v: any) => `${translateCurrencyName(v.name)}${v.symbol ? ' (' + v.symbol + ')' : ''}`).join(', ');
+  return vals.map((v: any) => `${translateCurrencyNameES(v.name)}${v.symbol ? ' (' + v.symbol + ')' : ''}`).join(', ');
 }
 
 // ─── REST name mapping ─────────────────────────────────────────────────────────
@@ -83,15 +77,15 @@ const REST_TO_LOCAL: Record<string,string> = {
   'Ivory Coast':   "Côte d'Ivoire",
 };
 
-// ─── Find local name by slug — fall back to EN keys for untranslated nations ──
+// ─── Find local name by slug ───────────────────────────────────────────────────
 const localName =
   Object.keys(countryDataSrc as any).find(k => slugify(k) === slug) ||
   (lang !== 'en' ? Object.keys(DATA_EN as any).find(k => slugify(k) === slug) : undefined);
-if (!localName) return Astro.redirect('/fr/');
+if (!localName) return Astro.redirect('/es/');
 const localData = (countryDataSrc as any)[localName] || (DATA_EN as any)[localName] || {};
 const restName  = LOCAL_TO_REST[localName] || localName;
 
-// ─── Fetch REST data for this country ─────────────────────────────────────────
+// ─── Fetch REST data ───────────────────────────────────────────────────────────
 const RF = 'name,capital,population,languages,flags,area,cca2,cca3,ccn3,latlng,region,subregion,currencies,timezones,idd,borders,car';
 let rc: any = null;
 try {
@@ -141,35 +135,34 @@ const country = {
   flag:            localData.flag || rc?.flags?.emoji || '🌍',
   capital:         localData.capital || rc?.capital?.[0] || '—',
   population:      localData.population || formatPop(rc?.population),
-  language:        translateLangs(localData.language || Object.values(rc?.languages || {}).join(', ') || '—'),
-  sport:           translateSportFR(localData.sport || '—'),
+  language:        translateLangsES(localData.language || Object.values(rc?.languages || {}).join(', ') || '—'),
+  sport:           translateSportES(localData.sport || '—'),
   fact:            localData.fact  || '',
   vibe:            (countryVibes as any)[localName] || 'Fascinating · Historic · Unique',
-  area:            rc?.area ? Math.round(rc.area).toLocaleString('fr-FR') : '—',
+  area:            rc?.area ? Math.round(rc.area).toLocaleString('es-ES') : '—',
   region:          rc?.region    || '',
   subregion:       rc?.subregion || '',
   latlng:          (rc?.latlng   || [0, 0]) as [number, number],
-  currency:        formatCurrencyFR(rc?.currencies),
+  currency:        formatCurrencyES(rc?.currencies),
   timezone:        localData.timezone || rc?.timezones?.[0] || '—',
   callingCode:     rc?.idd?.root ? rc.idd.root + (rc.idd.suffixes?.length === 1 ? rc.idd.suffixes[0] : '') : '—',
   drivingSide:     rc?.car?.side === 'left' ? t.driveLeft : rc?.car?.side === 'right' ? t.driveRight : '—',
   borderCountries,
-  dish:            translateDishFR((COUNTRY_DISHES as any)[localName] || null),
+  dish:            translateDishES((COUNTRY_DISHES as any)[localName] || null),
   peak:            (COUNTRY_PEAKS   as any)[localName] || null,
   cities:          (COUNTRY_CITIES  as any)[localName] || [],
   svgShape,
   svgViewBox,
 };
 
-const nameFR   = getCountryNameFR(country.name);
-// Plural countries (article "les") require plural verb forms
-const plural_c  = isPlural(country.name);
-const verbEtre  = plural_c ? 'sont' : 'est';
-const geoSpansFR    = plural_c ? ' couvrent ' : t.geoSpans;
-const popVibrantFR  = plural_c
-  ? ' sont une société dynamique avec un riche mélange de traditions et de communautés.'
+const nameES    = getCountryNameES(country.name);
+const plural_c  = isPluralES(country.name);
+const verbSer   = plural_c ? 'son' : 'es';
+const geoSpansES    = plural_c ? ' abarcan ' : t.geoSpans;
+const popVibrantES  = plural_c
+  ? ' son una sociedad vibrante con una rica mezcla de tradiciones y comunidades.'
   : t.popVibrant;
-const popDialCodeFR = plural_c ? " sont accessibles via l'indicatif " : t.popDialCode;
+const popDialCodeES = plural_c ? ' se contactan mediante el código ' : t.popDialCode;
 const ci = (countryInsights as Record<string, Record<string, string>>)[country.name] || {};
 const advisory = (TRAVEL_ADVISORY as Record<string,string>)[country.name] ?? null;
 const isDNT     = advisory === 'do-not-travel';
@@ -191,15 +184,15 @@ const countriesList = [...new Set([
 ])].sort().map(name => ({ name, slug: slugify(name) }));
 
 const siteBase = Astro.site?.href ?? 'https://terralenses.com/';
-const pageUrl  = new URL(`fr/country/${country.slug}/`, siteBase).href;
+const pageUrl  = new URL(`es/country/${country.slug}/`, siteBase).href;
 
-const title       = `${nameFR} – Faits, Capitale & Géographie | TerraLenses`;
-const locFR = tr(country.subregion || country.region);
+const title   = `${nameES} – Datos, Capital & Geografía | TerraLenses`;
+const locES   = tr(country.subregion || country.region);
 const description = [
-  locFR ? `${nameFR} ${verbEtre} un pays ${deOrD(locFR)}${locFR}.` : `${nameFR} ${verbEtre} un pays du monde.`,
-  country.capital    !== '—' ? `Capitale : ${country.capital}.`       : '',
-  country.population !== '—' ? `Population : ${country.population}.` : '',
-  country.language   !== '—' ? `Langue : ${country.language}.`     : '',
+  locES ? `${nameES} ${verbSer} un país de ${locES}.` : `${nameES} ${verbSer} un país del mundo.`,
+  country.capital    !== '—' ? `Capital: ${country.capital}.`          : '',
+  country.population !== '—' ? `Población: ${country.population}.`    : '',
+  country.language   !== '—' ? `Idioma: ${country.language}.`         : '',
   country.fact ? country.fact.slice(0, 110) + '…' : country.vibe,
 ].filter(Boolean).join(' ');
 
@@ -223,7 +216,7 @@ if (country.population !== '—') {
   const langNote = langs
     ? ` ${plural ? t.popLangsAre : t.popLangIs}${langs}${plural ? t.popLangReflect : t.popLangReflects}`
     : '';
-  const callNote = country.callingCode !== '—' ? `${t.popInternationally}${withArticleFR(country.name, nameFR)}${popDialCodeFR}${country.callingCode}${t.popDialCodeEnd}` : '';
+  const callNote = country.callingCode !== '—' ? `${t.popInternationally}${withArticleES(country.name, nameES)}${popDialCodeES}${country.callingCode}${t.popDialCodeEnd}` : '';
   const peopleText = `${langNote}${callNote}${ci.people ? ' ' + ci.people : ''}`.trimStart();
   if (peopleText) {
     insights.push({ icon: '👥', title: t.insightPeople, text: peopleText });
@@ -235,17 +228,16 @@ if (country.area !== '—') {
     if (ci.geography) return ci.geography;
     let txt = '';
     if (country.borderCountries.length > 0) {
-      const art = artFR(country.name);
+      const art = artES(country.name);
       const capArt = art ? art[0].toUpperCase() + art.slice(1) : '';
-      const geoSubject = capArt + nameFR;
-      const verbPartage = plural_c ? 'partagent' : 'partage';
-      const possAdj    = plural_c ? 'leurs' : 'ses';
+      const geoSubject = capArt + nameES;
+      const verbComparte = plural_c ? 'comparten' : 'comparte';
       const MAX_N = 8;
       const shown = country.borderCountries.slice(0, MAX_N);
       const total = country.borderCountries.length;
-      const nFR   = shown.map((b: any) => withArticleFR(b.name, getCountryNameFR(b.name))).join(', ');
-      const extra = total > MAX_N ? ` et ${total - MAX_N} autres pays` : '';
-      txt = `${geoSubject} ${verbPartage} ${possAdj} frontières avec ${nFR}${extra}.`;
+      const nES   = shown.map((b: any) => withArticleES(b.name, getCountryNameES(b.name))).join(', ');
+      const extra = total > MAX_N ? ` y ${total - MAX_N} países más` : '';
+      txt = `${geoSubject} ${verbComparte} sus fronteras con ${nES}${extra}.`;
     }
     if (country.drivingSide !== '—') {
       txt += country.drivingSide === t.driveLeft ? t.geoLeftHandRule : t.geoRightHandRule;
@@ -303,7 +295,7 @@ const jsonLd = JSON.stringify({
 });
 ---
 
-<Base title={title} description={description} countryName={country.name} lang="fr" hreflangEn={enUrl} hreflangFr={frUrl} hreflangEs={esUrl}>
+<Base title={title} description={description} countryName={country.name} lang="es" hreflangEn={enUrl} hreflangFr={frUrl} hreflangEs={esUrl}>
 
   <Fragment slot="head">
     <script type="application/ld+json" set:html={jsonLd} />
@@ -311,7 +303,7 @@ const jsonLd = JSON.stringify({
 
   <div class="cp-page" style={`--accent:${accent};`}>
 
-  <!-- ── Decorative background (always visible) ── -->
+  <!-- ── Decorative background ── -->
   <div class="cp-bg-deco" aria-hidden="true">
     <div class="cp-bg-ring cp-bg-ring-1"></div>
     <div class="cp-bg-ring cp-bg-ring-2"></div>
@@ -326,7 +318,7 @@ const jsonLd = JSON.stringify({
   <div class="cp-wrap">
 
     <!-- Back -->
-    <a href="/fr/map/" class="cp-back">
+    <a href="/es/map/" class="cp-back">
       <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12L6 8l4-4"/></svg>
       {t.backToMap}
     </a>
@@ -342,7 +334,7 @@ const jsonLd = JSON.stringify({
       ) : (
         <span class="cp-flag" role="img" aria-label={`Flag of ${country.name}`}>{country.flag}</span>
       )}
-      <h1 class="cp-title">{nameFR}</h1>
+      <h1 class="cp-title">{nameES}</h1>
       {country.officialName !== country.name && <p class="cp-official">{country.officialName}</p>}
       <p class="cp-region">{tr(country.subregion || country.region)}</p>
       <p class="cp-vibe">{country.vibe}</p>
@@ -354,13 +346,13 @@ const jsonLd = JSON.stringify({
     {isRecon && (
       <div class="cp-advisory cp-advisory--reconsider" role="alert">
         <span>⚠️</span>
-        <span>{t.advisoryReconsiderPre}<strong>{nameFR}</strong>{t.advisoryReconsiderPost}</span>
+        <span>{t.advisoryReconsiderPre}<strong>{nameES}</strong>{t.advisoryReconsiderPost}</span>
       </div>
     )}
     {isDNT && (
       <div class="cp-advisory cp-advisory--dnt" role="alert">
         <span>⛔</span>
-        <span>{t.advisoryDntPre}<strong>{nameFR}</strong>{t.advisoryDntPost}</span>
+        <span>{t.advisoryDntPre}<strong>{nameES}</strong>{t.advisoryDntPost}</span>
       </div>
     )}
 
@@ -402,7 +394,7 @@ const jsonLd = JSON.stringify({
     <!-- SEO Insight paragraphs -->
     {insights.length > 0 && (
       <section class="cp-section">
-        <h2 class="cp-section-label">{t.exploreSection} {withArticleFR(country.name, nameFR)}</h2>
+        <h2 class="cp-section-label">{t.exploreSection} {withArticleES(country.name, nameES)}</h2>
         <div class="cp-insights">
           {insights.map(ins => (
             <div class="cp-insight">
@@ -443,7 +435,7 @@ const jsonLd = JSON.stringify({
         <h2 class="cp-section-label">{t.neighbouringCountries}</h2>
         <div class="cp-neighbours">
           {country.borderCountries.map(b => (
-            <a href={`/fr/country/${b.slug}/`} class="cp-neighbour">{getCountryNameFR(b.name)}</a>
+            <a href={`/es/country/${b.slug}/`} class="cp-neighbour">{getCountryNameES(b.name)}</a>
           ))}
         </div>
       </nav>
@@ -452,12 +444,12 @@ const jsonLd = JSON.stringify({
     <!-- CTA map -->
     {!isDNT && (
       <div class="cp-map-cta">
-        <a href="/fr/map/" class="cp-map-btn">
+        <a href="/es/map/" class="cp-map-btn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
           </svg>
-          {isRecon ? `${t.viewOnMapPre}${nameFR}${t.viewOnMapPost}` : t.exploreOnMap}
+          {isRecon ? `${t.viewOnMapPre}${nameES}${t.viewOnMapPost}` : t.exploreOnMap}
         </a>
       </div>
     )}
@@ -470,7 +462,7 @@ const jsonLd = JSON.stringify({
   <div class="cp-modal-overlay" id="cp-modal" hidden aria-modal="true" role="dialog" aria-label="Compare countries">
     <div class="cp-modal-box">
       <div class="cp-modal-header">
-        <p class="cp-modal-title">{t.compareModalPre}<strong>{nameFR}</strong>{t.compareModalPost}</p>
+        <p class="cp-modal-title">{t.compareModalPre}<strong>{nameES}</strong>{t.compareModalPost}</p>
         <button class="cp-modal-close" id="cp-modal-close" aria-label="Close">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 2l12 12M14 2L2 14"/></svg>
         </button>
@@ -486,18 +478,15 @@ const jsonLd = JSON.stringify({
 </Base>
 
 <style is:global>
-  /* Override the overflow:hidden from style.css on country pages */
   html, body { overflow: auto !important; height: auto !important; background: #0d0d10 !important; }
   .ac-option { color: rgba(255,255,255,0.85) !important; }
 </style>
 
 <style>
-  /* ── Page root ── */
   .cp-page {
     position: relative;
     min-height: 100vh;
   }
-  /* ── Page glow backdrop ── */
   .cp-page::before {
     content: '';
     position: fixed;
@@ -511,7 +500,6 @@ const jsonLd = JSON.stringify({
     z-index: 0;
   }
 
-  /* ── Decorative background ── */
   .cp-bg-deco {
     position: fixed;
     inset: 0;
@@ -519,7 +507,6 @@ const jsonLd = JSON.stringify({
     z-index: 1;
     overflow: hidden;
   }
-  /* Concentric accent rings — always visible */
   .cp-bg-ring {
     position: absolute;
     border-radius: 50%;
@@ -543,7 +530,6 @@ const jsonLd = JSON.stringify({
     transform: translate(-50%, -50%);
     border-color: color-mix(in srgb, var(--accent, #5b8fff) 14%, transparent);
   }
-  /* Country SVG shape — shown on top of rings when available */
   .cp-shape-svg {
     position: absolute;
     top: 50%; left: 60%;
@@ -572,7 +558,6 @@ const jsonLd = JSON.stringify({
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* ── Back link ── */
   .cp-back {
     display: inline-flex;
     align-items: center;
@@ -587,7 +572,6 @@ const jsonLd = JSON.stringify({
   }
   .cp-back:hover { color: rgba(255,255,255,0.6); }
 
-  /* ── Hero ── */
   .cp-hero {
     text-align: center;
     margin-bottom: 64px;
@@ -650,7 +634,6 @@ const jsonLd = JSON.stringify({
     margin: 8px 0 0;
   }
 
-  /* ── Advisory banners ── */
   .cp-advisory {
     display: flex; align-items: flex-start; gap: 10px;
     border-radius: 10px; padding: 14px 18px;
@@ -669,7 +652,6 @@ const jsonLd = JSON.stringify({
   }
   .cp-advisory strong { font-weight: 600; }
 
-  /* ── Divider ── */
   .cp-divider {
     width: 32px;
     height: 1px;
@@ -678,10 +660,7 @@ const jsonLd = JSON.stringify({
     border: none;
   }
 
-  /* ── Sections ── */
-  .cp-section {
-    margin-bottom: 48px;
-  }
+  .cp-section { margin-bottom: 48px; }
   .cp-section-label {
     font-size: 9px;
     font-weight: 700;
@@ -692,7 +671,6 @@ const jsonLd = JSON.stringify({
     margin: 0 0 16px;
   }
 
-  /* ── Stats grid ── */
   .cp-stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
@@ -727,7 +705,6 @@ const jsonLd = JSON.stringify({
     font-weight: 400;
   }
 
-  /* ── About ── */
   .cp-about {
     font-size: 15px;
     line-height: 1.9;
@@ -739,7 +716,6 @@ const jsonLd = JSON.stringify({
     font-weight: 500;
   }
 
-  /* ── Fact blockquote ── */
   .cp-fact {
     font-family: 'Playfair Display', serif;
     font-style: italic;
@@ -753,7 +729,6 @@ const jsonLd = JSON.stringify({
     border-radius: 0 12px 12px 0;
   }
 
-  /* ── Cards ── */
   .cp-cards-row {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -785,7 +760,6 @@ const jsonLd = JSON.stringify({
   .cp-card-title { font-size: 14px; color: rgba(255,255,255,0.84); font-weight: 500; }
   .cp-card-sub   { font-size: 11.5px; color: rgba(255,255,255,0.32); }
 
-  /* ── Insights ── */
   .cp-insights {
     display: flex;
     flex-direction: column;
@@ -826,7 +800,6 @@ const jsonLd = JSON.stringify({
   }
   .cp-insight-text strong { color: rgba(255,255,255,0.9); font-weight: 500; }
 
-  /* ── Cities ── */
   .cp-cities {
     display: flex;
     flex-direction: column;
@@ -872,7 +845,6 @@ const jsonLd = JSON.stringify({
     font-weight: 600;
   }
 
-  /* ── Neighbours ── */
   .cp-neighbours {
     display: flex;
     flex-wrap: wrap;
@@ -895,7 +867,6 @@ const jsonLd = JSON.stringify({
     background: color-mix(in srgb, var(--accent, #fff) 8%, transparent);
   }
 
-  /* ── Map CTA ── */
   .cp-map-cta {
     margin-top: 52px;
     padding-top: 32px;
@@ -922,10 +893,7 @@ const jsonLd = JSON.stringify({
     color: rgba(255,255,255,0.95);
   }
 
-  /* ── Compare button ── */
-  .cp-compare-wrap {
-    margin-bottom: 48px;
-  }
+  .cp-compare-wrap { margin-bottom: 48px; }
   .cp-compare-btn {
     display: inline-flex;
     align-items: center;
@@ -947,7 +915,6 @@ const jsonLd = JSON.stringify({
     color: rgba(255,255,255,0.9);
   }
 
-  /* ── Compare modal ── */
   .cp-modal-overlay {
     position: fixed;
     inset: 0;
@@ -1113,7 +1080,7 @@ const jsonLd = JSON.stringify({
   }
 
   function pick(c: {name:string; slug:string}) {
-    window.location.href = `/fr/compare/${currentSlug}-vs-${c.slug}/`;
+    window.location.href = `/es/compare/${currentSlug}-vs-${c.slug}/`;
   }
 
   function setActive(idx: number) {

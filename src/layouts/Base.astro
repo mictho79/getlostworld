@@ -7,10 +7,11 @@ interface Props {
   lang?: string;
   hreflangEn?: string;
   hreflangFr?: string;
+  hreflangEs?: string;
 }
-const { title, description, ogImage, countryName, lang = 'en', hreflangEn, hreflangFr } = Astro.props;
+const { title, description, ogImage, countryName, lang = 'en', hreflangEn, hreflangFr, hreflangEs } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://terralenses.com').href;
-const p = lang === 'fr' ? '/fr' : '';
+const p = lang === 'fr' ? '/fr' : lang === 'es' ? '/es' : '';
 ---
 <!DOCTYPE html>
 <html lang={lang}>
@@ -21,10 +22,11 @@ const p = lang === 'fr' ? '/fr' : '';
   <meta name="description" content={description}>
   <link rel="canonical" href={canonical}>
   <meta name="google-site-verification" content="jncrLZewF1YuN4wAuQFWpmCTFcOhhZjQCeyAdK03Bcc" />
-  <script>(function(){var c=localStorage.getItem('lang-choice');if(c)return;var isFr=(navigator.language||'').toLowerCase().startsWith('fr');var alreadyFr=window.location.pathname.startsWith('/fr');if(isFr&&!alreadyFr)window.location.replace('/fr'+window.location.pathname);})();</script>
+  <script>(function(){var c=localStorage.getItem('lang-choice');if(c)return;var l=(navigator.language||'').toLowerCase().substr(0,2);var p=window.location.pathname;var already=p.startsWith('/fr')||p.startsWith('/es');if(!already){if(l==='fr')window.location.replace('/fr'+p);else if(l==='es')window.location.replace('/es'+p);}})();</script>
 
   {hreflangEn && <link rel="alternate" hreflang="en" href={hreflangEn} />}
   {hreflangFr && <link rel="alternate" hreflang="fr" href={hreflangFr} />}
+  {hreflangEs && <link rel="alternate" hreflang="es" href={hreflangEs} />}
   {hreflangEn && <link rel="alternate" hreflang="x-default" href={hreflangEn} />}
 
   <!-- Favicons -->
@@ -66,30 +68,30 @@ const p = lang === 'fr' ? '/fr' : '';
 </head>
 <body>
   <a href="#main-content" class="skip-link">Aller au contenu principal</a>
-  {hreflangEn && hreflangFr && (
+  {hreflangEn && (hreflangFr || hreflangEs) && (
     <div id="lang-switcher">
       <a href={hreflangEn} class={lang === 'en' ? 'active' : ''} onclick="localStorage.setItem('lang-choice','en')">EN</a>
-      <span>/</span>
-      <a href={hreflangFr} class={lang === 'fr' ? 'active' : ''} onclick="localStorage.setItem('lang-choice','fr')">FR</a>
+      {hreflangFr && <><span>/</span><a href={hreflangFr} class={lang === 'fr' ? 'active' : ''} onclick="localStorage.setItem('lang-choice','fr')">FR</a></>}
+      {hreflangEs && <><span>/</span><a href={hreflangEs} class={lang === 'es' ? 'active' : ''} onclick="localStorage.setItem('lang-choice','es')">ES</a></>}
     </div>
   )}
   <slot />
   <footer id="site-footer">
-    <a href={lang === 'fr' ? '/fr/' : '/'}>TerraLenses</a>
+    <a href={lang === 'fr' ? '/fr/' : lang === 'es' ? '/es/' : '/'}>TerraLenses</a>
     <span class="sep">·</span>
-    <a href={`${p}/countries/`}>{lang === 'fr' ? 'Tous les pays' : 'All Countries'}</a>
+    <a href={`${p}/countries/`}>{lang === 'fr' ? 'Tous les pays' : lang === 'es' ? 'Todos los países' : 'All Countries'}</a>
     <span class="sep">·</span>
-    <a href={`${p}/map/`}>{lang === 'fr' ? 'Carte' : 'Map'}</a>
+    <a href={`${p}/map/`}>{lang === 'fr' ? 'Carte' : lang === 'es' ? 'Mapa' : 'Map'}</a>
     <span class="sep">·</span>
-    <a href={`${p}/rankings/largest-countries/`}>{lang === 'fr' ? 'Classements' : 'Rankings'}</a>
+    <a href={`${p}/rankings/largest-countries/`}>{lang === 'fr' ? 'Classements' : lang === 'es' ? 'Rankings' : 'Rankings'}</a>
     <span class="sep">·</span>
-    <a href={`${p}/compare/`}>{lang === 'fr' ? 'Comparer' : 'Compare'}</a>
+    <a href={`${p}/compare/`}>{lang === 'fr' ? 'Comparer' : lang === 'es' ? 'Comparar' : 'Compare'}</a>
     <span class="sep">·</span>
-    <a href={`${p}/contact/`}>{lang === 'fr' ? 'Contact' : 'Contact'}</a>
+    <a href={`${p}/contact/`}>Contact</a>
     <span class="sep">·</span>
-    <a href={`${p}/legal/`}>{lang === 'fr' ? 'Mentions légales' : 'Legal'}</a>
+    <a href={`${p}/legal/`}>{lang === 'fr' ? 'Mentions légales' : lang === 'es' ? 'Legal' : 'Legal'}</a>
     <span class="sep">·</span>
-    <a href={`${p}/privacy/`}>{lang === 'fr' ? 'Confidentialité' : 'Privacy'}</a>
+    <a href={`${p}/privacy/`}>{lang === 'fr' ? 'Confidentialité' : lang === 'es' ? 'Privacidad' : 'Privacy'}</a>
   </footer>
   <style is:global>
     /* Content pages need to scroll — override any overflow:hidden from global CSS */

@@ -3,17 +3,17 @@ export const prerender = true;
 import { COUNTRY_DATA as DATA_EN, slugify } from '../../../lib/countryData.js';
 import { COUNTRY_REGION } from '../../../lib/countryExtras.js';
 import Base from '../../../layouts/Base.astro';
-import { getCountryNameFR } from '../../../i18n/translations';
+import { getCountryNameES } from '../../../i18n/translations';
 
-const fr = await import('../../../lib/countryData.fr.js');
-const COUNTRY_DATA_FR: Record<string,any> = { ...(DATA_EN as any), ...(fr.COUNTRY_DATA as any) };
+const es = await import('../../../lib/countryData.es.js');
+const COUNTRY_DATA_ES: Record<string,any> = { ...(DATA_EN as any), ...(es.COUNTRY_DATA as any) };
 
 const CONTINENT_ORDER = ['Europe', 'Asia', 'Africa', 'Americas', 'Oceania'];
 const CONTINENT_EMOJI: Record<string,string> = {
   Europe: '🌍', Asia: '🌏', Africa: '🌍', Americas: '🌎', Oceania: '🌏',
 };
-const CONTINENT_FR: Record<string,string> = {
-  Europe: 'Europe', Asia: 'Asie', Africa: 'Afrique', Americas: 'Amériques', Oceania: 'Océanie',
+const CONTINENT_ES: Record<string,string> = {
+  Europe: 'Europa', Asia: 'Asia', Africa: 'África', Americas: 'Américas', Oceania: 'Oceanía',
 };
 
 const byContinent: Record<string, { name: string; slug: string; flag: string; capital: string }[]> = {};
@@ -22,16 +22,16 @@ for (const cont of CONTINENT_ORDER) byContinent[cont] = [];
 for (const [name, data] of Object.entries(DATA_EN as Record<string,any>)) {
   const region = (COUNTRY_REGION as Record<string,string>)[name];
   if (!region || !byContinent[region]) continue;
-  const frData = COUNTRY_DATA_FR[name] || data;
+  const esData = COUNTRY_DATA_ES[name] || data;
   byContinent[region].push({
     name,
     slug: slugify(name),
-    flag: (frData as any).flag ?? (data as any).flag ?? '',
-    capital: (frData as any).capital ?? (data as any).capital ?? '',
+    flag: (esData as any).flag ?? (data as any).flag ?? '',
+    capital: (esData as any).capital ?? (data as any).capital ?? '',
   });
 }
 for (const cont of CONTINENT_ORDER) {
-  byContinent[cont].sort((a, b) => getCountryNameFR(a.name).localeCompare(getCountryNameFR(b.name), 'fr'));
+  byContinent[cont].sort((a, b) => getCountryNameES(a.name).localeCompare(getCountryNameES(b.name), 'es'));
 }
 
 const totalCountries = Object.values(byContinent).reduce((s, arr) => s + arr.length, 0);
@@ -39,9 +39,9 @@ const SITE = 'https://terralenses.com';
 ---
 
 <Base
-  title="Tous les pays – Faits & Géographie | TerraLenses"
-  description="Explorez les 195 pays du monde. Capitales, populations et géographies de chaque nation sur Terre."
-  lang="fr"
+  title="Todos los países – Datos & Geografía | TerraLenses"
+  description="Explora los 195 países del mundo. Capitales, poblaciones y geografía de cada nación en la Tierra."
+  lang="es"
   hreflangEn={`${SITE}/countries/`}
   hreflangFr={`${SITE}/fr/countries/`}
   hreflangEs={`${SITE}/es/countries/`}
@@ -148,25 +148,25 @@ const SITE = 'https://terralenses.com';
 
   <main id="countries-main">
     <div class="page-header">
-      <a href="/fr/" class="back-link">← TerraLenses</a>
-      <h1>Explorer tous les pays</h1>
-      <p class="subtitle">{totalCountries} pays répartis sur {CONTINENT_ORDER.length} continents</p>
+      <a href="/es/" class="back-link">← TerraLenses</a>
+      <h1>Explorar todos los países</h1>
+      <p class="subtitle">{totalCountries} países repartidos en {CONTINENT_ORDER.length} continentes</p>
     </div>
 
     {CONTINENT_ORDER.map(continent => (
       <section class="continent-section">
         <h2 class="continent-title">
           <span class="emoji">{CONTINENT_EMOJI[continent]}</span>
-          {CONTINENT_FR[continent]}
+          {CONTINENT_ES[continent]}
           <span style="margin-left:auto;font-weight:400;opacity:0.5;">{byContinent[continent].length}</span>
         </h2>
         <ul class="country-grid">
           {byContinent[continent].map(c => (
             <li>
-              <a href={`/fr/country/${c.slug}/`} class="country-card">
+              <a href={`/es/country/${c.slug}/`} class="country-card">
                 <span class="country-flag">{c.flag}</span>
                 <span class="country-info">
-                  <span class="country-name">{getCountryNameFR(c.name)}</span>
+                  <span class="country-name">{getCountryNameES(c.name)}</span>
                   <span class="country-capital">{c.capital}</span>
                 </span>
               </a>

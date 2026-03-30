@@ -3,19 +3,19 @@ export const prerender = false;
 import Base from '../../../layouts/Base.astro';
 import { COUNTRY_VIBES, COUNTRY_DATA, slugify } from '../../../lib/countryData.js';
 import { COUNTRY_STATS } from '../../../lib/countryStats.js';
-import { getCountryNameFR } from '../../../i18n/translations';
+import { getCountryNameES } from '../../../i18n/translations';
 
 const SITE = 'https://terralenses.com';
 
 // ── Helper formatters ────────────────────────────────────────────────────────
 function fmtArea(km2: number): string {
-  return km2.toLocaleString('fr-FR') + ' km²';
+  return km2.toLocaleString('es-ES') + ' km²';
 }
 function fmtPop(n: number): string {
-  if (n >= 1e9) return (n / 1e9).toFixed(2).replace(/\.?0+$/, '').replace('.', ',') + ' milliards';
+  if (n >= 1e9) return (n / 1e9).toFixed(2).replace(/\.?0+$/, '').replace('.', ',') + ' mil millones';
   if (n >= 1e6) return (n / 1e6).toFixed(1).replace('.', ',') + ' M';
   if (n >= 1e3) return (n / 1e3).toFixed(0) + ' K';
-  return n.toLocaleString('fr-FR');
+  return n.toLocaleString('es-ES');
 }
 
 // ── Ranking definitions ──────────────────────────────────────────────────────
@@ -33,9 +33,9 @@ interface RankingDef {
 
 const RANKINGS: Record<string, RankingDef> = {
   'largest-countries': {
-    title:          'Les 30 plus grands pays du monde | TerraLenses',
-    h1:             'Les 30 plus grands pays du monde',
-    description:    'Quels pays occupent le plus de superficie sur Terre ? Des steppes immenses de la Russie aux étendues sauvages du Canada — classés par superficie totale en km².',
+    title:          'Los 30 países más grandes del mundo | TerraLenses',
+    h1:             'Los 30 países más grandes del mundo',
+    description:    '¿Qué países ocupan más superficie en la Tierra? Desde las inmensas estepas de Rusia hasta los vastos territorios de Canadá — clasificados por superficie total en km².',
     metricLabel:    'Superficie',
     metricFn:       s => s.area,
     fmtFn:          s => fmtArea(s.area),
@@ -44,9 +44,9 @@ const RANKINGS: Record<string, RankingDef> = {
     highlightLimit: 10,
   },
   'smallest-countries': {
-    title:          'Les plus petits pays du monde | TerraLenses',
-    h1:             'Les plus petits pays du monde',
-    description:    "Les plus petites nations du monde regorgent de culture, d'histoire et de personnalité dans des superficies incroyablement réduites. Explorez les pays indépendants les plus petits.",
+    title:          'Los países más pequeños del mundo | TerraLenses',
+    h1:             'Los países más pequeños del mundo',
+    description:    'Las naciones más pequeñas del mundo albergan una gran riqueza cultural, histórica y de personalidad en superficies increíblemente reducidas. Explora los países independientes más pequeños.',
     metricLabel:    'Superficie',
     metricFn:       s => -s.area,
     fmtFn:          s => fmtArea(s.area),
@@ -55,10 +55,10 @@ const RANKINGS: Record<string, RankingDef> = {
     highlightLimit: 10,
   },
   'most-populated': {
-    title:          'Les pays les plus peuplés du monde | TerraLenses',
-    h1:             'Les pays les plus peuplés du monde',
-    description:    'Quels pays abritent le plus de personnes ? Classés par population totale, de l\'Inde et la Chine aux nations plus petites mais très densément peuplées.',
-    metricLabel:    'Population',
+    title:          'Los países más poblados del mundo | TerraLenses',
+    h1:             'Los países más poblados del mundo',
+    description:    '¿Qué países albergan más personas? Clasificados por población total, desde India y China hasta naciones más pequeñas pero muy densamente pobladas.',
+    metricLabel:    'Población',
     metricFn:       s => s.pop,
     fmtFn:          s => fmtPop(s.pop),
     filterFn:       s => s.pop > 0,
@@ -66,20 +66,20 @@ const RANKINGS: Record<string, RankingDef> = {
     highlightLimit: 10,
   },
   'most-neighbors': {
-    title:          'Les pays avec le plus de voisins | TerraLenses',
-    h1:             'Les pays avec le plus de frontières terrestres',
-    description:    'Certains pays partagent leurs frontières avec plus d\'une douzaine de nations. Découvrez quels pays ont le plus de voisins et se trouvent au cœur de leur continent.',
-    metricLabel:    'Frontières',
+    title:          'Los países con más vecinos | TerraLenses',
+    h1:             'Los países con más fronteras terrestres',
+    description:    'Algunos países comparten sus fronteras con más de una docena de naciones. Descubre qué países tienen más vecinos y se encuentran en el corazón de su continente.',
+    metricLabel:    'Fronteras',
     metricFn:       s => s.borders,
-    fmtFn:          s => s.borders + (s.borders === 1 ? ' pays' : ' pays'),
+    fmtFn:          s => s.borders + ' países',
     filterFn:       s => s.borders > 0,
     limit:          25,
     highlightLimit: 10,
   },
   'island-nations': {
-    title:          'Les nations insulaires du monde | TerraLenses',
-    h1:             'Les nations insulaires du monde',
-    description:    'Des pays entièrement entourés d\'eau, de l\'immense Australie aux minuscules atolls coralliens du Pacifique. Explorez toutes les nations insulaires du monde.',
+    title:          'Las naciones insulares del mundo | TerraLenses',
+    h1:             'Las naciones insulares del mundo',
+    description:    'Países rodeados enteramente de agua, desde la inmensa Australia hasta los minúsculos atolones coralinos del Pacífico. Explora todas las naciones insulares del mundo.',
     metricLabel:    'Superficie',
     metricFn:       s => s.area,
     fmtFn:          s => s.area > 0 ? fmtArea(s.area) : '—',
@@ -91,12 +91,12 @@ const RANKINGS: Record<string, RankingDef> = {
 
 const { slug } = Astro.params as { slug: string };
 const def = RANKINGS[slug];
-if (!def) return Astro.redirect('/fr/');
+if (!def) return Astro.redirect('/es/');
 
 // ── Build ranked list ────────────────────────────────────────────────────────
 interface RankEntry {
   name: string;
-  nameFR: string;
+  nameES: string;
   slug: string;
   flag: string;
   value: string;
@@ -117,7 +117,7 @@ for (const name of vibesKeys) {
   const cd = (COUNTRY_DATA as any)[name] || {};
   entries.push({
     name,
-    nameFR: getCountryNameFR(name),
+    nameES: getCountryNameES(name),
     slug: countrySlug,
     flag: cd.flag || '',
     value: def.fmtFn(s),
@@ -131,7 +131,7 @@ const ranked = entries.slice(0, def.limit);
 // ── Map highlight URL ────────────────────────────────────────────────────────
 const highlightSlugs = ranked.slice(0, def.highlightLimit).map(e => e.slug).join(',');
 const hlValues = ranked.slice(0, def.highlightLimit).map(e => e.value).join('|');
-const mapUrl = `/fr/map/?highlight=${highlightSlugs}&from=${slug}&values=${encodeURIComponent(hlValues)}`;
+const mapUrl = `/es/map/?highlight=${highlightSlugs}&from=${slug}&values=${encodeURIComponent(hlValues)}`;
 
 const enUrl = `${SITE}/rankings/${slug}/`;
 const frUrl = `${SITE}/fr/rankings/${slug}/`;
@@ -141,7 +141,7 @@ const esUrl = `${SITE}/es/rankings/${slug}/`;
 <Base
   title={def.title}
   description={def.description}
-  lang="fr"
+  lang="es"
   hreflangEn={enUrl}
   hreflangFr={frUrl}
   hreflangEs={esUrl}
@@ -207,9 +207,9 @@ const esUrl = `${SITE}/es/rankings/${slug}/`;
 
   <div class="page-wrap">
     <nav class="breadcrumb">
-      <a href="/fr/">TerraLenses</a>
+      <a href="/es/">TerraLenses</a>
       <span>›</span>
-      <a href="/fr/countries/">Pays</a>
+      <a href="/es/countries/">Países</a>
       <span>›</span>
       <span>{def.h1}</span>
     </nav>
@@ -219,10 +219,10 @@ const esUrl = `${SITE}/es/rankings/${slug}/`;
 
     <div class="actions">
       <a href={mapUrl} class="btn btn-primary">
-        🗺 Voir sur la carte
+        🗺 Ver en el mapa
       </a>
-      <a href="/fr/countries/" class="btn btn-secondary">
-        Tous les pays →
+      <a href="/es/countries/" class="btn btn-secondary">
+        Todos los países →
       </a>
     </div>
 
@@ -230,7 +230,7 @@ const esUrl = `${SITE}/es/rankings/${slug}/`;
       <thead>
         <tr>
           <th>#</th>
-          <th>Pays</th>
+          <th>País</th>
           <th>{def.metricLabel}</th>
         </tr>
       </thead>
@@ -241,7 +241,7 @@ const esUrl = `${SITE}/es/rankings/${slug}/`;
             <td>
               <div class="country-cell">
                 <span class="country-flag">{entry.flag}</span>
-                <a class="country-name" href={`/fr/country/${entry.slug}/`}>{entry.nameFR}</a>
+                <a class="country-name" href={`/es/country/${entry.slug}/`}>{entry.nameES}</a>
               </div>
             </td>
             <td><span class="metric-val">{entry.value}</span></td>
@@ -251,10 +251,10 @@ const esUrl = `${SITE}/es/rankings/${slug}/`;
     </table>
 
     <div class="other-rankings">
-      <div class="other-rankings-label">Autres classements</div>
+      <div class="other-rankings-label">Otros clasificaciones</div>
       <div class="other-rankings-grid">
         {Object.entries(RANKINGS).filter(([s]) => s !== slug).map(([s, d]) => (
-          <a href={`/fr/rankings/${s}/`} class="ork-card">
+          <a href={`/es/rankings/${s}/`} class="ork-card">
             <span class="ork-title">{d.h1}</span>
           </a>
         ))}
@@ -262,7 +262,7 @@ const esUrl = `${SITE}/es/rankings/${slug}/`;
     </div>
 
     <p class="lang-note">
-      This page is also available in <a href={`/rankings/${slug}/`}>English</a>.
+      This page is also available in <a href={`/rankings/${slug}/`}>English</a> and <a href={`/fr/rankings/${slug}/`}>French</a>.
     </p>
   </div>
 </Base>
