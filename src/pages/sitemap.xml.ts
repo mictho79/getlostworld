@@ -58,6 +58,7 @@ export const GET: APIRoute = async () => {
     url(base + '/countries/', '0.8', 'weekly',  base + '/fr/countries/'),
     url(base + '/legal/',     '0.3', 'yearly',  base + '/fr/legal/'),
     url(base + '/privacy/',   '0.3', 'yearly',  base + '/fr/privacy/'),
+    url(base + '/contact/',   '0.3', 'yearly',  base + '/fr/contact/'),
     // ── FR static (alternate, no hreflang duplication) ──────
     url(base + '/fr/',           '0.9', 'weekly'),
     url(base + '/fr/map/',       '0.8', 'weekly'),
@@ -65,6 +66,7 @@ export const GET: APIRoute = async () => {
     url(base + '/fr/countries/', '0.7', 'weekly'),
     url(base + '/fr/legal/',     '0.3', 'yearly'),
     url(base + '/fr/privacy/',   '0.3', 'yearly'),
+    url(base + '/fr/contact/',   '0.3', 'yearly'),
     // ── EN country pages with hreflang ──────────────────────
     ...countries.map(c => url(
       `${base}/country/${slugify(c)}/`, '0.8', 'monthly',
