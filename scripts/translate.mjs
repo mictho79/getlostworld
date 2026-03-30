@@ -43,9 +43,10 @@ const LANGS    = (LANG_ARG ? LANG_ARG.split('=')[1] : 'fr,es,de')
 const GOOGLE_LANG = { FR: 'fr', ES: 'es', DE: 'de' };
 
 // ── Config ────────────────────────────────────────────────────────────────────
-const DELAY_MS       = 600;   // ms between requests
-const RATELIMIT_WAIT = 90_000; // ms to wait after a 429 (90 seconds)
-const MAX_RETRY      = 4;
+const DELAY_MS       = 1500;    // ms between requests (base)
+const DELAY_JITTER   = 500;     // ± random jitter added to each delay
+const RATELIMIT_WAIT = 300_000; // ms to wait after a 429 (5 minutes)
+const MAX_RETRY      = 10;      // keep retrying with long waits
 
 // ── Validate ──────────────────────────────────────────────────────────────────
 for (const l of LANGS) {
@@ -91,7 +92,7 @@ const totalChars = queue.reduce((n, q) => n + q.value.length, 0);
 console.log(`\n📊 Strings to translate  : ${queue.length.toLocaleString()}`);
 console.log(`📏 Characters per lang   : ~${totalChars.toLocaleString()}`);
 console.log(`🌍 Target languages      : ${LANGS.map(l => GOOGLE_LANG[l]).join(', ')}`);
-console.log(`⏱  Estimated time/lang   : ~${Math.round(queue.length * DELAY_MS / 1000)}s\n`);
+console.log(`⏱  Estimated time/lang   : ~${Math.round(queue.length * DELAY_MS / 60000)} min\n`);
 
 if (DRY_RUN) {
   console.log('🚧 Dry-run mode — no API calls made.\n');
@@ -124,7 +125,7 @@ async function callGoogle(text, targetLang, attempt = 1) {
         await sleep(RATELIMIT_WAIT);
         return callGoogle(text, targetLang, attempt + 1);
       }
-      throw new Error('Rate limit exceeded after max retries. Re-run the script to resume from checkpoint.');
+      throw new Error('Rate limit exceeded after max retries.');
     }
     if (attempt <= MAX_RETRY) {
       await sleep(2000 * attempt);
@@ -167,7 +168,7 @@ async function translateAll(items, targetLang, langKey) {
 
     process.stdout.write(`✓\n`);
 
-    if (i < total - 1) await sleep(DELAY_MS);
+    if (i < total - 1) await sleep(DELAY_MS + Math.floor(Math.random() * DELAY_JITTER * 2) - DELAY_JITTER);
   }
 
   if (done === total) {
