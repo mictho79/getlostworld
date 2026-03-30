@@ -1,0 +1,17 @@
+/country/united-states/    /country/united-states-of-america/    301
+/country/usa/              /country/united-states-of-america/    301
+/country/uk/               /country/england/                     301
+/country/united-kingdom/   /country/england/                     301
+/country/czechia/          /country/czech-republic/              301
+/country/dr-congo/         /country/democratic-republic-of-the-congo/ 301
+/country/ivory-coast/      /country/cote-divoire/                301
+/country/cape-verde/       /country/cabo-verde/                  301
+
+/fr/country/united-states/    /fr/country/united-states-of-america/    301
+/fr/country/usa/              /fr/country/united-states-of-america/    301
+/fr/country/uk/               /fr/country/england/                     301
+/fr/country/united-kingdom/   /fr/country/england/                     301
+/fr/country/czechia/          /fr/country/czech-republic/              301
+/fr/country/dr-congo/         /fr/country/democratic-republic-of-the-congo/ 301
+/fr/country/ivory-coast/      /fr/country/cote-divoire/                301
+/fr/country/cape-verde/       /fr/country/cabo-verde/                  301

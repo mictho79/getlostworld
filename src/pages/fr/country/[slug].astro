@@ -1,7 +1,10 @@
 ---
-export const prerender = false;
 import Base from '../../../layouts/Base.astro';
 import { COUNTRY_DATA as DATA_EN, COUNTRY_VIBES as VIBES_EN, COUNTRY_PEAKS, COUNTRY_DISHES, COUNTRY_CITIES, COUNTRY_INSIGHTS as INSIGHTS_EN, slugify } from '../../../lib/countryData.js';
+
+export async function getStaticPaths() {
+  return Object.keys(VIBES_EN as any).map(name => ({ params: { slug: slugify(name) } }));
+}
 import { COUNTRY_CCN3 } from '../../../lib/countryCodes.js';
 import { TRAVEL_ADVISORY } from '../../../lib/travelScores.js';
 import { geojsonToSvgPath } from '../../../lib/geojsonSvg.js';
