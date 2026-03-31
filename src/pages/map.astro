@@ -160,12 +160,12 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
     #sb-region {
       font-family: 'Fraunces', Georgia, serif;
       font-size: 12px; font-style: italic;
-      color: rgba(93,202,165,0.7); letter-spacing: 0.02em;
+      color: color-mix(in srgb, var(--cc,#1D9E75) 70%, transparent); letter-spacing: 0.02em;
     }
 
     .sb-divider {
       height: 1px;
-      background: rgba(29,158,117,0.12);
+      background: color-mix(in srgb, var(--cc,#1D9E75) 12%, transparent);
       margin: 0 24px;
       flex-shrink: 0;
     }
@@ -174,7 +174,7 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
     .sb-section-label {
       font-family: 'IBM Plex Mono', monospace;
       font-size: 9px; font-weight: 500;
-      color: rgba(93,202,165,0.5);
+      color: color-mix(in srgb, var(--cc,#1D9E75) 50%, transparent);
       text-transform: uppercase; letter-spacing: 0.14em;
       padding: 18px 24px 8px;
     }
@@ -188,7 +188,7 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
     .sb-primary-stat {
       background: transparent;
       border: none;
-      border-bottom: 1px solid rgba(29,158,117,0.1);
+      border-bottom: 1px solid color-mix(in srgb, var(--cc,#1D9E75) 10%, transparent);
       border-radius: 0;
       padding: 12px 0;
       display: flex;
@@ -201,7 +201,7 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
     .sb-primary-stat:last-child { border-bottom: none; }
     .sb-primary-label {
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 9px; color: rgba(93,202,165,0.5);
+      font-size: 9px; color: color-mix(in srgb, var(--cc,#1D9E75) 50%, transparent);
       text-transform: uppercase; letter-spacing: 0.12em;
       flex-shrink: 0;
     }
@@ -219,12 +219,12 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
     .sb-secondary-row {
       display: flex; justify-content: space-between; align-items: center;
       padding: 12px 0;
-      border-bottom: 1px solid rgba(29,158,117,0.1);
+      border-bottom: 1px solid color-mix(in srgb, var(--cc,#1D9E75) 10%, transparent);
     }
     .sb-secondary-row:last-child { border-bottom: none; }
     .sb-secondary-label {
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 9px; color: rgba(93,202,165,0.5);
+      font-size: 9px; color: color-mix(in srgb, var(--cc,#1D9E75) 50%, transparent);
       text-transform: uppercase; letter-spacing: 0.12em;
     }
     .sb-secondary-val {
@@ -237,13 +237,13 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
     .sb-fact {
       margin: 20px 24px 24px;
       padding: 2px 0 2px 16px;
-      border-left: 3px solid #1D9E75;
+      border-left: 3px solid var(--cc,#1D9E75);
       flex-shrink: 0;
     }
     .sb-fact-label {
       font-family: 'IBM Plex Mono', monospace;
       font-size: 9px; font-weight: 500;
-      color: rgba(93,202,165,0.5);
+      color: color-mix(in srgb, var(--cc,#1D9E75) 50%, transparent);
       text-transform: uppercase; letter-spacing: 0.14em;
       margin-bottom: 10px; display: block;
     }
@@ -486,8 +486,10 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
     };
 
     function showCountry(info, data) {
+      const sbCountry = document.getElementById('sb-country');
+      sbCountry.classList.add('visible');
+      sbCountry.style.setProperty('--cc', (CONT_COLOR[getRegion(info)] || CONT_COLOR['Europe']).s);
       document.getElementById('sb-welcome').classList.add('hidden');
-      document.getElementById('sb-country').classList.add('visible');
       document.getElementById('sb-accent').style.background = ACCENT[getRegion(info)] || ACCENT['Europe'];
       document.getElementById('sb-flag').textContent     = info.flag     || '';
       document.getElementById('sb-name').textContent     = info.name     || '';
