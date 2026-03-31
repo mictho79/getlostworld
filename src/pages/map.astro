@@ -511,49 +511,15 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
     const STYLE_SELECTED = { weight: 1.0, color: '#5DCAA5',              fillColor: '#1D9E75', fillOpacity: 0.18 };
     const _hlSlugs = new Set(window._HIGHLIGHT || []);
 
-    // ── Capital city coordinates ──────────────────────
-    const CAP_COORDS = {
-      'France':[48.853,2.349],'Germany':[52.52,13.405],'United Kingdom':[51.507,-0.128],
-      'Italy':[41.9,12.5],'Spain':[40.416,-3.703],'Portugal':[38.717,-9.139],
-      'Netherlands':[52.374,4.9],'Belgium':[50.85,4.35],'Switzerland':[46.948,7.448],
-      'Austria':[48.208,16.373],'Poland':[52.231,21.006],'Sweden':[59.334,18.067],
-      'Norway':[59.914,10.752],'Denmark':[55.676,12.568],'Finland':[60.17,24.938],
-      'Greece':[37.984,23.728],'Romania':[44.432,26.103],'Ukraine':[50.45,30.523],
-      'Hungary':[47.498,19.04],'Czech Republic':[50.088,14.421],'Serbia':[44.804,20.465],
-      'Croatia':[45.815,15.981],'Bulgaria':[42.697,23.322],'Slovakia':[48.148,17.107],
-      'Russia':[55.756,37.617],'Turkey':[39.921,32.854],
-      'China':[39.906,116.391],'Japan':[35.682,139.759],'India':[28.614,77.209],
-      'South Korea':[37.566,126.978],'Saudi Arabia':[24.686,46.722],'Iran':[35.696,51.423],
-      'Iraq':[33.341,44.401],'Thailand':[13.754,100.502],'Vietnam':[21.028,105.854],
-      'Indonesia':[-6.211,106.845],'Philippines':[14.599,120.984],'Pakistan':[33.738,73.084],
-      'Bangladesh':[23.724,90.408],'Malaysia':[3.149,101.697],'Kazakhstan':[51.127,71.43],
-      'Myanmar':[16.866,96.195],'Afghanistan':[34.528,69.178],'Uzbekistan':[41.299,69.24],
-      'Syria':[33.51,36.291],'Yemen':[15.369,44.191],'Nepal':[27.702,85.318],
-      'Algeria':[36.737,3.086],'Nigeria':[9.058,7.498],'Egypt':[30.046,31.239],
-      'Ethiopia':[9.025,38.747],'South Africa':[-25.747,28.188],'Kenya':[-1.287,36.82],
-      'Morocco':[34.021,-6.834],'Tanzania':[-6.185,35.739],'Ghana':[5.551,-0.202],
-      'Angola':[-8.836,13.234],'Mozambique':[-25.967,32.573],'Madagascar':[-18.913,47.536],
-      'Cameroon':[3.866,11.517],'Ivory Coast':[6.808,-5.276],'Niger':[13.513,2.114],
-      'Mali':[12.65,-8.0],'Sudan':[15.558,32.532],'Libya':[32.901,13.18],
-      'Somalia':[2.046,45.341],'Democratic Republic of the Congo':[-4.317,15.322],
-      'United States of America':[38.895,-77.037],'Canada':[45.424,-75.697],
-      'Mexico':[19.433,-99.133],'Cuba':[23.135,-82.359],'Haiti':[18.542,-72.337],
-      'Dominican Republic':[18.487,-69.931],'Guatemala':[14.641,-90.513],
-      'Honduras':[14.1,-87.204],'El Salvador':[13.698,-89.191],'Nicaragua':[12.133,-86.283],
-      'Costa Rica':[9.928,-84.09],'Panama':[8.994,-79.519],'Jamaica':[17.997,-76.793],
-      'Brazil':[-15.78,-47.929],'Argentina':[-34.612,-58.443],'Colombia':[4.711,-74.073],
-      'Peru':[-12.043,-77.028],'Venezuela':[10.488,-66.879],'Chile':[-33.459,-70.648],
-      'Ecuador':[-0.229,-78.524],'Bolivia':[-16.491,-68.133],'Paraguay':[-25.287,-57.647],
-      'Uruguay':[-34.858,-56.171],'Guyana':[6.801,-58.155],'Suriname':[5.866,-55.167],
-      'Australia':[-35.282,149.129],'New Zealand':[-41.286,174.776],
-      'Papua New Guinea':[-9.444,147.194],'Fiji':[-18.143,178.441],
-    };
+    // ── Capital city coordinates (loaded from /capitals.json, keyed by slug) ──
+    let CAP_COORDS = {};
+    fetch('/capitals.json').then(r => r.json()).then(d => { CAP_COORDS = d; }).catch(() => {});
 
     // ── Capital pulse animation ───────────────────────
     let _capMarker = null;
     function showCapitalPulse(info) {
       removeCapitalPulse();
-      const coords = CAP_COORDS[info.name];
+      const coords = CAP_COORDS[info.slug];
       if (!coords) return;
       const c = (CONT_COLOR[getRegion(info)] || CONT_COLOR['Europe']).s;
       _capMarker = L.marker(coords, {
