@@ -1,0 +1,130 @@
+---
+import Base from '../../../layouts/Base.astro';
+
+const SITE = 'https://terralenses.com';
+
+const title       = 'Rankings de países — Más grandes, más pequeños, más poblados | TerraLenses';
+const description = 'Explora rankings de países del mundo: los más grandes por superficie, los más pequeños, los más poblados, los que tienen más fronteras y todas las naciones insulares.';
+
+const enUrl = `${SITE}/rankings/`;
+const frUrl = `${SITE}/fr/rankings/`;
+const esUrl = `${SITE}/es/rankings/`;
+
+const CARDS = [
+  {
+    slug: 'largest-countries',
+    icon: '🌍',
+    label: 'Países más grandes',
+    desc: 'Los 30 países más vastos por superficie — de Rusia a Kazajistán.',
+  },
+  {
+    slug: 'smallest-countries',
+    icon: '🔬',
+    label: 'Países más pequeños',
+    desc: 'Las naciones más diminutas del mundo, por debajo de 1.000 km².',
+  },
+  {
+    slug: 'most-populated',
+    icon: '👥',
+    label: 'Más poblados',
+    desc: 'Los 30 países con mayor población total.',
+  },
+  {
+    slug: 'most-neighbors',
+    icon: '🤝',
+    label: 'Más fronteras',
+    desc: 'Los países que comparten más fronteras terrestres.',
+  },
+  {
+    slug: 'island-nations',
+    icon: '🏝',
+    label: 'Naciones insulares',
+    desc: 'Todos los países completamente rodeados por el mar.',
+  },
+];
+---
+
+<Base
+  title={title}
+  description={description}
+  lang="es"
+  hreflangEn={enUrl}
+  hreflangFr={frUrl}
+  hreflangEs={esUrl}
+>
+  <style is:global>
+    html, body { overflow: auto !important; height: auto !important; }
+  </style>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #0d1117; color: #e2e8f0; line-height: 1.6; }
+
+    .page-wrap { max-width: 860px; margin: 0 auto; padding: 40px 20px 80px; }
+
+    .breadcrumb { font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 32px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .breadcrumb a { color: rgba(255,255,255,0.5); text-decoration: none; }
+    .breadcrumb a:hover { color: rgba(255,255,255,0.9); }
+
+    h1 { font-size: clamp(24px, 4vw, 38px); font-weight: 700; color: #fff; margin-bottom: 12px; }
+    .subtitle { font-size: 16px; color: rgba(255,255,255,0.55); margin-bottom: 48px; max-width: 600px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 22px 20px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      text-decoration: none;
+      transition: background 0.15s, border-color 0.15s, transform 0.15s;
+    }
+    .card:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.16);
+      transform: translateY(-2px);
+    }
+
+    .card-icon { font-size: 28px; line-height: 1; }
+    .card-label { font-size: 16px; font-weight: 600; color: #fff; }
+    .card-desc { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.5; }
+
+    .card-cta {
+      margin-top: auto;
+      font-size: 12px;
+      font-weight: 600;
+      color: #60a5fa;
+      letter-spacing: 0.04em;
+    }
+  </style>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <div class="page-wrap">
+    <nav class="breadcrumb">
+      <a href="/es/">TerraLenses</a>
+      <span>›</span>
+      <span>Rankings</span>
+    </nav>
+
+    <h1>Rankings de países</h1>
+    <p class="subtitle">Compara países por tamaño, población, fronteras y más — con mapas interactivos.</p>
+
+    <div class="grid">
+      {CARDS.map(c => (
+        <a href={`/es/rankings/${c.slug}/`} class="card">
+          <span class="card-icon">{c.icon}</span>
+          <span class="card-label">{c.label}</span>
+          <span class="card-desc">{c.desc}</span>
+          <span class="card-cta">Ver ranking →</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</Base>
