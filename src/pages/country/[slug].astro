@@ -155,14 +155,19 @@ const isDNT     = advisory === 'do-not-travel';
 const isRecon   = advisory === 'reconsider';
 
 const REGION_ACCENT: Record<string, string> = {
-  'Europe':   '#5b8fff',
-  'Asia':     '#ff7043',
-  'Africa':   '#ffb74d',
-  'Americas': '#69d89a',
-  'Oceania':  '#26c6da',
-  'Antarctic':'#b0c4de',
+  'Europe':        '#60a5fa',
+  'Asia':          '#fb923c',
+  'Africa':        '#fbbf24',
+  'North America': '#f87171',
+  'South America': '#4ade80',
+  'Americas':      '#f87171',
+  'Oceania':       '#22d3ee',
+  'Antarctic':     '#b0c4de',
 };
-const accent = REGION_ACCENT[country.region] || '#aaaaaa';
+const effectiveRegion = country.region === 'Americas'
+  ? (country.subregion === 'South America' ? 'South America' : 'North America')
+  : country.region;
+const accent = REGION_ACCENT[effectiveRegion] || '#aaaaaa';
 
 const countriesList = [...new Set([
   ...Object.keys(countryDataSrc as Record<string, unknown>),
