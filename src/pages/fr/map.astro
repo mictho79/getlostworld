@@ -281,10 +281,7 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
       attributionControl: false
     });
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
-    L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}', {
-      opacity: 0.22, maxZoom: 18, attribution: ''
-    }).addTo(map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
 
     // ── Continent colour system (N/S America split) ────────────────
     const SOUTH_AM = new Set(['Brazil','Argentina','Colombia','Peru','Venezuela','Chile','Ecuador','Bolivia','Paraguay','Uruguay','Guyana','Suriname','Trinidad and Tobago']);
