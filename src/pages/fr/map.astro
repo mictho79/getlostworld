@@ -2,9 +2,8 @@
 export const prerender = false;
 import { COUNTRY_DATA as DATA_EN } from '../../lib/countryData.js';
 import { getT, COUNTRY_NAMES_FR } from '../../i18n/translations';
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-const _capsJson = readFileSync(resolve(process.cwd(), 'public/capitals.json'), 'utf-8');
+import capsData from '../../lib/capitals.json';
+const _capsJson = JSON.stringify(capsData);
 
 const lang = 'fr' as const;
 const t = getT(lang);
