@@ -166,6 +166,11 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
     @media (max-width: 768px) {
       #sidebar { display: none; } #map { left: 0; } #map-dotgrid { left: 0; } #mobile-logo { display: block; }
     }
+
+    .cap-pulse { position:relative; width:24px; height:24px; }
+    .cap-dot { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:5px; height:5px; border-radius:50%; background:var(--cc); box-shadow:0 0 8px var(--cc); }
+    .cap-ring { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) scale(0.3); width:22px; height:22px; border-radius:50%; border:1.5px solid var(--cc); animation:capPulse 1.8s ease-out infinite; opacity:0; }
+    @keyframes capPulse { 0% { transform:translate(-50%,-50%) scale(0.3); opacity:0.9; } 100% { transform:translate(-50%,-50%) scale(1.8); opacity:0; } }
   </style>
 </head>
 <body>
@@ -276,29 +281,81 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
       attributionControl: false
     });
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png').addTo(map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
     L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}', {
-      opacity: 0.28, maxZoom: 18, attribution: ''
+      opacity: 0.22, maxZoom: 18, attribution: ''
     }).addTo(map);
+
+    // ── Continent colour system (N/S America split) ────────────────
+    const SOUTH_AM = new Set(['Brazil','Argentina','Colombia','Peru','Venezuela','Chile','Ecuador','Bolivia','Paraguay','Uruguay','Guyana','Suriname','Trinidad and Tobago']);
+    function getRegion(info) {
+      if (info.region === 'Americas') return SOUTH_AM.has(info.name) ? 'South America' : 'North America';
+      return info.region;
+    }
+    const CONT_COLOR = {
+      'Europe':{'s':'#60a5fa','f':'#60a5fa'},'Asia':{'s':'#fb923c','f':'#fb923c'},
+      'Africa':{'s':'#fbbf24','f':'#fbbf24'},'North America':{'s':'#f87171','f':'#f87171'},
+      'South America':{'s':'#4ade80','f':'#4ade80'},'Americas':{'s':'#4ade80','f':'#4ade80'},
+      'Oceania':{'s':'#22d3ee','f':'#22d3ee'},
+    };
+    function getHoverStyle(info) {
+      const c = CONT_COLOR[getRegion(info)] || CONT_COLOR['Europe'];
+      return { weight: 0.8, color: c.s, fillColor: c.f, fillOpacity: 0.22 };
+    }
+    const CAP_COORDS = {
+      'France':[48.853,2.349],'Germany':[52.52,13.405],'United Kingdom':[51.507,-0.128],
+      'Italy':[41.9,12.5],'Spain':[40.416,-3.703],'Portugal':[38.717,-9.139],
+      'Netherlands':[52.374,4.9],'Belgium':[50.85,4.35],'Switzerland':[46.948,7.448],
+      'Austria':[48.208,16.373],'Poland':[52.231,21.006],'Sweden':[59.334,18.067],
+      'Norway':[59.914,10.752],'Denmark':[55.676,12.568],'Finland':[60.17,24.938],
+      'Greece':[37.984,23.728],'Romania':[44.432,26.103],'Ukraine':[50.45,30.523],
+      'Russia':[55.756,37.617],'Turkey':[39.921,32.854],
+      'China':[39.906,116.391],'Japan':[35.682,139.759],'India':[28.614,77.209],
+      'South Korea':[37.566,126.978],'Saudi Arabia':[24.686,46.722],'Iran':[35.696,51.423],
+      'Iraq':[33.341,44.401],'Thailand':[13.754,100.502],'Vietnam':[21.028,105.854],
+      'Indonesia':[-6.211,106.845],'Philippines':[14.599,120.984],'Pakistan':[33.738,73.084],
+      'Malaysia':[3.149,101.697],'Kazakhstan':[51.127,71.43],'Syria':[33.51,36.291],
+      'Algeria':[36.737,3.086],'Nigeria':[9.058,7.498],'Egypt':[30.046,31.239],
+      'Ethiopia':[9.025,38.747],'South Africa':[-25.747,28.188],'Kenya':[-1.287,36.82],
+      'Morocco':[34.021,-6.834],'Ghana':[5.551,-0.202],'Angola':[-8.836,13.234],
+      'Democratic Republic of the Congo':[-4.317,15.322],
+      'United States of America':[38.895,-77.037],'Canada':[45.424,-75.697],
+      'Mexico':[19.433,-99.133],'Cuba':[23.135,-82.359],'Guatemala':[14.641,-90.513],
+      'Brazil':[-15.78,-47.929],'Argentina':[-34.612,-58.443],'Colombia':[4.711,-74.073],
+      'Peru':[-12.043,-77.028],'Venezuela':[10.488,-66.879],'Chile':[-33.459,-70.648],
+      'Ecuador':[-0.229,-78.524],'Bolivia':[-16.491,-68.133],
+      'Australia':[-35.282,149.129],'New Zealand':[-41.286,174.776],
+    };
+    let _capMarker = null;
+    function showCapitalPulse(info) {
+      removeCapitalPulse();
+      const coords = CAP_COORDS[info.name];
+      if (!coords) return;
+      const c = (CONT_COLOR[getRegion(info)] || CONT_COLOR['Europe']).s;
+      _capMarker = L.marker(coords, {
+        icon: L.divIcon({ className:'', html:`<div class="cap-pulse" style="--cc:${c}"><span class="cap-ring"></span><span class="cap-dot"></span></div>`, iconSize:[24,24], iconAnchor:[12,12] }),
+        interactive:false, zIndexOffset:2000
+      }).addTo(map);
+    }
+    function removeCapitalPulse() { if (_capMarker) { map.removeLayer(_capMarker); _capMarker = null; } }
 
     // ── Sidebar ───────────────────────────────────────
     const ACCENT = {
-      Europe:   'linear-gradient(90deg,#1D9E75,#5DCAA5)',
-      Asia:     'linear-gradient(90deg,#0d8a63,#1D9E75)',
-      Africa:   'linear-gradient(90deg,#2cb580,#5DCAA5)',
-      Americas: 'linear-gradient(90deg,#1D9E75,#4fc99e)',
-      Oceania:  'linear-gradient(90deg,#14866a,#5DCAA5)',
+      'Europe':'linear-gradient(90deg,#3b82f6,#60a5fa)','Asia':'linear-gradient(90deg,#d97706,#fb923c)',
+      'Africa':'linear-gradient(90deg,#b45309,#fbbf24)','North America':'linear-gradient(90deg,#dc2626,#f87171)',
+      'South America':'linear-gradient(90deg,#16a34a,#4ade80)','Americas':'linear-gradient(90deg,#16a34a,#4ade80)',
+      'Oceania':'linear-gradient(90deg,#0891b2,#22d3ee)',
     };
-    const REGION_FR = { Europe:'Europe', Asia:'Asie', Africa:'Afrique', Americas:'Amériques', Oceania:'Océanie' };
+    const REGION_FR = { Europe:'Europe', Asia:'Asie', Africa:'Afrique', Americas:'Amériques', Oceania:'Océanie', 'North America':'Amérique du Nord', 'South America':'Amérique du Sud' };
 
     function showCountry(info, data) {
       const nameFR = (window.COUNTRY_NAMES_FR_MAP && window.COUNTRY_NAMES_FR_MAP[info.name]) || info.name;
       document.getElementById('sb-welcome').classList.add('hidden');
       document.getElementById('sb-country').classList.add('visible');
-      document.getElementById('sb-accent').style.background = ACCENT[info.region] || ACCENT.Europe;
+      document.getElementById('sb-accent').style.background = ACCENT[getRegion(info)] || ACCENT['Europe'];
       document.getElementById('sb-flag').textContent     = info.flag     || '';
       document.getElementById('sb-name').textContent     = nameFR;
-      document.getElementById('sb-region').textContent   = REGION_FR[info.region] || info.region || '';
+      document.getElementById('sb-region').textContent   = REGION_FR[getRegion(info)] || info.region || '';
       document.getElementById('sb-capital').textContent  = data.capital  || '—';
       document.getElementById('sb-pop').textContent      = data.pop      || '—';
       document.getElementById('sb-currency').textContent = data.currency || '—';
@@ -678,8 +735,9 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
           if (foundId) {
             const info = COUNTRY_ID_MAP[+foundId] || UK_NATIONS_INFO[foundId];
             if (info && featureLayers[foundId]) {
-              featureLayers[foundId].forEach(l => { l.setStyle(STYLE_HOVER); l.bringToFront(); });
+              featureLayers[foundId].forEach(l => { l.setStyle(getHoverStyle(info)); l.bringToFront(); });
               showCountry(info, COUNTRY_DATA[info.name] || {});
+              showCapitalPulse(info);
               mapEl.style.cursor = 'pointer';
             }
           } else {
@@ -691,6 +749,7 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
         map.on('mouseout', () => {
           if (_hlSlugs.size === 0) {
             if (hoveredId && featureLayers[hoveredId]) featureLayers[hoveredId].forEach(l => l.setStyle(STYLE_DEFAULT));
+            removeCapitalPulse();
             showWelcome();
           }
           hoveredId = null; mapEl.style.cursor = '';
