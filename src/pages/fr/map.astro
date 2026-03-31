@@ -2,6 +2,9 @@
 export const prerender = false;
 import { COUNTRY_DATA as DATA_EN } from '../../lib/countryData.js';
 import { getT, COUNTRY_NAMES_FR } from '../../i18n/translations';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+const _capsJson = readFileSync(resolve(process.cwd(), 'public/capitals.json'), 'utf-8');
 
 const lang = 'fr' as const;
 const t = getT(lang);
@@ -256,6 +259,7 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
 
   <script set:html={`window.SIDEBAR_FACTS = ${JSON.stringify(sidebarFacts)};`}></script>
   <script set:html={`window.COUNTRY_NAMES_FR_MAP = ${JSON.stringify(COUNTRY_NAMES_FR)};`}></script>
+  <script set:html={`window._CAPS=${_capsJson};`}></script>
   <script set:html={`window._HIGHLIGHT=${JSON.stringify(highlightSlugs)};window._FROM=${JSON.stringify(fromParam)};window._HL_VALUES=${JSON.stringify(highlightValues)};`}></script>
   <script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script is:inline src="/topojson.min.js"></script>
@@ -299,8 +303,7 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
       const c = CONT_COLOR[getRegion(info)] || CONT_COLOR['Europe'];
       return { weight: 0.8, color: c.s, fillColor: c.f, fillOpacity: 0.22 };
     }
-    let CAP_COORDS = {};
-    fetch('/capitals.json').then(r => r.json()).then(d => { CAP_COORDS = d; }).catch(() => {});
+    const CAP_COORDS = window._CAPS || {};
     let _capMarker = null;
     function showCapitalPulse(info) {
       removeCapitalPulse();

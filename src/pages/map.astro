@@ -2,6 +2,9 @@
 export const prerender = false;
 import { COUNTRY_DATA as DATA_EN } from '../lib/countryData.js';
 import { getT } from '../i18n/translations';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+const _capsJson = readFileSync(resolve(process.cwd(), 'public/capitals.json'), 'utf-8');
 
 const lang = 'en' as const;
 const t = getT(lang);
@@ -420,6 +423,7 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
   <div id="map-dotgrid"></div>
 
   <script set:html={`window.SIDEBAR_FACTS = ${JSON.stringify(sidebarFacts)};`}></script>
+  <script set:html={`window._CAPS=${_capsJson};`}></script>
   <script set:html={`window._HIGHLIGHT=${JSON.stringify(highlightSlugs)};window._FROM=${JSON.stringify(fromParam)};window._HL_VALUES=${JSON.stringify(highlightValues)};`}></script>
   <script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script is:inline src="/topojson.min.js"></script>
@@ -511,9 +515,8 @@ for (const [cjsName, libName] of Object.entries(SIDEBAR_ALIASES)) {
     const STYLE_SELECTED = { weight: 1.0, color: '#5DCAA5',              fillColor: '#1D9E75', fillOpacity: 0.18 };
     const _hlSlugs = new Set(window._HIGHLIGHT || []);
 
-    // ── Capital city coordinates (loaded from /capitals.json, keyed by slug) ──
-    let CAP_COORDS = {};
-    fetch('/capitals.json').then(r => r.json()).then(d => { CAP_COORDS = d; }).catch(() => {});
+    // ── Capital city coordinates (keyed by slug) ─────────────────────────────
+    const CAP_COORDS = window._CAPS || {};
 
     // ── Capital pulse animation ───────────────────────
     let _capMarker = null;
