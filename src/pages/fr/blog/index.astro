@@ -1,0 +1,100 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const SITE = 'https://terralenses.com';
+const title       = 'Blog — Comparaisons de Pays, Géographie & Guides Voyage | TerraLenses';
+const description = 'Articles experts sur les comparaisons de pays, la géographie mondiale et les conseils de voyage — 198 pays couverts avec des données fiables.';
+const enUrl = `${SITE}/blog/`;
+const frUrl = `${SITE}/fr/blog/`;
+const esUrl = `${SITE}/es/blog/`;
+
+const allPosts = (await getCollection('blog'))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const CLUSTER_LABELS: Record<string, string> = {
+  'country-comparisons': 'Comparaisons de Pays',
+  'world-geography':     'Géographie Mondiale',
+  'travel-planning':     'Planification Voyage',
+  'country-deep-dives':  'Guides Pays',
+};
+const CLUSTER_COLORS: Record<string, string> = {
+  'country-comparisons': '#5b8fff',
+  'world-geography':     '#ffb74d',
+  'travel-planning':     '#69d89a',
+  'country-deep-dives':  '#ff7043',
+};
+---
+
+<Base title={title} description={description} lang="fr" hreflangEn={enUrl} hreflangFr={frUrl} hreflangEs={esUrl}>
+  <main id="main-content">
+    <div class="blog-container">
+
+      <nav class="breadcrumb" aria-label="Fil d'Ariane">
+        <a href="/fr/">Accueil</a><span>›</span><span>Blog</span>
+      </nav>
+
+      <header class="blog-header">
+        <h1>Blog TerraLenses</h1>
+        <p>Comparaisons de pays, faits géographiques et guides voyage — alimentés par des données issues de 198 pays.</p>
+      </header>
+
+      <div class="posts-grid">
+        {allPosts.map(post => (
+          <a href={`/fr/blog/${post.slug}/`} class="post-card">
+            <span class="post-cluster" style={`color:${CLUSTER_COLORS[post.data.cluster]||'#5b8fff'}`}>
+              {CLUSTER_LABELS[post.data.cluster] || post.data.cluster}
+            </span>
+            <h2>{post.data.title}</h2>
+            <p>{post.data.description}</p>
+            <time datetime={post.data.pubDate.toISOString().slice(0,10)}>
+              {post.data.pubDate.toLocaleDateString('fr-FR', { year:'numeric', month:'long', day:'numeric' })}
+            </time>
+          </a>
+        ))}
+      </div>
+
+    </div>
+  </main>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    .blog-container {
+      max-width: 1100px; margin: 0 auto;
+      padding: 40px 24px 80px; font-family: 'DM Sans', sans-serif;
+    }
+    .breadcrumb {
+      display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
+      font-size: 13px; color: rgba(255,255,255,0.3); margin-bottom: 24px;
+    }
+    .breadcrumb a { color: rgba(255,255,255,0.45); text-decoration: none; }
+    .breadcrumb a:hover { color: rgba(255,255,255,0.75); }
+    .blog-header { margin-bottom: 48px; }
+    .blog-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      font-weight: 700; color: #f0f4ff; margin: 0 0 12px;
+    }
+    .blog-header p { font-size: 18px; color: rgba(255,255,255,0.5); line-height: 1.6; max-width: 600px; margin: 0; }
+    .posts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+    .post-card {
+      display: block; background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07); border-radius: 12px;
+      padding: 24px; text-decoration: none; transition: background 0.15s, border-color 0.15s;
+    }
+    .post-card:hover { background: rgba(255,255,255,0.055); border-color: rgba(255,255,255,0.14); }
+    .post-cluster {
+      display: block; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px;
+    }
+    .post-card h2 {
+      font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700;
+      color: rgba(255,255,255,0.9); margin: 0 0 10px; line-height: 1.35;
+    }
+    .post-card p {
+      font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.6; margin: 0 0 14px;
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .post-card time { font-size: 12px; color: rgba(255,255,255,0.25); }
+  </style>
+</Base>

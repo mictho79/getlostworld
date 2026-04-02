@@ -1,0 +1,56 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { BEST_OF, BEST_OF_SLUGS } from '../../../lib/bestOfData.js';
+
+const SITE = 'https://terralenses.com';
+---
+
+<Base
+  title="Meilleurs pays par catégorie | TerraLenses"
+  description="Découvrez les meilleurs pays du monde par catégorie : voyage solo, gastronomie, sécurité, nomades numériques, petit budget, et plus encore."
+  lang="fr"
+  hreflangEn={`${SITE}/best/`}
+  hreflangFr={`${SITE}/fr/best/`}
+  hreflangEs={`${SITE}/es/best/`}
+>
+  <main id="main-content">
+    <div class="best-index-container">
+      <nav class="breadcrumb">
+        <a href="/fr/">Accueil</a><span>›</span>
+        <span>Meilleurs</span>
+      </nav>
+      <header class="best-index-header">
+        <h1>Meilleurs pays</h1>
+        <p class="best-index-intro">Classements experts des meilleurs pays du monde par catégorie — voyage solo, gastronomie, sécurité, nomades numériques et plus.</p>
+      </header>
+      <div class="best-index-grid">
+        {BEST_OF_SLUGS.map(s => {
+          const d = BEST_OF[s];
+          return (
+            <a href={`/fr/best/${s}/`} class="best-index-card">
+              <div class="best-index-card-title">{d.h1}</div>
+              <p class="best-index-card-intro">{d.intro.slice(0, 100)}…</p>
+              <span class="best-index-card-count">{d.countries.length} pays →</span>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </main>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    .best-index-container { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; font-family: 'DM Sans', sans-serif; }
+    .breadcrumb { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.3); margin-bottom: 32px; }
+    .breadcrumb a { color: rgba(255,255,255,0.45); text-decoration: none; }
+    .breadcrumb a:hover { color: rgba(255,255,255,0.75); }
+    .best-index-header { margin-bottom: 48px; }
+    .best-index-header h1 { font-family: 'Playfair Display', serif; font-size: clamp(2rem,4vw,3rem); font-weight: 700; color: #f0f4ff; margin: 0 0 16px; }
+    .best-index-intro { font-size: 17px; color: rgba(255,255,255,0.6); line-height: 1.7; margin: 0; }
+    .best-index-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .best-index-card { display: flex; flex-direction: column; gap: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 22px; text-decoration: none; transition: border-color 0.15s, background 0.15s; }
+    .best-index-card:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.13); }
+    .best-index-card-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: #f0f4ff; line-height: 1.3; }
+    .best-index-card-intro { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.6; margin: 0; flex: 1; }
+    .best-index-card-count { font-size: 12px; font-weight: 600; color: #5b8fff; }
+  </style>
+</Base>

@@ -1,0 +1,108 @@
+---
+interface Post {
+  slug: string;
+  data: {
+    title: string;
+    description: string;
+    cluster: string;
+    pubDate: Date;
+  };
+}
+
+interface Props {
+  posts: Post[];
+  lang?: string;
+}
+
+const { posts, lang = 'en' } = Astro.props;
+const p = lang === 'fr' ? '/fr' : lang === 'es' ? '/es' : '';
+
+const CLUSTER_LABELS: Record<string, string> = {
+  'country-comparisons': 'Country Comparisons',
+  'world-geography':     'World Geography',
+  'travel-planning':     'Travel Planning',
+  'country-deep-dives':  'Country Guides',
+};
+
+const CLUSTER_COLORS: Record<string, string> = {
+  'country-comparisons': '#5b8fff',
+  'world-geography':     '#ffb74d',
+  'travel-planning':     '#69d89a',
+  'country-deep-dives':  '#ff7043',
+};
+---
+
+<section class="related-articles">
+  <h2 class="related-title">Related Articles</h2>
+  <div class="related-grid">
+    {posts.map(post => (
+      <a href={`${p}/blog/${post.slug}/`} class="related-card">
+        <span class="related-cluster" style={`color:${CLUSTER_COLORS[post.data.cluster]||'#5b8fff'}`}>
+          {CLUSTER_LABELS[post.data.cluster] || post.data.cluster}
+        </span>
+        <h3>{post.data.title}</h3>
+        <p>{post.data.description}</p>
+      </a>
+    ))}
+  </div>
+</section>
+
+<style>
+  .related-articles {
+    margin-top: 60px;
+    padding-top: 40px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .related-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 24px;
+  }
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  .related-card {
+    display: block;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 18px 20px;
+    text-decoration: none;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .related-card:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.14);
+  }
+  .related-cluster {
+    display: block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .related-card h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.88);
+    margin: 0 0 6px;
+    line-height: 1.4;
+  }
+  .related-card p {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.5;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

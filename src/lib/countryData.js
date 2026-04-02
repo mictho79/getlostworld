@@ -70,7 +70,6 @@ export const COUNTRY_VIBES = {
   "Brunei":"Gilded · Rainforest · Serene",
   "Burkina Faso":"Landlocked · Proud · Cultural",
   "Burundi":"Hilly · Resilient · Lakeside",
-  "Cabo Verde":"Creole · Breezy · Musical",
   "Cape Verde":"Creole · Breezy · Musical",
   "Central African Republic":"Wild · Vast · Forgotten",
   "Chad":"Arid · Ancient · Landlocked",
@@ -272,7 +271,6 @@ export const COUNTRY_DATA = {
   "Brunei":{ flag:"🇧🇳", capital:"Bandar Seri Begawan", population:"440,000", language:"Malay", sport:"Football / Badminton", fact:"Brunei's Sultan Hassanal Bolkiah owns one of the world's largest private car collections, exceeding 7,000 vehicles — among them hundreds of Rolls-Royces and custom-built Ferraris." },
   "Burkina Faso":{ flag:"🇧🇫", capital:"Ouagadougou", population:"22.1M", language:"French", sport:"Football", fact:"Burkina Faso means 'Land of Incorruptible People' in both Mooré and Dioula — the name was coined in 1984 by revolutionary leader Thomas Sankara." },
   "Burundi":{ flag:"🇧🇮", capital:"Gitega", population:"12.6M", language:"Kirundi, French, English", sport:"Football / Athletics", fact:"The Royal Drummers of Burundi, who perform on intore ceremonial drums, are UNESCO-listed and have played for royalty for centuries — their performances last up to 72 hours." },
-  "Cabo Verde":{ flag:"🇨🇻", capital:"Praia", population:"560,000", language:"Portuguese, Cape Verdean Creole", sport:"Football", fact:"Cabo Verde produces the genre of music called morna — a melancholic, soulful style popularised internationally by singer Cesária Évora, who performed barefoot as a symbol of solidarity with the poor." },
   "Cape Verde":{ flag:"🇨🇻", capital:"Praia", population:"560,000", language:"Portuguese, Cape Verdean Creole", sport:"Football", fact:"Cape Verde produces the genre of music called morna — a melancholic, soulful style popularised internationally by singer Cesária Évora, who performed barefoot as a symbol of solidarity with the poor." },
   "Central African Republic":{ flag:"🇨🇫", capital:"Bangui", population:"5.5M", language:"French, Sango", sport:"Football", fact:"The CAR contains one of Africa's largest remaining rainforests and the Dzanga-Sangha reserve, home to forest elephants and western lowland gorillas, as well as a unique salt-lick where dozens of elephants gather daily." },
   "Chad":{ flag:"🇹🇩", capital:"N'Djamena", population:"17.4M", language:"French, Arabic", sport:"Football", fact:"Lake Chad has shrunk by approximately 90% since the 1960s due to climate change and irrigation — once one of Africa's largest lakes, it is now a stark emblem of desertification." },
@@ -474,7 +472,6 @@ export const COUNTRY_CITIES = {
   "Brunei":[ {name:"Kuala Belait",latlng:[4.59,114.20]},{name:"Seria",latlng:[4.62,114.32]} ],
   "Burkina Faso":[ {name:"Bobo-Dioulasso",latlng:[11.18,-4.30]},{name:"Koudougou",latlng:[12.25,-2.36]} ],
   "Burundi":[ {name:"Bujumbura",latlng:[-3.38,29.36]},{name:"Muyinga",latlng:[-2.84,30.34]} ],
-  "Cabo Verde":[ {name:"Mindelo",latlng:[16.89,-24.98]},{name:"Santa Maria",latlng:[14.91,-23.70]} ],
   "Cape Verde":[ {name:"Mindelo",latlng:[16.89,-24.98]},{name:"Santa Maria",latlng:[14.91,-23.70]} ],
   "Central African Republic":[ {name:"Bimbo",latlng:[4.26,18.41]},{name:"Berbérati",latlng:[4.27,15.79]} ],
   "Chad":[ {name:"Moundou",latlng:[8.57,16.08]},{name:"Sarh",latlng:[9.14,18.39]} ],
@@ -675,7 +672,6 @@ export const COUNTRY_PEAKS = {
   "Brunei":{ name:"Bukit Pagon", elevation:1850, latlng:[4.55,115.14] },
   "Burkina Faso":{ name:"Tena Kourou", elevation:749, latlng:[10.96,-4.71] },
   "Burundi":{ name:"Heha", elevation:2685, latlng:[-3.47,29.44] },
-  "Cabo Verde":{ name:"Pico do Fogo", elevation:2829, latlng:[14.95,-24.35] },
   "Cape Verde":{ name:"Pico do Fogo", elevation:2829, latlng:[14.95,-24.35] },
   "Central African Republic":{ name:"Mont Ngaoui", elevation:1420, latlng:[5.96,14.39] },
   "Chad":{ name:"Emi Koussi", elevation:3415, latlng:[19.79,18.55] },
@@ -1495,13 +1491,6 @@ export const COUNTRY_INSIGHTS = {
   food: "Isombe — cassava leaves cooked with palm oil, onion, and groundnuts — is a staple dish across Burundi that reflects the agricultural base of a densely populated country where cassava is the primary food security crop, while ugali (maize porridge) and kidney beans form the daily nutritional foundation for a population where subsistence agriculture employs over 90% of the workforce.",
   sport: "Football is Burundi's most popular sport, with the national team's Africa Cup of Nations debut in 2019 causing national celebration — but long-distance running has produced athletes capable of competing internationally, with the rugged geography of the highlands creating natural altitude training conditions comparable to Kenya and Ethiopia.",
   nature: "Lake Tanganyika borders western Burundi and is the world's second deepest lake at 1,470 metres and second largest by volume — a 12-million-year-old rift lake so ancient it developed entirely unique fish species (over 350 endemic cichlid species) found nowhere else on Earth, whose clear blue waters sustain both local fishing economies and significant scientific research on evolutionary biology."
-},
-"Cabo Verde": {
-  capital: "Praia on Santiago Island is Cabo Verde's capital and largest city, a compact Atlantic city where the plateau (Plateau neighbourhood) preserves Portuguese colonial architecture above the market town below — a small capital in one of Africa's most stable democracies, regularly ranking at the top of African governance indices despite having no natural resources beyond wind and sea.",
-  people: "Cabo Verdeans developed a Creole culture from the forced mixing of Portuguese colonisers and enslaved Africans from across West Africa — producing a Kriolu language, the morna music tradition (a melancholic genre Cesária Évora brought to global audiences), and a diasporic consciousness that sees more Cabo Verdeans living abroad in Portugal, the US, and the Netherlands than on the islands themselves.",
-  food: "Cachupa — a slow-cooked stew of hominy corn, beans, fish or meat, and vegetables — is Cabo Verde's national dish, its richness determined by economic circumstance: rich cachupa includes more protein, poor cachupa more vegetables, with the stew reflecting both the Atlantic maritime economy and the African agricultural traditions that merged on these mid-ocean islands.",
-  sport: "Football is the dominant sporting passion, with Cabo Verde's national team qualifying for multiple Africa Cup of Nations competitions despite the country's tiny population — a success achieved partly through the dual citizenship rules that allow Cabo Verdean diaspora players born in Europe to represent the islands, effectively giving a country of 560,000 access to a talent pool of millions.",
-  nature: "Pico do Fogo on Fogo Island is one of the Atlantic's most active volcanoes, erupting as recently as 2014 when lava flows destroyed two villages on the crater's inner slopes — a 2,829-metre peak visible from 100 kilometres at sea, surrounded by vineyards producing unique wines from vines planted in volcanic ash that have survived multiple eruption cycles."
 },
 "Central African Republic": {
   capital: "Bangui sits on the north bank of the Ubangi River, which forms the border with Democratic Republic of the Congo — a small capital city with low-rise buildings and red laterite streets that has experienced multiple coups, repeated civil conflict, and a humanitarian crisis that has displaced over a third of the country's population in the past decade.",

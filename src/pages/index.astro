@@ -286,6 +286,53 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       flex-shrink: 0;
     }
 
+    /* ── Discover section ────────────────────────────────────── */
+    #discover-section {
+      padding: 20px 36px 0;
+      flex-shrink: 0;
+    }
+    .discover-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.2);
+      margin-bottom: 10px;
+    }
+    .discover-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .discover-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 11px 12px;
+      text-decoration: none;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .discover-card:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.12);
+    }
+    .discover-icon { font-size: 1.1rem; line-height: 1; flex-shrink: 0; }
+    .discover-card-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.2;
+    }
+    .discover-card-sub {
+      font-size: 10px;
+      color: rgba(255,255,255,0.28);
+      line-height: 1.3;
+      margin-top: 2px;
+    }
+
     /* ── All countries link ───────────────────────────────────── */
     #nav-countries {
       padding: 12px 36px 0;
@@ -305,65 +352,78 @@ const countryList = Object.keys(globeData).sort().map(n => ({
     /* ── Spacer ───────────────────────────────────────────────── */
     #spacer { flex: 1; min-height: 0; }
 
-    /* ── Country card (slides up from bottom) ─────────────────── */
+    /* ── Country bubble (floating over globe) ───────────────────── */
     #country-card {
-      margin: 0 20px 24px;
-      padding: 20px 22px 18px;
-      background: rgba(10, 24, 58, 0.72);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(96, 165, 250, 0.14);
-      border-radius: 18px;
-      flex-shrink: 0;
+      position: fixed;
+      z-index: 20;
+      width: 210px;
+      padding: 14px 16px 12px;
+      background: rgba(6, 12, 28, 0.90);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1px solid rgba(240, 165, 0, 0.22);
+      border-radius: 14px;
       opacity: 0;
-      transform: translateY(10px) scale(0.98);
-      transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.34, 1.5, 0.64, 1);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.55), 0 0 24px rgba(240,165,0,0.07);
     }
     #country-card.visible {
       opacity: 1;
-      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    /* SVG connector */
+    #globe-connector {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 15;
+      display: none;
     }
 
     #card-header {
       display: flex;
       align-items: flex-start;
-      gap: 14px;
-      margin-bottom: 12px;
+      gap: 10px;
+      margin-bottom: 8px;
     }
     #card-flag {
-      font-size: 38px;
+      font-size: 28px;
       line-height: 1;
       flex-shrink: 0;
-      margin-top: 2px;
+      margin-top: 1px;
     }
     #card-info { min-width: 0; flex: 1; }
     #card-name {
       font-family: 'Playfair Display', serif;
-      font-size: 19px;
+      font-size: 15px;
       font-weight: 700;
       color: #fff;
-      letter-spacing: -0.02em;
-      line-height: 1.15;
-      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+      margin-bottom: 3px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     #card-vibe {
-      font-size: 11px;
+      font-size: 10px;
       color: rgba(147, 197, 253, 0.65);
       letter-spacing: 0.03em;
     }
 
     #card-fact {
-      font-size: 12px;
+      font-size: 11px;
       color: rgba(255, 255, 255, 0.38);
-      line-height: 1.65;
-      border-left: 2px solid rgba(59, 130, 246, 0.35);
-      padding-left: 12px;
-      margin-bottom: 14px;
+      line-height: 1.6;
+      border-left: 2px solid rgba(240, 165, 0, 0.3);
+      padding-left: 10px;
+      margin-bottom: 10px;
       display: -webkit-box;
-      -webkit-line-clamp: 3;
+      -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
@@ -371,8 +431,8 @@ const countryList = Object.keys(globeData).sort().map(n => ({
     #card-link {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      font-size: 12px;
+      gap: 4px;
+      font-size: 11px;
       font-weight: 600;
       color: #f0a500;
       text-decoration: none;
@@ -453,7 +513,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       #search-wrapper, #cta-wrap, #nav-countries { padding-left: 24px; padding-right: 24px; }
       #stats { padding: 20px 24px 0; }
       .sep { margin: 20px 24px 0; }
-      #spacer, #country-card, #globe-hint, #nav-countries { display: none; }
+      #spacer, #globe-hint, #nav-countries, #discover-section { display: none; }
       #globe-container { bottom: 48vh; bottom: 48svh; }
     }
   </style>
@@ -521,21 +581,63 @@ const countryList = Object.keys(globeData).sort().map(n => ({
     </div>
 
     <div class="sep"></div>
-    <div id="spacer"></div>
 
-    <!-- Country card -->
-    <div id="country-card">
-      <div id="card-header">
-        <span id="card-flag">🌍</span>
-        <div id="card-info">
-          <div id="card-name">—</div>
-          <div id="card-vibe">—</div>
-        </div>
+    <!-- Discover section -->
+    <div id="discover-section">
+      <div class="discover-label">Explore</div>
+      <div class="discover-grid">
+        <a href="/best/" class="discover-card">
+          <span class="discover-icon">🏆</span>
+          <div>
+            <div class="discover-card-title">Best Of</div>
+            <div class="discover-card-sub">Top countries by category</div>
+          </div>
+        </a>
+        <a href="/blog/" class="discover-card">
+          <span class="discover-icon">✍️</span>
+          <div>
+            <div class="discover-card-title">Blog</div>
+            <div class="discover-card-sub">Guides & comparisons</div>
+          </div>
+        </a>
+        <a href="/for/" class="discover-card">
+          <span class="discover-icon">🎯</span>
+          <div>
+            <div class="discover-card-title">For You</div>
+            <div class="discover-card-sub">Find your perfect country</div>
+          </div>
+        </a>
+        <a href="/compare/" class="discover-card">
+          <span class="discover-icon">⚖️</span>
+          <div>
+            <div class="discover-card-title">Compare</div>
+            <div class="discover-card-sub">Side-by-side country data</div>
+          </div>
+        </a>
       </div>
-      <div id="card-fact"></div>
-      <a id="card-link" href="#"> </a>
     </div>
+
+    <div id="spacer"></div>
   </aside>
+
+  <!-- Floating country bubble (positioned by JS over the globe) -->
+  <div id="country-card">
+    <div id="card-header">
+      <span id="card-flag">🌍</span>
+      <div id="card-info">
+        <div id="card-name">—</div>
+        <div id="card-vibe">—</div>
+      </div>
+    </div>
+    <div id="card-fact"></div>
+    <a id="card-link" href="#"> </a>
+  </div>
+
+  <!-- SVG connector line + dot -->
+  <svg id="globe-connector" aria-hidden="true">
+    <line id="connector-line" stroke="rgba(240,165,0,0.45)" stroke-width="1.5" stroke-dasharray="5,3"/>
+    <circle id="connector-dot" r="4" fill="#f0a500"/>
+  </svg>
 
   <!-- Globe hint -->
   <div id="globe-hint">{t.clickToExplore}</div>
@@ -773,6 +875,11 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       var flying    = false;
       var raycaster = new THREE.Raycaster();
       var mouse     = new THREE.Vector2();
+      var currentCentroid = null;
+      var bubbleEl  = document.getElementById('country-card');
+      var svgEl     = document.getElementById('globe-connector');
+      var cLine     = document.getElementById('connector-line');
+      var cDot      = document.getElementById('connector-dot');
 
       /* ── Point-in-polygon ── */
       function ptInRing(lng, lat, ring) {
@@ -960,8 +1067,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
 
       /* ── Card update ── */
       function showCard(f, fly) {
-        // On mobile the country card is hidden — skip highlight to avoid orphaned colors on globe
-        if (window.innerWidth > 700) setHighlight(f);
+        setHighlight(f);
         var p = f.properties;
         document.getElementById('card-flag').textContent = p.flag;
         document.getElementById('card-name').textContent = p.name;
@@ -971,6 +1077,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         lnk.href        = '/country/' + p.slug;
         lnk.textContent = window._UI.discoverLabel + ' ' + p.name;
         document.getElementById('country-card').classList.add('visible');
+        currentCentroid = centroid(f);
 
         if (fly) {
           var c  = centroid(f);
@@ -1069,6 +1176,34 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         }
 
         renderer.render(scene, camera);
+
+        /* ── Update floating bubble position ── */
+        if (currentCentroid && bubbleEl.classList.contains('visible')) {
+          var lp = ll3(currentCentroid.lat, currentCentroid.lng, 1.002);
+          var wp = lp.clone().applyEuler(globe.rotation);
+          /* Visibility: point on front hemisphere → wp·camPos > 1 */
+          var vis = (wp.y * (-0.25) + wp.z * 3.25) > 1;
+          if (vis) {
+            var ndcV = wp.clone().project(camera);
+            var _r = renderer.domElement.getBoundingClientRect();
+            var sx = (ndcV.x *  0.5 + 0.5) * _r.width  + _r.left;
+            var sy = (-ndcV.y * 0.5 + 0.5) * _r.height + _r.top;
+            cDot.setAttribute('cx', sx);
+            cDot.setAttribute('cy', sy);
+            var bw = 210, bh = 115;
+            var bx = (sx < bw + 50) ? sx + 24 : sx - 24 - bw;
+            var by = Math.max(8, Math.min(_r.height - bh - 8, sy - bh * 0.45));
+            bubbleEl.style.left = bx + 'px';
+            bubbleEl.style.top  = by + 'px';
+            var lx2 = (bx < sx) ? bx + bw : bx;
+            var ly2 = by + bh * 0.42;
+            cLine.setAttribute('x1', sx);  cLine.setAttribute('y1', sy);
+            cLine.setAttribute('x2', lx2); cLine.setAttribute('y2', ly2);
+            svgEl.style.display = 'block';
+          } else {
+            svgEl.style.display = 'none';
+          }
+        }
       }
       animate();
 

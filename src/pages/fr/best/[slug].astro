@@ -1,0 +1,131 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { BEST_OF, BEST_OF_SLUGS } from '../../../lib/bestOfData.js';
+
+export function getStaticPaths() {
+  return BEST_OF_SLUGS.map(slug => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const data = BEST_OF[slug];
+if (!data) return Astro.redirect('/fr/');
+
+const SITE = 'https://terralenses.com';
+const enUrl = `${SITE}/best/${slug}/`;
+const frUrl = `${SITE}/fr/best/${slug}/`;
+const esUrl = `${SITE}/es/best/${slug}/`;
+
+const itemListSchema = JSON.stringify({
+  "@context": "https://schema.org", "@type": "ItemList",
+  "name": data.h1, "numberOfItems": data.countries.length,
+  "itemListElement": data.countries.map(c => ({
+    "@type": "ListItem", "position": c.rank, "name": c.name,
+    "url": `${SITE}/country/${c.slug}/`,
+  })),
+});
+const faqSchema = JSON.stringify({
+  "@context": "https://schema.org", "@type": "FAQPage",
+  "mainEntity": data.faq.map(item => ({
+    "@type": "Question", "name": item.q,
+    "acceptedAnswer": { "@type": "Answer", "text": item.a },
+  })),
+});
+
+const otherPages = BEST_OF_SLUGS.filter(s => s !== slug).slice(0, 6).map(s => ({ slug: s, title: BEST_OF[s].h1 }));
+---
+
+<Base title={data.metaTitle} description={data.metaDescription} lang="fr"
+  hreflangEn={enUrl} hreflangFr={frUrl} hreflangEs={esUrl}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={itemListSchema} />
+    <script type="application/ld+json" set:html={faqSchema} />
+  </Fragment>
+  <main id="main-content">
+    <div class="best-container">
+      <nav class="breadcrumb">
+        <a href="/fr/">Accueil</a><span>›</span>
+        <a href="/fr/best/">Meilleurs</a><span>›</span>
+        <span>{data.h1}</span>
+      </nav>
+      <header class="best-header">
+        <h1>{data.h1}</h1>
+        <p class="best-intro">{data.intro}</p>
+        <p class="best-criteria"><strong>Critères :</strong> {data.criteria}</p>
+      </header>
+      <section class="countries-section">
+        <ol class="countries-list">
+          {data.countries.map(c => (
+            <li class="country-item">
+              <div class="rank-badge">#{c.rank}</div>
+              <div class="country-content">
+                <div class="country-title-row">
+                  <span class="country-flag">{c.flag}</span>
+                  <a href={`/fr/country/${c.slug}/`} class="country-name">{c.name}</a>
+                </div>
+                <p class="country-why">{c.why}</p>
+                <div class="country-highlight">
+                  <span class="highlight-icon">✦</span>
+                  <span>{c.highlight}</span>
+                </div>
+                <a href={`/fr/country/${c.slug}/`} class="action-link">Voir la fiche {c.name} →</a>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+      <section class="faq-section">
+        <h2>Questions fréquentes</h2>
+        <div class="faq-list">
+          {data.faq.map(item => (
+            <details class="faq-item">
+              <summary>{item.q}</summary>
+              <p>{item.a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+      <section class="more-section">
+        <h2>Plus de classements</h2>
+        <div class="more-grid">
+          {otherPages.map(p => <a href={`/fr/best/${p.slug}/`} class="more-card">{p.title}</a>)}
+        </div>
+      </section>
+    </div>
+  </main>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    .best-container { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; font-family: 'DM Sans', sans-serif; }
+    .breadcrumb { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.3); margin-bottom: 32px; }
+    .breadcrumb a { color: rgba(255,255,255,0.45); text-decoration: none; }
+    .best-header { margin-bottom: 48px; }
+    .best-header h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.9rem,4vw,2.8rem); font-weight: 700; color: #f0f4ff; margin: 0 0 16px; line-height: 1.2; }
+    .best-intro { font-size: 17px; color: rgba(255,255,255,0.6); line-height: 1.7; margin: 0 0 14px; }
+    .best-criteria { font-size: 13px; color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 10px 14px; margin: 0; }
+    .best-criteria strong { color: rgba(255,255,255,0.55); }
+    .countries-section { margin-bottom: 56px; }
+    .countries-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 20px; }
+    .country-item { display: flex; gap: 20px; align-items: flex-start; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 24px; }
+    .rank-badge { flex-shrink: 0; width: 42px; height: 42px; background: rgba(91,143,255,0.12); border: 1px solid rgba(91,143,255,0.25); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #5b8fff; }
+    .country-content { flex: 1; min-width: 0; }
+    .country-title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .country-flag { font-size: 1.5rem; line-height: 1; }
+    .country-name { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: #f0f4ff; text-decoration: none; }
+    .country-name:hover { color: #5b8fff; }
+    .country-why { font-size: 15px; color: rgba(255,255,255,0.65); line-height: 1.6; margin: 0 0 12px; }
+    .country-highlight { display: flex; gap: 8px; align-items: flex-start; background: rgba(255,255,255,0.03); border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.5; }
+    .highlight-icon { color: #ffb74d; flex-shrink: 0; }
+    .action-link { font-size: 12px; font-weight: 600; color: #5b8fff; text-decoration: none; }
+    .faq-section { margin-bottom: 56px; }
+    .faq-section h2, .more-section h2 { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: #f0f4ff; margin: 0 0 24px; }
+    .faq-list { display: flex; flex-direction: column; gap: 10px; }
+    .faq-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; }
+    .faq-item summary { font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.85); padding: 16px 20px; cursor: pointer; list-style: none; display: flex; justify-content: space-between; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-size: 18px; color: rgba(255,255,255,0.3); }
+    .faq-item[open] summary::after { content: '−'; }
+    .faq-item p { font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.6; padding: 0 20px 16px; margin: 0; }
+    .more-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+    .more-card { display: block; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 16px 20px; text-decoration: none; font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.65); transition: all 0.15s; line-height: 1.4; }
+    .more-card:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.9); }
+  </style>
+</Base>

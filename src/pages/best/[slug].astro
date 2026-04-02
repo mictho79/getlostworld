@@ -1,0 +1,328 @@
+---
+import Base from '../../layouts/Base.astro';
+import { BEST_OF, BEST_OF_SLUGS } from '../../lib/bestOfData.js';
+
+export function getStaticPaths() {
+  return BEST_OF_SLUGS.map(slug => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const data = BEST_OF[slug];
+if (!data) return Astro.redirect('/');
+
+const SITE = 'https://terralenses.com';
+const enUrl = `${SITE}/best/${slug}/`;
+const frUrl = `${SITE}/fr/best/${slug}/`;
+const esUrl = `${SITE}/es/best/${slug}/`;
+const canonical = enUrl;
+
+const itemListSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": data.h1,
+  "description": data.metaDescription,
+  "numberOfItems": data.countries.length,
+  "itemListElement": data.countries.map((c, i) => ({
+    "@type": "ListItem",
+    "position": c.rank,
+    "name": c.name,
+    "url": `${SITE}/country/${c.slug}/`,
+    "description": c.why,
+  })),
+});
+
+const faqSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": data.faq.map(item => ({
+    "@type": "Question",
+    "name": item.q,
+    "acceptedAnswer": { "@type": "Answer", "text": item.a },
+  })),
+});
+
+const breadcrumbSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": `${SITE}/` },
+    { "@type": "ListItem", "position": 2, "name": "Best Of", "item": `${SITE}/best/` },
+    { "@type": "ListItem", "position": 3, "name": data.h1, "item": canonical },
+  ],
+});
+
+const otherPages = BEST_OF_SLUGS.filter(s => s !== slug).slice(0, 6).map(s => ({
+  slug: s,
+  title: BEST_OF[s].h1,
+}));
+---
+
+<Base
+  title={data.metaTitle}
+  description={data.metaDescription}
+  lang="en"
+  hreflangEn={enUrl}
+  hreflangFr={frUrl}
+  hreflangEs={esUrl}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={itemListSchema} />
+    <script type="application/ld+json" set:html={faqSchema} />
+    <script type="application/ld+json" set:html={breadcrumbSchema} />
+  </Fragment>
+
+  <main id="main-content">
+    <div class="best-container">
+
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a><span>›</span>
+        <a href="/best/">Best Of</a><span>›</span>
+        <span>{data.h1}</span>
+      </nav>
+
+      <!-- Header -->
+      <header class="best-header">
+        <h1>{data.h1}</h1>
+        <p class="best-intro">{data.intro}</p>
+        <p class="best-criteria"><strong>Criteria:</strong> {data.criteria}</p>
+      </header>
+
+      <!-- Country List -->
+      <section class="countries-section">
+        <ol class="countries-list">
+          {data.countries.map(c => (
+            <li class="country-item">
+              <div class="rank-badge">#{c.rank}</div>
+              <div class="country-content">
+                <div class="country-title-row">
+                  <span class="country-flag">{c.flag}</span>
+                  <a href={`/country/${c.slug}/`} class="country-name">{c.name}</a>
+                </div>
+                <p class="country-why">{c.why}</p>
+                <div class="country-highlight">
+                  <span class="highlight-icon">✦</span>
+                  <span>{c.highlight}</span>
+                </div>
+                <div class="country-actions">
+                  <a href={`/country/${c.slug}/`} class="action-link">
+                    View {c.name} profile →
+                  </a>
+                  <a href={`/compare/${c.slug}-vs-france/`} class="action-link action-link--secondary">
+                    Compare →
+                  </a>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <!-- Summary Table -->
+      <section class="table-section">
+        <h2>Quick Comparison</h2>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Country</th>
+                <th>Why it's on this list</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.countries.map(c => (
+                <tr>
+                  <td class="rank-cell">#{c.rank}</td>
+                  <td class="name-cell">
+                    <span>{c.flag}</span>
+                    <a href={`/country/${c.slug}/`}>{c.name}</a>
+                  </td>
+                  <td class="why-cell">{c.why.split('. ')[0]}.</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section class="faq-section">
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-list">
+          {data.faq.map(item => (
+            <details class="faq-item">
+              <summary>{item.q}</summary>
+              <p>{item.a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <!-- More Best Of -->
+      <section class="more-section">
+        <h2>More Best Of Lists</h2>
+        <div class="more-grid">
+          {otherPages.map(p => (
+            <a href={`/best/${p.slug}/`} class="more-card">
+              {p.title}
+            </a>
+          ))}
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    .best-container {
+      max-width: 900px; margin: 0 auto;
+      padding: 40px 24px 80px; font-family: 'DM Sans', sans-serif;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
+      font-size: 13px; color: rgba(255,255,255,0.3); margin-bottom: 32px;
+    }
+    .breadcrumb a { color: rgba(255,255,255,0.45); text-decoration: none; }
+    .breadcrumb a:hover { color: rgba(255,255,255,0.75); }
+
+    /* Header */
+    .best-header { margin-bottom: 48px; }
+    .best-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.9rem, 4vw, 2.8rem); font-weight: 700;
+      color: #f0f4ff; margin: 0 0 16px; line-height: 1.2;
+    }
+    .best-intro {
+      font-size: 17px; color: rgba(255,255,255,0.6);
+      line-height: 1.7; margin: 0 0 14px;
+    }
+    .best-criteria {
+      font-size: 13px; color: rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 8px; padding: 10px 14px; margin: 0;
+    }
+    .best-criteria strong { color: rgba(255,255,255,0.55); }
+
+    /* Countries List */
+    .countries-section { margin-bottom: 56px; }
+    .countries-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 20px; }
+
+    .country-item {
+      display: flex; gap: 20px; align-items: flex-start;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px; padding: 24px;
+      transition: border-color 0.15s;
+    }
+    .country-item:hover { border-color: rgba(255,255,255,0.13); }
+
+    .rank-badge {
+      flex-shrink: 0; width: 42px; height: 42px;
+      background: rgba(91,143,255,0.12); border: 1px solid rgba(91,143,255,0.25);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #5b8fff;
+    }
+
+    .country-content { flex: 1; min-width: 0; }
+
+    .country-title-row {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    }
+    .country-flag { font-size: 1.5rem; line-height: 1; }
+    .country-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem; font-weight: 700;
+      color: #f0f4ff; text-decoration: none;
+    }
+    .country-name:hover { color: #5b8fff; }
+
+    .country-why {
+      font-size: 15px; color: rgba(255,255,255,0.65);
+      line-height: 1.6; margin: 0 0 12px;
+    }
+
+    .country-highlight {
+      display: flex; gap: 8px; align-items: flex-start;
+      background: rgba(255,255,255,0.03); border-radius: 8px;
+      padding: 10px 14px; margin-bottom: 14px;
+      font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.5;
+    }
+    .highlight-icon { color: #ffb74d; flex-shrink: 0; margin-top: 1px; }
+
+    .country-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .action-link {
+      font-size: 12px; font-weight: 600; color: #5b8fff;
+      text-decoration: none;
+    }
+    .action-link:hover { color: #7aa5ff; }
+    .action-link--secondary { color: rgba(255,255,255,0.4); }
+    .action-link--secondary:hover { color: rgba(255,255,255,0.7); }
+
+    /* Table */
+    .table-section { margin-bottom: 56px; }
+    .table-section h2,
+    .faq-section h2,
+    .more-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; font-weight: 700;
+      color: #f0f4ff; margin: 0 0 24px;
+    }
+    .table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid rgba(255,255,255,0.07); }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.45); font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      padding: 12px 16px; text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    .rank-cell { color: #5b8fff; font-weight: 700; font-size: 13px; white-space: nowrap; }
+    .name-cell {
+      white-space: nowrap; display: flex; gap: 8px; align-items: center;
+    }
+    .name-cell a { color: rgba(255,255,255,0.85); text-decoration: none; font-weight: 600; }
+    .name-cell a:hover { color: #5b8fff; }
+    .why-cell { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.5; }
+
+    /* FAQ */
+    .faq-section { margin-bottom: 56px; }
+    .faq-list { display: flex; flex-direction: column; gap: 10px; }
+    .faq-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px; overflow: hidden;
+    }
+    .faq-item summary {
+      font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.85);
+      padding: 16px 20px; cursor: pointer; list-style: none;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-size: 18px; color: rgba(255,255,255,0.3); }
+    .faq-item[open] summary::after { content: '−'; }
+    .faq-item p { font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.6; padding: 0 20px 16px; margin: 0; }
+
+    /* More section */
+    .more-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+    .more-card {
+      display: block; background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07); border-radius: 10px;
+      padding: 16px 20px; text-decoration: none;
+      font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.65);
+      transition: all 0.15s; line-height: 1.4;
+    }
+    .more-card:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.9); border-color: rgba(255,255,255,0.13); }
+  </style>
+</Base>

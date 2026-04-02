@@ -9,6 +9,7 @@ import {
 import { TRAVEL_SCORES, TRAVEL_ADVISORY } from '../../../lib/travelScores.js';
 import { COUNTRY_REGION, COUNTRY_EXTRAS } from '../../../lib/countryExtras.js';
 import { getT, translateRegion, getCountryNameES } from '../../../i18n/translations';
+import { getEditorial } from '../../../lib/compareEditorial.js';
 
 const lang = 'es' as const;
 const t = getT(lang);
@@ -79,6 +80,8 @@ const findCountry = (s: string) => {
 const countryA = findCountry(slugA);
 const countryB = findCountry(slugB);
 if (!countryA || !countryB) return Astro.redirect('/es/');
+
+const editorialData = getEditorial(slugA, slugB);
 
 const ciA = countryA.insights as Record<string,string>;
 const ciB = countryB.insights as Record<string,string>;
@@ -718,6 +721,50 @@ const jsonLd = JSON.stringify({
         </section>
       )}
 
+      {editorialData && (
+        <section class="editorial-section">
+          <p class="editorial-intro">{editorialData.intro}</p>
+
+          <div class="editorial-split">
+            <div class="editorial-card">
+              <div class="editorial-card-label">Elige {countryA.flag} {countryA.name} si…</div>
+              <p>{editorialData.whichToVisit.a}</p>
+            </div>
+            <div class="editorial-card">
+              <div class="editorial-card-label">Elige {countryB.flag} {countryB.name} si…</div>
+              <p>{editorialData.whichToVisit.b}</p>
+            </div>
+          </div>
+
+          {editorialData.keyDifferences.length > 0 && (
+            <div class="editorial-diffs">
+              <h3 class="editorial-diffs-title">Diferencias clave</h3>
+              <ul class="editorial-diffs-list">
+                {editorialData.keyDifferences.map((d: string) => <li>{d}</li>)}
+              </ul>
+            </div>
+          )}
+
+          {editorialData.faq.length > 0 && (
+            <div class="editorial-faq">
+              <h3 class="editorial-faq-title">Preguntas frecuentes</h3>
+              {editorialData.faq.map((item: { q: string; a: string }) => (
+                <details class="editorial-faq-item">
+                  <summary>{item.q}</summary>
+                  <p>{item.a}</p>
+                </details>
+              ))}
+            </div>
+          )}
+
+          {editorialData.blogLink && (
+            <a href={`/es${editorialData.blogLink}`} class="editorial-blog-link">
+              Leer la comparación completa: {editorialData.blogLabel} →
+            </a>
+          )}
+        </section>
+      )}
+
       <!-- World map CTA -->
       <div class="map-cta">
         <a href="/es/map/" class="map-btn">
@@ -1178,6 +1225,27 @@ const jsonLd = JSON.stringify({
 .neighbours-section { display: flex; flex-direction: column; gap: 20px; }
 
 /* ── Map CTA ── */
+.editorial-section { margin: 48px 0; padding: 32px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; }
+.editorial-intro { font-size: 16px; color: rgba(255,255,255,0.65); line-height: 1.7; margin: 0 0 28px; }
+.editorial-split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+@media (max-width: 600px) { .editorial-split { grid-template-columns: 1fr; } }
+.editorial-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 18px 20px; }
+.editorial-card-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #5b8fff; margin-bottom: 8px; }
+.editorial-card p { font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.6; margin: 0; }
+.editorial-diffs { margin-bottom: 28px; }
+.editorial-diffs-title, .editorial-faq-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: #f0f4ff; margin: 0 0 14px; }
+.editorial-diffs-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.editorial-diffs-list li { font-size: 14px; color: rgba(255,255,255,0.6); padding-left: 18px; position: relative; line-height: 1.5; }
+.editorial-diffs-list li::before { content: '→'; position: absolute; left: 0; color: #5b8fff; font-size: 12px; top: 2px; }
+.editorial-faq { margin-bottom: 24px; display: flex; flex-direction: column; gap: 8px; }
+.editorial-faq-item { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; overflow: hidden; }
+.editorial-faq-item summary { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.8); padding: 13px 16px; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+.editorial-faq-item summary::-webkit-details-marker { display: none; }
+.editorial-faq-item summary::after { content: '+'; font-size: 16px; color: rgba(255,255,255,0.3); }
+.editorial-faq-item[open] summary::after { content: '−'; }
+.editorial-faq-item p { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.6; padding: 0 16px 13px; margin: 0; }
+.editorial-blog-link { display: inline-block; font-size: 13px; font-weight: 600; color: #5b8fff; text-decoration: none; }
+.editorial-blog-link:hover { color: #7aa5ff; }
 .map-cta { margin-top: 48px; padding-top: 28px; border-top: 0.5px solid rgba(255,255,255,0.05); text-align: center; }
 .map-btn {
   display: inline-flex; align-items: center; gap: 8px;

@@ -1,5 +1,18 @@
 import type { APIRoute } from 'astro';
 import { COUNTRY_VIBES, slugify } from '../lib/countryData.js';
+import { USE_CASE_SLUGS } from '../lib/useCaseData.js';
+import { BEST_OF_SLUGS } from '../lib/bestOfData.js';
+
+const BLOG_SLUGS = [
+  'france-vs-spain-which-to-visit',
+  'usa-vs-canada-comparison',
+  'japan-vs-south-korea-travel',
+  'italy-vs-greece-summer-holiday',
+  'thailand-vs-vietnam-backpacking',
+  'australia-vs-new-zealand-travel',
+  'portugal-vs-spain-expat',
+  'germany-vs-austria-differences',
+];
 
 const today = new Date().toISOString().slice(0, 10);
 
@@ -103,6 +116,41 @@ export const GET: APIRoute = async () => {
     ...curated.map(([a, b]) => url(`${base}/fr/compare/${a}-vs-${b}/`, '0.6', 'monthly')),
     // ── ES curated compare pairs ────────────────────────────
     ...curated.map(([a, b]) => url(`${base}/es/compare/${a}-vs-${b}/`, '0.6', 'monthly')),
+    // ── Blog index ─────────────────────────────────────────
+    url(`${base}/blog/`,    '0.8', 'weekly', `${base}/fr/blog/`,    `${base}/es/blog/`),
+    url(`${base}/fr/blog/`, '0.7', 'weekly'),
+    url(`${base}/es/blog/`, '0.7', 'weekly'),
+    // ── Blog articles with hreflang ─────────────────────────
+    ...BLOG_SLUGS.map(s => url(
+      `${base}/blog/${s}/`, '0.7', 'monthly',
+      `${base}/fr/blog/${s}/`,
+      `${base}/es/blog/${s}/`
+    )),
+    ...BLOG_SLUGS.map(s => url(`${base}/fr/blog/${s}/`, '0.6', 'monthly')),
+    ...BLOG_SLUGS.map(s => url(`${base}/es/blog/${s}/`, '0.6', 'monthly')),
+    // ── Use Case pages with hreflang ───────────────────────
+    url(`${base}/for/`, '0.7', 'monthly', `${base}/fr/for/`, `${base}/es/for/`),
+    url(`${base}/fr/for/`, '0.6', 'monthly'),
+    url(`${base}/es/for/`, '0.6', 'monthly'),
+    ...USE_CASE_SLUGS.map((s: string) => url(
+      `${base}/for/${s}/`, '0.7', 'monthly',
+      `${base}/fr/for/${s}/`,
+      `${base}/es/for/${s}/`
+    )),
+    ...USE_CASE_SLUGS.map((s: string) => url(`${base}/fr/for/${s}/`, '0.6', 'monthly')),
+    ...USE_CASE_SLUGS.map((s: string) => url(`${base}/es/for/${s}/`, '0.6', 'monthly')),
+    // ── Best Of index ──────────────────────────────────────
+    url(`${base}/best/`, '0.8', 'monthly', `${base}/fr/best/`, `${base}/es/best/`),
+    url(`${base}/fr/best/`, '0.7', 'monthly'),
+    url(`${base}/es/best/`, '0.7', 'monthly'),
+    // ── Best Of pages with hreflang ────────────────────────
+    ...BEST_OF_SLUGS.map((s: string) => url(
+      `${base}/best/${s}/`, '0.7', 'monthly',
+      `${base}/fr/best/${s}/`,
+      `${base}/es/best/${s}/`
+    )),
+    ...BEST_OF_SLUGS.map((s: string) => url(`${base}/fr/best/${s}/`, '0.6', 'monthly')),
+    ...BEST_OF_SLUGS.map((s: string) => url(`${base}/es/best/${s}/`, '0.6', 'monthly')),
     // ── EN ranking pages with hreflang ──────────────────────
     url(`${base}/rankings/largest-countries/`,  '0.8', 'monthly', `${base}/fr/rankings/largest-countries/`,  `${base}/es/rankings/largest-countries/`),
     url(`${base}/rankings/most-populated/`,     '0.8', 'monthly', `${base}/fr/rankings/most-populated/`,     `${base}/es/rankings/most-populated/`),

@@ -33,7 +33,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TerraLenses — Perdez-vous dans le monde</title>
-  <meta name="description" content="Explorez 195 pays — cultures, paysages, faits et comparaisons." />
+  <meta name="description" content="Explorez 198 pays — cultures, paysages, faits et comparaisons." />
   <meta name="google-site-verification" content="jncrLZewF1YuN4wAuQFWpmCTFcOhhZjQCeyAdK03Bcc" />
   <link rel="canonical" href="https://terralenses.com/fr/" />
   <link rel="alternate" hreflang="en" href="https://terralenses.com/" />
@@ -41,7 +41,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
   <link rel="alternate" hreflang="es" href="https://terralenses.com/es/" />
   <link rel="alternate" hreflang="x-default" href="https://terralenses.com/" />
   <meta property="og:title" content="TerraLenses — Perdez-vous dans le monde" />
-  <meta property="og:description" content="Explorez 195 pays — cultures, paysages, faits et comparaisons. Globe interactif 3D." />
+  <meta property="og:description" content="Explorez 198 pays — cultures, paysages, faits et comparaisons. Globe interactif 3D." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://terralenses.com/fr/" />
   <meta property="og:image" content="https://terralenses.com/og-image.png" />
@@ -49,7 +49,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="TerraLenses — Perdez-vous dans le monde" />
-  <meta name="twitter:description" content="Explorez 195 pays — cultures, paysages, faits et comparaisons." />
+  <meta name="twitter:description" content="Explorez 198 pays — cultures, paysages, faits et comparaisons." />
   <meta name="twitter:image" content="https://terralenses.com/og-image.png" />
   <script is:inline defer data-domain="terralenses.com" src="https://plausible.io/js/script.js"></script>
   <script is:inline async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4020973443671350" crossorigin="anonymous"></script>
@@ -289,6 +289,16 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       flex-shrink: 0;
     }
 
+    /* ── Discover section ────────────────────────────────────── */
+    #discover-section { padding: 20px 36px 0; flex-shrink: 0; }
+    .discover-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.2); margin-bottom: 10px; }
+    .discover-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .discover-card { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 11px 12px; text-decoration: none; transition: background 0.15s, border-color 0.15s; }
+    .discover-card:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12); }
+    .discover-icon { font-size: 1.1rem; line-height: 1; flex-shrink: 0; }
+    .discover-card-title { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.75); line-height: 1.2; }
+    .discover-card-sub { font-size: 10px; color: rgba(255,255,255,0.28); line-height: 1.3; margin-top: 2px; }
+
     /* ── All countries link ───────────────────────────────────── */
     #nav-countries {
       padding: 12px 36px 0;
@@ -308,79 +318,59 @@ const countryList = Object.keys(globeData).sort().map(n => ({
     /* ── Spacer ───────────────────────────────────────────────── */
     #spacer { flex: 1; min-height: 0; }
 
-    /* ── Country card (slides up from bottom) ─────────────────── */
+    /* ── Country bubble (floating over globe) ───────────────────── */
     #country-card {
-      margin: 0 20px 24px;
-      padding: 20px 22px 18px;
-      background: rgba(10, 24, 58, 0.72);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(96, 165, 250, 0.14);
-      border-radius: 18px;
-      flex-shrink: 0;
+      position: fixed;
+      z-index: 20;
+      width: 210px;
+      padding: 14px 16px 12px;
+      background: rgba(6, 12, 28, 0.90);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1px solid rgba(240, 165, 0, 0.22);
+      border-radius: 14px;
       opacity: 0;
-      transform: translateY(10px) scale(0.98);
-      transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.34, 1.5, 0.64, 1);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.55), 0 0 24px rgba(240,165,0,0.07);
     }
     #country-card.visible {
       opacity: 1;
-      transform: translateY(0) scale(1);
+      pointer-events: auto;
     }
-
+    #globe-connector {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 15;
+      display: none;
+    }
     #card-header {
       display: flex;
       align-items: flex-start;
-      gap: 14px;
-      margin-bottom: 12px;
+      gap: 10px;
+      margin-bottom: 8px;
     }
-    #card-flag {
-      font-size: 38px;
-      line-height: 1;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
+    #card-flag { font-size: 28px; line-height: 1; flex-shrink: 0; margin-top: 1px; }
     #card-info { min-width: 0; flex: 1; }
     #card-name {
       font-family: 'Playfair Display', serif;
-      font-size: 19px;
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: -0.02em;
-      line-height: 1.15;
-      margin-bottom: 4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 15px; font-weight: 700; color: #fff;
+      letter-spacing: -0.01em; line-height: 1.2; margin-bottom: 3px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    #card-vibe {
-      font-size: 11px;
-      color: rgba(147, 197, 253, 0.65);
-      letter-spacing: 0.03em;
-    }
-
+    #card-vibe { font-size: 10px; color: rgba(147,197,253,0.65); letter-spacing: 0.03em; }
     #card-fact {
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.38);
-      line-height: 1.65;
-      border-left: 2px solid rgba(59, 130, 246, 0.35);
-      padding-left: 12px;
-      margin-bottom: 14px;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      font-size: 11px; color: rgba(255,255,255,0.38); line-height: 1.6;
+      border-left: 2px solid rgba(240,165,0,0.3); padding-left: 10px; margin-bottom: 10px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     }
-
     #card-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #f0a500;
-      text-decoration: none;
-      letter-spacing: 0.02em;
-      transition: color 0.18s;
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 600; color: #f0a500;
+      text-decoration: none; letter-spacing: 0.02em; transition: color 0.18s;
     }
     #card-link:hover { color: #fbbf24; }
     #card-link::after { content: '→'; display: inline-block; transition: transform 0.2s; }
@@ -457,7 +447,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       #search-wrapper, #cta-wrap, #nav-countries { padding-left: 24px; padding-right: 24px; }
       #stats { padding: 20px 24px 0; }
       .sep { margin: 20px 24px 0; }
-      #spacer, #country-card, #globe-hint, #nav-countries { display: none; }
+      #spacer, #globe-hint, #nav-countries, #discover-section { display: none; }
       #globe-container { bottom: 48vh; bottom: 48svh; }
     }
   </style>
@@ -526,21 +516,60 @@ const countryList = Object.keys(globeData).sort().map(n => ({
     </div>
 
     <div class="sep"></div>
-    <div id="spacer"></div>
 
-    <!-- Country card -->
-    <div id="country-card">
-      <div id="card-header">
-        <span id="card-flag">🌍</span>
-        <div id="card-info">
-          <div id="card-name">—</div>
-          <div id="card-vibe">—</div>
-        </div>
+    <!-- Discover section -->
+    <div id="discover-section">
+      <div class="discover-label">Explorer</div>
+      <div class="discover-grid">
+        <a href="/fr/best/" class="discover-card">
+          <span class="discover-icon">🏆</span>
+          <div>
+            <div class="discover-card-title">Meilleurs pays</div>
+            <div class="discover-card-sub">Top pays par catégorie</div>
+          </div>
+        </a>
+        <a href="/fr/blog/" class="discover-card">
+          <span class="discover-icon">✍️</span>
+          <div>
+            <div class="discover-card-title">Blog</div>
+            <div class="discover-card-sub">Guides & comparaisons</div>
+          </div>
+        </a>
+        <a href="/fr/for/" class="discover-card">
+          <span class="discover-icon">🎯</span>
+          <div>
+            <div class="discover-card-title">Pour vous</div>
+            <div class="discover-card-sub">Trouvez votre pays idéal</div>
+          </div>
+        </a>
+        <a href="/fr/compare/" class="discover-card">
+          <span class="discover-icon">⚖️</span>
+          <div>
+            <div class="discover-card-title">Comparer</div>
+            <div class="discover-card-sub">Comparaison côte à côte</div>
+          </div>
+        </a>
       </div>
-      <div id="card-fact"></div>
-      <a id="card-link" href="#"> </a>
     </div>
+
+    <div id="spacer"></div>
   </aside>
+
+  <div id="country-card">
+    <div id="card-header">
+      <span id="card-flag">🌍</span>
+      <div id="card-info">
+        <div id="card-name">—</div>
+        <div id="card-vibe">—</div>
+      </div>
+    </div>
+    <div id="card-fact"></div>
+    <a id="card-link" href="#"> </a>
+  </div>
+  <svg id="globe-connector" aria-hidden="true">
+    <line id="connector-line" stroke="rgba(240,165,0,0.45)" stroke-width="1.5" stroke-dasharray="5,3"/>
+    <circle id="connector-dot" r="4" fill="#f0a500"/>
+  </svg>
 
   <!-- Globe hint -->
   <div id="globe-hint">{t.clickToExplore}</div>
@@ -778,6 +807,11 @@ const countryList = Object.keys(globeData).sort().map(n => ({
       var flying    = false;
       var raycaster = new THREE.Raycaster();
       var mouse     = new THREE.Vector2();
+      var currentCentroid = null;
+      var bubbleEl  = document.getElementById('country-card');
+      var svgEl     = document.getElementById('globe-connector');
+      var cLine     = document.getElementById('connector-line');
+      var cDot      = document.getElementById('connector-dot');
 
       /* ── Point-in-polygon ── */
       function ptInRing(lng, lat, ring) {
@@ -965,8 +999,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
 
       /* ── Card update ── */
       function showCard(f, fly) {
-        // On mobile the country card is hidden — skip highlight to avoid orphaned colors on globe
-        if (window.innerWidth > 700) setHighlight(f);
+        setHighlight(f);
         var p = f.properties;
         document.getElementById('card-flag').textContent = p.flag;
         document.getElementById('card-name').textContent = p.name;
@@ -976,6 +1009,7 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         lnk.href        = '/fr/country/' + p.slug;
         lnk.textContent = window._UI.discoverLabel + ' ' + p.name;
         document.getElementById('country-card').classList.add('visible');
+        currentCentroid = centroid(f);
 
         if (fly) {
           var c  = centroid(f);
@@ -1074,6 +1108,27 @@ const countryList = Object.keys(globeData).sort().map(n => ({
         }
 
         renderer.render(scene, camera);
+
+        if (currentCentroid && bubbleEl.classList.contains('visible')) {
+          var lp = ll3(currentCentroid.lat, currentCentroid.lng, 1.002);
+          var wp = lp.clone().applyEuler(globe.rotation);
+          var vis = (wp.y * (-0.25) + wp.z * 3.25) > 1;
+          if (vis) {
+            var ndcV = wp.clone().project(camera);
+            var _r = renderer.domElement.getBoundingClientRect();
+            var sx = (ndcV.x *  0.5 + 0.5) * _r.width  + _r.left;
+            var sy = (-ndcV.y * 0.5 + 0.5) * _r.height + _r.top;
+            cDot.setAttribute('cx', sx); cDot.setAttribute('cy', sy);
+            var bw = 210, bh = 115;
+            var bx = (sx < bw + 50) ? sx + 24 : sx - 24 - bw;
+            var by = Math.max(8, Math.min(_r.height - bh - 8, sy - bh * 0.45));
+            bubbleEl.style.left = bx + 'px'; bubbleEl.style.top = by + 'px';
+            var lx2 = (bx < sx) ? bx + bw : bx; var ly2 = by + bh * 0.42;
+            cLine.setAttribute('x1', sx); cLine.setAttribute('y1', sy);
+            cLine.setAttribute('x2', lx2); cLine.setAttribute('y2', ly2);
+            svgEl.style.display = 'block';
+          } else { svgEl.style.display = 'none'; }
+        }
       }
       animate();
 
@@ -1093,6 +1148,9 @@ const countryList = Object.keys(globeData).sort().map(n => ({
           ));
 
           /* Per-feature: metadata + bbox for click detection */
+          /* ISO numeric → alpha-2 for Intl.DisplayNames translation */
+          var _a2={4:'AF',8:'AL',12:'DZ',24:'AO',32:'AR',36:'AU',40:'AT',31:'AZ',51:'AM',50:'BD',112:'BY',56:'BE',84:'BZ',204:'BJ',64:'BT',68:'BO',70:'BA',72:'BW',76:'BR',96:'BN',100:'BG',116:'KH',120:'CM',132:'CV',140:'CF',144:'LK',152:'CL',156:'CN',170:'CO',188:'CR',191:'HR',192:'CU',196:'CY',203:'CZ',208:'DK',214:'DO',218:'EC',818:'EG',222:'SV',231:'ET',246:'FI',250:'FR',266:'GA',270:'GM',276:'DE',288:'GH',300:'GR',320:'GT',324:'GN',624:'GW',332:'HT',340:'HN',348:'HU',356:'IN',360:'ID',364:'IR',368:'IQ',376:'IL',380:'IT',388:'JM',392:'JP',400:'JO',398:'KZ',404:'KE',408:'KP',414:'KW',417:'KG',418:'LA',422:'LB',426:'LS',430:'LR',434:'LY',440:'LT',442:'LU',450:'MG',454:'MW',458:'MY',462:'MV',484:'MX',496:'MN',504:'MA',508:'MZ',104:'MM',516:'NA',524:'NP',528:'NL',554:'NZ',558:'NI',562:'NE',566:'NG',807:'MK',578:'NO',512:'OM',586:'PK',591:'PA',598:'PG',600:'PY',604:'PE',608:'PH',616:'PL',620:'PT',634:'QA',642:'RO',643:'RU',646:'RW',682:'SA',686:'SN',694:'SL',706:'SO',710:'ZA',728:'SS',724:'ES',729:'SD',740:'SR',752:'SE',756:'CH',760:'SY',762:'TJ',764:'TH',768:'TG',780:'TT',788:'TN',792:'TR',800:'UG',804:'UA',784:'AE',840:'US',858:'UY',860:'UZ',862:'VE',704:'VN',887:'YE',894:'ZM',716:'ZW',304:'GL',158:'TW',275:'PS',732:'EH',90:'SB',548:'VU',242:'FJ',626:'TL',48:'BH',52:'BB',44:'BS',308:'GD',28:'AG',212:'DM',662:'LC',670:'VC',659:'KN',748:'SZ',174:'KM',480:'MU',499:'ME',630:'PR',344:'HK',688:'RS',703:'SK',705:'SI',702:'SG',383:'XK',688:'RS',826:'GB'};
+          var _dn=null; try{_dn=new Intl.DisplayNames(['fr'],{type:'region'});}catch(e){}
           var geojson = topojson.feature(world, world.objects.countries);
           features = geojson.features.map(function(f) {
             var info = idMap[+f.id];
@@ -1110,9 +1168,11 @@ const countryList = Object.keys(globeData).sort().map(n => ({
                 }
               bboxes[f.id] = [x0, y0, x1, y1];
             }
+            var a2=_a2[+f.id]; var localName=info.name;
+            try{if(_dn&&a2){var t=_dn.of(a2);if(t)localName=t;}}catch(e){}
             return Object.assign({}, f, {
               properties: {
-                name: info.name, flag: info.flag || '',
+                name: localName, flag: info.flag || '',
                 slug: gd ? gd.slug : '', vibe: gd ? gd.vibe : '', fact: gd ? gd.fact : ''
               }
             });

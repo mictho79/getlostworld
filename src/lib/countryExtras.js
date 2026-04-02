@@ -20,7 +20,7 @@ export const COUNTRY_REGION = {
   Romania:'Europe', Russia:'Europe', 'San Marino':'Europe', Serbia:'Europe',
   Slovakia:'Europe', Slovenia:'Europe', Spain:'Europe', Sweden:'Europe',
   Switzerland:'Europe', Ukraine:'Europe',
-  England:'Europe', Scotland:'Europe', Wales:'Europe', 'Northern Ireland':'Europe',
+  England:'Europe', Scotland:'Europe', Wales:'Europe', 'Northern Ireland':'Europe', 'Vatican City':'Europe',
   // Asia
   Afghanistan:'Asia', Armenia:'Asia', Azerbaijan:'Asia', Bahrain:'Asia',
   Bangladesh:'Asia', Bhutan:'Asia', Brunei:'Asia', Cambodia:'Asia',
@@ -36,8 +36,7 @@ export const COUNTRY_REGION = {
   'United Arab Emirates':'Asia', Uzbekistan:'Asia', Vietnam:'Asia', Yemen:'Asia',
   // Africa
   Algeria:'Africa', Angola:'Africa', Benin:'Africa', Botswana:'Africa',
-  'Burkina Faso':'Africa', Burundi:'Africa', 'Cabo Verde':'Africa',
-  'Cape Verde':'Africa', Cameroon:'Africa',
+  'Burkina Faso':'Africa', Burundi:'Africa', 'Cape Verde':'Africa', Cameroon:'Africa',
   'Central African Republic':'Africa', Chad:'Africa', Comoros:'Africa',
   "Côte d'Ivoire":'Africa', 'Democratic Republic of the Congo':'Africa',
   Djibouti:'Africa', Egypt:'Africa', 'Equatorial Guinea':'Africa',
@@ -106,7 +105,6 @@ export const COUNTRY_EXTRAS = {
   Burundi:        { climate:'Tropical / Highland', religion:'Roman Catholic (62%)', hdi:'low',    dishes:['Ugali','Isombe','Nyama ya ngombe'], athletes:['Francine Niyonsaba (athletics)'], landlocked:true  },
 
   // ── C ──────────────────────────────────────────────────────────────────
-  'Cabo Verde':   { climate:'Semi-arid / Tropical', religion:'Roman Catholic (77%)', hdi:'medium', dishes:['Cachupa','Caldo de peixe','Buzio'], athletes:['Nélson Évora (triple jump)'], landlocked:false },
   'Cape Verde':   { climate:'Semi-arid / Tropical', religion:'Roman Catholic (77%)', hdi:'medium', dishes:['Cachupa','Caldo de peixe','Buzio'], athletes:['Nélson Évora (triple jump)'], landlocked:false },
   Cambodia:       { climate:'Tropical Monsoon', religion:'Buddhism (97%)', hdi:'medium', dishes:['Fish amok','Bai sach chrouk','Nom banh chok'], athletes:['Sorn Seavmey (taekwondo)'], landlocked:false },
   Cameroon:       { climate:'Tropical / Savanna', religion:'Christianity (70%)', hdi:'medium', dishes:['Ndolé','Koki','Achu'],              athletes:['Samuel Eto\'o','Roger Milla'], landlocked:false },

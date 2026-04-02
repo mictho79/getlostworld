@@ -178,7 +178,7 @@ const T = {
     editTwoPlates:           ' — two plates, two worlds.',
 
     // ── Homepage ──────────────────────────────────────────────────────────────
-    tagline:        'Explore 195 countries \u2014 cultures, landscapes, facts, and comparisons.',
+    tagline:        'Explore 198 countries \u2014 cultures, landscapes, facts, and comparisons.',
     searchCountry:  'Search for a country\u2026',
     exploreTheMap:  'Explore the map',
     statCountries:  'Countries',
@@ -359,7 +359,7 @@ const T = {
     editTwoPlates:           ' — deux assiettes, deux mondes.',
 
     // ── Homepage ──────────────────────────────────────────────────────────────
-    tagline:        'Explorez 195 pays \u2014 cultures, paysages, faits et comparaisons.',
+    tagline:        'Explorez 198 pays \u2014 cultures, paysages, faits et comparaisons.',
     searchCountry:  'Rechercher un pays\u2026',
     exploreTheMap:  'Explorer la carte',
     statCountries:  'Pays',
@@ -540,7 +540,7 @@ const T = {
     editTwoPlates:           ' — dos platos, dos mundos.',
 
     // ── Homepage ──────────────────────────────────────────────────────────────
-    tagline:        'Explora 195 pa\u00edses \u2014 culturas, paisajes, datos y comparaciones.',
+    tagline:        'Explora 198 pa\u00edses \u2014 culturas, paisajes, datos y comparaciones.',
     searchCountry:  'Buscar un pa\u00eds\u2026',
     exploreTheMap:  'Explorar el mapa',
     statCountries:  'Pa\u00edses',
@@ -721,7 +721,7 @@ const T = {
     editTwoPlates:           ' — zwei Teller, zwei Welten.',
 
     // ── Homepage ──────────────────────────────────────────────────────────────
-    tagline:        '195 L\u00e4nder entdecken \u2014 Kulturen, Landschaften, Fakten und Vergleiche.',
+    tagline:        '198 L\u00e4nder entdecken \u2014 Kulturen, Landschaften, Fakten und Vergleiche.',
     searchCountry:  'Land suchen\u2026',
     exploreTheMap:  'Karte erkunden',
     statCountries:  'L\u00e4nder',

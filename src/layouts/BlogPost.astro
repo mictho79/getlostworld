@@ -1,0 +1,318 @@
+---
+import Base from './Base.astro';
+import RelatedArticles from '../components/RelatedArticles.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  cluster: string;
+  countries?: string[];
+  related?: string[];
+  featured?: boolean;
+  lang?: string;
+  slug?: string;
+  allPosts?: any[];
+}
+
+const {
+  title, description, pubDate, updatedDate,
+  cluster, countries = [], related = [], lang = 'en',
+  slug = '', allPosts = [],
+} = Astro.props;
+
+const SITE = 'https://terralenses.com';
+const p    = lang === 'fr' ? '/fr' : lang === 'es' ? '/es' : '';
+const enUrl = `${SITE}/blog/${slug}/`;
+const frUrl = `${SITE}/fr/blog/${slug}/`;
+const esUrl = `${SITE}/es/blog/${slug}/`;
+
+const dateIso     = pubDate.toISOString().slice(0, 10);
+const updatedIso  = updatedDate?.toISOString().slice(0, 10);
+const dateDisplay = pubDate.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+
+const CLUSTER_LABELS: Record<string, string> = {
+  'country-comparisons': 'Country Comparisons',
+  'world-geography':     'World Geography',
+  'travel-planning':     'Travel Planning',
+  'country-deep-dives':  'Country Guides',
+};
+const CLUSTER_COLORS: Record<string, string> = {
+  'country-comparisons': '#5b8fff',
+  'world-geography':     '#ffb74d',
+  'travel-planning':     '#69d89a',
+  'country-deep-dives':  '#ff7043',
+};
+const clusterLabel = CLUSTER_LABELS[cluster] || cluster;
+const clusterColor = CLUSTER_COLORS[cluster] || '#5b8fff';
+
+// Related posts: explicit list first, then same cluster, cap at 3
+const relatedPosts = allPosts
+  .filter((post: any) => post.slug !== slug)
+  .sort((a: any, b: any) => {
+    const aRel = related.includes(a.slug) ? 0 : 1;
+    const bRel = related.includes(b.slug) ? 0 : 1;
+    if (aRel !== bRel) return aRel - bRel;
+    return (b.data.cluster === cluster ? 1 : 0) - (a.data.cluster === cluster ? 1 : 0);
+  })
+  .slice(0, 3);
+
+const canonical = `${SITE}${p}/blog/${slug}/`;
+
+const articleSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": title,
+  "description": description,
+  "datePublished": dateIso,
+  ...(updatedIso ? { "dateModified": updatedIso } : {}),
+  "author": { "@type": "Organization", "name": "TerraLenses", "url": SITE },
+  "publisher": {
+    "@type": "Organization", "name": "TerraLenses", "url": SITE,
+    "logo": { "@type": "ImageObject", "url": `${SITE}/favicon.svg` }
+  },
+  "mainEntityOfPage": { "@type": "WebPage", "@id": canonical },
+});
+
+const breadcrumbSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home",             "item": `${SITE}${p}/` },
+    { "@type": "ListItem", "position": 2, "name": "Blog",             "item": `${SITE}${p}/blog/` },
+    { "@type": "ListItem", "position": 3, "name": clusterLabel,       "item": `${SITE}${p}/blog/?cluster=${cluster}` },
+    { "@type": "ListItem", "position": 4, "name": title,              "item": canonical },
+  ],
+});
+---
+
+<Base
+  title={`${title} | TerraLenses`}
+  description={description}
+  lang={lang}
+  hreflangEn={enUrl}
+  hreflangFr={frUrl}
+  hreflangEs={esUrl}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={articleSchema} />
+    <script type="application/ld+json" set:html={breadcrumbSchema} />
+  </Fragment>
+
+  <main id="main-content">
+    <div class="article-container">
+
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href={`${p}/`}>Home</a>
+        <span aria-hidden="true">›</span>
+        <a href={`${p}/blog/`}>Blog</a>
+        <span aria-hidden="true">›</span>
+        <span>{clusterLabel}</span>
+      </nav>
+
+      <header class="article-header">
+        <span class="cluster-tag" style={`color:${clusterColor};background:${clusterColor}1a;border-color:${clusterColor}40`}>
+          {clusterLabel}
+        </span>
+        <h1>{title}</h1>
+        <p class="article-description">{description}</p>
+        <div class="article-meta">
+          <time datetime={dateIso}>{dateDisplay}</time>
+          {updatedIso && <span class="updated">· Updated {updatedIso}</span>}
+        </div>
+        {countries.length > 0 && (
+          <div class="country-pills">
+            {countries.map(c => (
+              <a href={`${p}/country/${c}/`} class="country-pill">
+                {c.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+              </a>
+            ))}
+          </div>
+        )}
+      </header>
+
+      <hr class="header-divider" />
+
+      <div class="prose">
+        <slot />
+      </div>
+
+      {relatedPosts.length > 0 && (
+        <RelatedArticles posts={relatedPosts} lang={lang} />
+      )}
+
+    </div>
+  </main>
+</Base>
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  .article-container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ── Breadcrumb ── */
+  .breadcrumb {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 24px;
+  }
+  .breadcrumb a {
+    color: rgba(255,255,255,0.45);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .breadcrumb a:hover { color: rgba(255,255,255,0.75); }
+
+  /* ── Header ── */
+  .article-header { margin-bottom: 8px; }
+
+  .cluster-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 1px solid;
+    border-radius: 4px;
+    padding: 3px 10px;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: #f0f4ff;
+    line-height: 1.2;
+    margin: 0 0 14px;
+  }
+
+  .article-description {
+    font-size: 18px;
+    color: rgba(255,255,255,0.58);
+    line-height: 1.6;
+    margin: 0 0 12px;
+  }
+
+  .article-meta {
+    font-size: 13px;
+    color: rgba(255,255,255,0.3);
+  }
+  .updated { opacity: 0.7; }
+
+  .country-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+  }
+  .country-pill {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 4px 12px;
+    text-decoration: none;
+    text-transform: capitalize;
+    transition: background 0.15s;
+  }
+  .country-pill:hover { background: rgba(255,255,255,0.1); }
+
+  .header-divider {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    margin: 28px 0 36px;
+  }
+
+  /* ── Prose ── */
+  .prose {
+    font-size: 17px;
+    color: rgba(255,255,255,0.82);
+    line-height: 1.8;
+  }
+  .prose :global(h2) {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #f0f4ff;
+    margin: 2.5rem 0 1rem;
+    line-height: 1.25;
+  }
+  .prose :global(h3) {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+    margin: 2rem 0 0.75rem;
+  }
+  .prose :global(p) { margin: 0 0 1.2rem; }
+  .prose :global(ul),
+  .prose :global(ol) { padding-left: 1.5rem; margin: 0 0 1.2rem; }
+  .prose :global(li) { margin-bottom: 0.4rem; }
+  .prose :global(strong) { color: #f0f4ff; font-weight: 600; }
+  .prose :global(a) {
+    color: #5b8fff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .prose :global(a:hover) { color: #7aa5ff; }
+
+  .prose :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 15px;
+  }
+  .prose :global(th) {
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.55);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .prose :global(td) {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.75);
+  }
+  .prose :global(tr:last-child td) { border-bottom: none; }
+
+  .prose :global(blockquote) {
+    border-left: 3px solid #5b8fff;
+    margin: 1.5rem 0;
+    padding: 1rem 1.5rem;
+    background: rgba(91,143,255,0.06);
+    border-radius: 0 8px 8px 0;
+    color: rgba(255,255,255,0.75);
+    font-style: italic;
+  }
+
+  .prose :global(code) {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.875em;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+    padding: 2px 6px;
+  }
+
+  .prose :global(hr) {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    margin: 2rem 0;
+  }
+</style>
