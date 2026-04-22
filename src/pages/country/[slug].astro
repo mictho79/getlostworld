@@ -1092,21 +1092,49 @@ const jsonLd = JSON.stringify({
   }
   .cp-mdx :global(h2) {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(1.55rem, 3.2vw, 2rem);
+    font-size: clamp(1.55rem, 3.2vw, 2.05rem);
     font-weight: 700;
-    color: #f0f4ff;
-    line-height: 1.25;
-    margin: 3rem 0 1.1rem;
+    font-style: italic;
+    color: color-mix(in srgb, var(--accent, #5b8fff) 82%, #fff);
+    line-height: 1.22;
+    margin: 3.2rem 0 1.1rem;
     letter-spacing: -0.005em;
+    position: relative;
+    padding-left: 18px;
+  }
+  .cp-mdx :global(h2::before) {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.4em;
+    bottom: 0.35em;
+    width: 3px;
+    background: linear-gradient(
+      180deg,
+      var(--accent, #5b8fff) 0%,
+      color-mix(in srgb, var(--accent, #5b8fff) 30%, transparent) 100%
+    );
+    border-radius: 2px;
   }
   .cp-mdx :global(h2:first-child) { margin-top: 1rem; }
   .cp-mdx :global(h3) {
     font-family: 'DM Sans', sans-serif;
-    font-size: 1.15rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.92);
-    margin: 2rem 0 0.75rem;
-    letter-spacing: 0.005em;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 2.1rem 0 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .cp-mdx :global(h3::after) {
+    content: '';
+    display: inline-block;
+    width: 32px;
+    height: 1px;
+    background: color-mix(in srgb, var(--accent, #5b8fff) 70%, transparent);
+    margin-left: 14px;
+    vertical-align: middle;
+    margin-bottom: 3px;
   }
   .cp-mdx :global(p) { margin: 0 0 1.3rem; }
   .cp-mdx :global(p:first-of-type)::first-letter {
