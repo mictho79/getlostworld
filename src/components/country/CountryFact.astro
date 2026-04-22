@@ -1,0 +1,73 @@
+---
+interface Props {
+  title?: string;
+  source?: string | number;
+}
+const { title, source } = Astro.props;
+---
+<aside class="cf-box">
+  <div class="cf-head">
+    <span class="cf-icon" aria-hidden="true">✦</span>
+    {title && <span class="cf-title">{title}</span>}
+    {source !== undefined && <span class="cf-source">Source {source}</span>}
+  </div>
+  <div class="cf-body">
+    <slot />
+  </div>
+</aside>
+
+<style>
+  .cf-box {
+    margin: 2rem 0;
+    padding: 20px 22px;
+    border: 1px solid color-mix(in srgb, var(--accent, #5b8fff) 22%, transparent);
+    border-left: 3px solid var(--accent, #5b8fff);
+    border-radius: 10px;
+    background:
+      linear-gradient(135deg,
+        color-mix(in srgb, var(--accent, #5b8fff) 7%, transparent) 0%,
+        color-mix(in srgb, var(--accent, #5b8fff) 2%, transparent) 100%),
+      rgba(255, 255, 255, 0.02);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .cf-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .cf-icon {
+    color: var(--accent, #5b8fff);
+    font-size: 18px;
+    line-height: 1;
+  }
+  .cf-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #f0f4ff;
+    letter-spacing: 0.01em;
+    flex: 1 1 auto;
+  }
+  .cf-source {
+    font-size: 10.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: color-mix(in srgb, var(--accent, #5b8fff) 65%, rgba(255,255,255,0.5));
+    padding: 3px 9px;
+    border: 1px solid color-mix(in srgb, var(--accent, #5b8fff) 30%, transparent);
+    border-radius: 12px;
+  }
+  .cf-body {
+    font-size: 15.5px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.75);
+  }
+  .cf-body :global(p) {
+    margin: 0;
+  }
+  .cf-body :global(p + p) {
+    margin-top: 0.8rem;
+  }
+</style>

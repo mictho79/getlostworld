@@ -262,13 +262,8 @@ if (country.area !== '—') {
   }
 }
 
-if (country.currency !== '—') {
-  const tzNote = country.timezone !== '—'
-    ? `${t.econBusiness}${country.timezone}${t.econAligning}`
-    : '';
-  if (tzNote) {
-    insights.push({ icon: '💱', title: t.insightEconomy, text: tzNote.trimStart() });
-  }
+if (ci.economy) {
+  insights.push({ icon: '💱', title: t.insightEconomy, text: ci.economy });
 }
 
 if (ci.food) {

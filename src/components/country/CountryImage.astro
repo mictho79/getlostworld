@@ -1,0 +1,137 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  credit?: string;
+  creditUrl?: string;
+  caption?: string;
+}
+const { src, alt, credit, creditUrl, caption } = Astro.props;
+---
+<figure class="ci-figure">
+  <div class="ci-img-wrap">
+    <img src={src} alt={alt} loading="lazy" decoding="async" />
+    <div class="ci-placeholder" aria-hidden="true">
+      <span class="ci-placeholder-label">📷 {alt.slice(0, 80)}{alt.length > 80 ? '…' : ''}</span>
+    </div>
+  </div>
+  {(caption || credit) && (
+    <figcaption class="ci-caption">
+      {caption && <span class="ci-caption-text">{caption}</span>}
+      {credit && (
+        <span class="ci-credit">
+          {creditUrl
+            ? <a href={creditUrl} rel="noopener noreferrer nofollow" target="_blank">Photo: {credit}</a>
+            : <>Photo: {credit}</>}
+        </span>
+      )}
+    </figcaption>
+  )}
+</figure>
+
+<style>
+  .ci-figure {
+    margin: 2.5rem 0;
+    border-radius: 14px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  .ci-img-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: linear-gradient(135deg,
+      color-mix(in srgb, var(--accent, #5b8fff) 18%, #0d0d10) 0%,
+      color-mix(in srgb, var(--accent, #5b8fff) 6%, #0d0d10) 60%,
+      #0d0d10 100%);
+    overflow: hidden;
+  }
+  .ci-img-wrap img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    z-index: 2;
+  }
+  .ci-img-wrap img[alt]:after,
+  .ci-img-wrap img:not([src]),
+  .ci-img-wrap img[src=""] {
+    content: none;
+  }
+  /* Placeholder shown when image fails to load */
+  .ci-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 1;
+    text-align: center;
+  }
+  .ci-placeholder::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--accent, #5b8fff) 22%, transparent) 0%, transparent 50%),
+      radial-gradient(circle at 70% 80%, color-mix(in srgb, var(--accent, #5b8fff) 14%, transparent) 0%, transparent 55%);
+    pointer-events: none;
+  }
+  .ci-placeholder-label {
+    position: relative;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.02em;
+    max-width: 80%;
+    line-height: 1.5;
+  }
+  /* Hide placeholder when image loaded successfully */
+  .ci-img-wrap img[src]:not([src=""]) ~ .ci-placeholder {
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .ci-caption {
+    display: block;
+    padding: 14px 18px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .ci-caption-text {
+    display: block;
+    font-style: italic;
+  }
+  .ci-credit {
+    display: block;
+    margin-top: 6px;
+    font-size: 11.5px;
+    color: rgba(255, 255, 255, 0.32);
+    letter-spacing: 0.02em;
+  }
+  .ci-credit a {
+    color: rgba(255, 255, 255, 0.45);
+    text-decoration: none;
+  }
+  .ci-credit a:hover { color: rgba(255, 255, 255, 0.75); }
+</style>
+
+<script>
+  // Hide placeholder when real image loads; keep it if image errors
+  document.querySelectorAll('.ci-img-wrap img').forEach(function(img) {
+    const holder = img.parentElement?.querySelector('.ci-placeholder');
+    if (!holder) return;
+    if (img.complete && img.naturalWidth > 0) {
+      holder.style.display = 'none';
+    } else {
+      img.addEventListener('load', function() { holder.style.display = 'none'; });
+      img.addEventListener('error', function() { img.style.display = 'none'; });
+    }
+  });
+</script>
