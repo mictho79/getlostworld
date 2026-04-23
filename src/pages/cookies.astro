@@ -1,0 +1,274 @@
+---
+import Base from '../layouts/Base.astro';
+
+const SITE = 'https://terralenses.com';
+const canonical = `${SITE}/cookies/`;
+---
+<Base
+  title="Cookie Policy — TerraLenses"
+  description="How TerraLenses uses cookies: a single preference cookie for language, and third-party advertising cookies via Google AdSense. GDPR-compliant."
+  lang="en"
+  hreflangEn={canonical}
+>
+  <main id="main-content">
+    <div class="cookies-wrap">
+
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a>
+        <span aria-hidden="true">›</span>
+        <span>Cookie Policy</span>
+      </nav>
+
+      <header class="cookies-header">
+        <p class="cookies-kicker">Cookie Policy</p>
+        <h1 class="cookies-title">How TerraLenses uses cookies</h1>
+        <p class="cookies-lede">Last updated: 23 April 2026</p>
+      </header>
+
+      <hr class="cookies-divider" />
+
+      <section>
+        <h2>What cookies are</h2>
+        <p>
+          Cookies are small text files a website stores in your browser. They remember preferences between visits, track usage patterns, or enable third-party services like advertising. The GDPR and the ePrivacy Directive require EU-facing sites to disclose cookie usage and, in some cases, obtain consent before setting non-essential cookies.
+        </p>
+      </section>
+
+      <section>
+        <h2>Which cookies TerraLenses sets</h2>
+        <p>We use a minimal set of cookies. The full list:</p>
+
+        <div class="cookie-table">
+          <div class="cookie-row cookie-row--header">
+            <div>Name</div><div>Purpose</div><div>Duration</div><div>Type</div>
+          </div>
+          <div class="cookie-row">
+            <div><code>lang-choice</code></div>
+            <div>Remembers your preferred language (EN/FR/ES) between visits, so the site doesn't redirect you repeatedly.</div>
+            <div>Persistent (localStorage)</div>
+            <div>Essential</div>
+          </div>
+          <div class="cookie-row">
+            <div>Google AdSense cookies (<code>IDE</code>, <code>NID</code>, <code>ANID</code>, etc.)</div>
+            <div>Third-party advertising cookies set by Google to serve ads based on your browsing. See Google's ad policy.</div>
+            <div>Up to 2 years</div>
+            <div>Advertising</div>
+          </div>
+          <div class="cookie-row">
+            <div>Plausible Analytics</div>
+            <div>Not a cookie. Plausible is a privacy-friendly analytics tool that collects aggregated usage data without setting any cookies or collecting personal data.</div>
+            <div>—</div>
+            <div>Analytics (no cookie)</div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Third-party advertising — Google AdSense</h2>
+        <p>
+          TerraLenses monetises through <strong>Google AdSense</strong>. Google and its partners may use cookies to serve ads based on your prior visits to this site or other sites. Personalised advertising uses behavioural data; non-personalised advertising uses only context (e.g., the content of the page).
+        </p>
+        <p>
+          You can review or opt out of Google's personalised advertising at any time:
+        </p>
+        <ul class="cookies-list">
+          <li><a href="https://www.google.com/settings/ads" rel="noopener noreferrer" target="_blank">Google Ads Settings</a> — control the ads you see across Google's services.</li>
+          <li><a href="https://www.aboutads.info/choices/" rel="noopener noreferrer" target="_blank">Digital Advertising Alliance (USA)</a> — opt out of third-party interest-based advertising from participating vendors.</li>
+          <li><a href="https://www.youronlinechoices.com/" rel="noopener noreferrer" target="_blank">Your Online Choices (EU)</a> — EU-facing version of the same opt-out framework.</li>
+          <li><a href="https://policies.google.com/technologies/ads" rel="noopener noreferrer" target="_blank">Google's advertising privacy policy</a> — details of what data Google collects and how it is used.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>How to manage cookies yourself</h2>
+        <p>
+          All major browsers let you view, delete, or block cookies. This usually takes a few minutes to set up and can be scoped to specific sites.
+        </p>
+        <ul class="cookies-list">
+          <li><a href="https://support.google.com/chrome/answer/95647" rel="noopener noreferrer" target="_blank">Google Chrome</a></li>
+          <li><a href="https://support.mozilla.org/en-US/kb/cookies-information-websites-store-on-your-computer" rel="noopener noreferrer" target="_blank">Firefox</a></li>
+          <li><a href="https://support.apple.com/guide/safari/manage-cookies-sfri11471/mac" rel="noopener noreferrer" target="_blank">Safari</a></li>
+          <li><a href="https://support.microsoft.com/en-us/windows/manage-cookies-in-microsoft-edge-view-allow-block-delete-and-use-168dab11-0753-043d-7c16-ede5947fc64d" rel="noopener noreferrer" target="_blank">Microsoft Edge</a></li>
+        </ul>
+        <p>
+          Disabling cookies will not prevent you from using TerraLenses — the site functions without any cookie storage. You may, however, see less-relevant advertising if you disable advertising cookies.
+        </p>
+      </section>
+
+      <section>
+        <h2>Consent and children</h2>
+        <p>
+          TerraLenses is intended for a general audience and is not directed at children under 13. We do not knowingly collect personal information from children. If you believe a child has provided us with personal information, please contact us and we will take appropriate steps to delete it.
+        </p>
+        <p>
+          Where required by GDPR, EU-based visitors may see a consent notice before non-essential advertising cookies are set. Non-EU visitors see ads by default, subject to Google's standard advertising policies.
+        </p>
+      </section>
+
+      <section>
+        <h2>Changes to this policy</h2>
+        <p>
+          We may update this cookie policy to reflect changes in our practices or in applicable law. The "last updated" date at the top of the page will always reflect the most recent revision.
+        </p>
+      </section>
+
+      <section>
+        <h2>Contact</h2>
+        <p>
+          Questions about cookies or privacy: <a href="mailto:mic.thomas1334@gmail.com">mic.thomas1334@gmail.com</a>.
+        </p>
+        <p>
+          See also our <a href="/privacy/">privacy policy</a> for a broader overview of data handling at TerraLenses.
+        </p>
+      </section>
+
+    </div>
+  </main>
+</Base>
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  .cookies-wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    font-family: 'DM Sans', sans-serif;
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  .breadcrumb {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.3);
+    margin-bottom: 32px;
+  }
+  .breadcrumb a { color: rgba(255, 255, 255, 0.45); text-decoration: none; }
+  .breadcrumb a:hover { color: rgba(255, 255, 255, 0.75); }
+
+  .cookies-header { margin-bottom: 22px; }
+
+  .cookies-kicker {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #60a5fa;
+    margin: 0 0 18px;
+  }
+
+  .cookies-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4.2vw, 2.6rem);
+    font-weight: 700;
+    color: #f0f4ff;
+    line-height: 1.18;
+    margin: 0 0 14px;
+    letter-spacing: -0.01em;
+  }
+
+  .cookies-lede {
+    font-size: 13.5px;
+    color: rgba(255, 255, 255, 0.4);
+    margin: 0;
+    letter-spacing: 0.02em;
+  }
+
+  .cookies-divider {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+    margin: 28px 0 36px;
+  }
+
+  section { margin-bottom: 36px; }
+
+  section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    font-style: italic;
+    color: color-mix(in srgb, #60a5fa 82%, #fff);
+    line-height: 1.22;
+    margin: 0 0 14px;
+    padding-left: 14px;
+    border-left: 3px solid #60a5fa;
+  }
+
+  section p {
+    font-size: 16px;
+    line-height: 1.75;
+    margin: 0 0 1rem;
+  }
+  section a {
+    color: #60a5fa;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  section strong { color: #f0f4ff; font-weight: 600; }
+  section code {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.88em;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .cookies-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+  }
+  .cookies-list li {
+    position: relative;
+    padding: 7px 0 7px 24px;
+    font-size: 15.5px;
+    line-height: 1.6;
+  }
+  .cookies-list li::before {
+    content: '✦';
+    position: absolute;
+    left: 2px;
+    top: 10px;
+    color: #60a5fa;
+    font-size: 12px;
+  }
+
+  .cookie-table {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 1rem 0 1.3rem;
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .cookie-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 1fr;
+    gap: 14px;
+    padding: 12px 16px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.7);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .cookie-row:last-child { border-bottom: none; }
+  .cookie-row--header {
+    background: rgba(96, 165, 250, 0.07);
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.72);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  @media (max-width: 640px) {
+    .cookie-row { grid-template-columns: 1fr; gap: 4px; }
+    .cookie-row--header { display: none; }
+    .cookie-row div:nth-child(1) { font-weight: 600; color: #f0f4ff; }
+  }
+</style>

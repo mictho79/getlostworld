@@ -1,0 +1,250 @@
+---
+import Base from '../layouts/Base.astro';
+
+const SITE = 'https://terralenses.com';
+const canonical = `${SITE}/methodology/`;
+---
+<Base
+  title="Methodology — How TerraLenses Collects, Verifies, and Updates Country Data"
+  description="Behind-the-scenes: how TerraLenses sources country data, verifies facts, credits primary references, and updates pages. Full transparency on editorial standards."
+  lang="en"
+  hreflangEn={canonical}
+>
+  <main id="main-content">
+    <div class="meth-wrap">
+
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a>
+        <span aria-hidden="true">›</span>
+        <a href="/about/">About</a>
+        <span aria-hidden="true">›</span>
+        <span>Methodology</span>
+      </nav>
+
+      <header class="meth-header">
+        <p class="meth-kicker">Methodology</p>
+        <h1 class="meth-title">How we source, verify, and update the atlas</h1>
+        <p class="meth-lede">
+          TerraLenses covers 198 countries across three languages. That scale makes editorial standards especially important — this page explains where data comes from, how it is verified, and how we handle corrections.
+        </p>
+      </header>
+
+      <hr class="meth-divider" />
+
+      <section>
+        <h2>1. Data sources</h2>
+        <p>
+          Every country page draws on a standard set of <strong>primary and authoritative sources</strong>, supplemented by country-specific references for each flagship page. Statistics, historical claims, and cultural context are cross-checked against at least one authoritative source before publication.
+        </p>
+        <ul class="meth-list">
+          <li><strong>UNESCO World Heritage Centre</strong> — the definitive list of World Heritage Sites, Intangible Cultural Heritage inscriptions, and biosphere reserves, by country.</li>
+          <li><strong>The World Bank Open Data</strong> — GDP, population, sectoral breakdowns, development indicators. All economic figures on country pages use World Bank or national-statistics-office data with the reference year specified.</li>
+          <li><strong>National statistics agencies</strong> — the primary source for population, demographics, and national economic indicators (INSEE for France, IBGE for Brazil, ONS for the UK, Istat for Italy, and dozens of equivalents).</li>
+          <li><strong>Central banks</strong> — for current exchange rates, inflation, and monetary policy context (Banque de France, Federal Reserve, Bank of Japan, and equivalents).</li>
+          <li><strong>Official tourism boards</strong> — the ground truth for tourism statistics, seasonal timings, and practical travel information (Atout France, VisitBritain, Tourism Australia, JNTO, and equivalents).</li>
+          <li><strong>Ministry or agency publications</strong> — for specialised topics (ministries of culture, environment agencies, meteorological services).</li>
+          <li><strong>Encyclopaedia Britannica</strong> — for historical and cultural background, used as a secondary consolidating source rather than primary.</li>
+          <li><strong>The REST Countries API</strong> — for consolidated cross-country data on calling codes, capitals, currencies, borders, and time zones. This data is re-verified against official sources before publication.</li>
+        </ul>
+        <p>
+          For geographic data, we use the <strong>world-atlas topojson</strong> and <strong>OpenStreetMap</strong> datasets. Country shapes, borders, and ISO codes follow ISO 3166-1.
+        </p>
+      </section>
+
+      <section>
+        <h2>2. Fact-checking process</h2>
+        <p>
+          Each flagship country page (the 1,500-2,500 word long-form treatments) goes through the following checks before publication:
+        </p>
+        <ul class="meth-list">
+          <li><strong>Every numerical claim</strong> is traced back to at least one primary source. Statistics include the reference year in the text, not just a footnote.</li>
+          <li><strong>Every historical date</strong> is cross-checked against at least two sources. Where dates are contested (e.g., "Vietnam's reunification" vs "fall of Saigon") we flag the terminology explicitly.</li>
+          <li><strong>Every superlative</strong> ("largest", "oldest", "first") is verified against an authoritative source, and dated where the superlative may change (e.g., "the world's fifth-largest economy by nominal GDP in 2024").</li>
+          <li><strong>Every direct quote and attribution</strong> is verified or removed.</li>
+          <li><strong>Controversial claims</strong> — historical interpretations, territorial disputes, political characterisations — are sourced to specific authoritative bodies rather than presented as undisputed fact.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>3. How pages are dated and updated</h2>
+        <p>
+          Every country page carries a <code>pubDate</code> (publication date) and an <code>updatedDate</code> (most recent revision). Both dates are shown in the page byline.
+        </p>
+        <ul class="meth-list">
+          <li><strong>Economic statistics</strong> are updated annually, using the most recent World Bank or national statistics figures.</li>
+          <li><strong>Political leadership</strong> (heads of state, prime ministers) is updated promptly after elections or changes in government.</li>
+          <li><strong>Tourism numbers</strong> are updated annually from national tourism board data.</li>
+          <li><strong>UNESCO World Heritage inscriptions</strong> are updated after each annual committee session.</li>
+          <li><strong>Travel advisories</strong> — where we mention them — should always be cross-checked against your government's live travel advisory service before booking.</li>
+        </ul>
+        <p>
+          When a significant claim is corrected, we note the correction at the bottom of the page with the date of correction.
+        </p>
+      </section>
+
+      <section>
+        <h2>4. Translation and localisation</h2>
+        <p>
+          TerraLenses publishes in three languages — English, French, and Spanish — with English as the source language. Translations are currently handled through a combination of machine translation and editorial review; the translated versions mirror the structure of the English pages and use locally appropriate conventions (metric units, local number formats, regional terminology).
+        </p>
+        <p>
+          Because the source language is English, the French and Spanish pages may lag the English versions by a short period when a country page is revised. The updated date shown on each localised page reflects its own last revision.
+        </p>
+      </section>
+
+      <section>
+        <h2>5. What AI does (and doesn't do) here</h2>
+        <p>
+          We use AI tools — in particular large language models — for <strong>research synthesis, drafting assistance, and editorial review</strong>. No page on TerraLenses is generated by AI alone and published without human review.
+        </p>
+        <p>
+          The typical flow for a flagship country page: the author identifies the scope and structure, drafts a first version (sometimes with AI assistance for research synthesis), fact-checks against primary sources, edits for tone and accuracy, and publishes. The result is writing that is the author's responsibility — AI is a research assistant, not an author.
+        </p>
+        <p>
+          We will never use AI to fabricate quotes, attribute statements to people who didn't make them, or invent statistics. If AI generates something plausible-sounding that turns out to be wrong, the error is on us for not catching it; please report it.
+        </p>
+      </section>
+
+      <section>
+        <h2>6. Reporting errors</h2>
+        <p>
+          If you find a factual error on the site, please email <a href="mailto:mic.thomas1334@gmail.com">mic.thomas1334@gmail.com</a> or use the <a href="/contact/">contact page</a>. Include:
+        </p>
+        <ul class="meth-list">
+          <li>The URL of the page in question</li>
+          <li>The specific statement that is wrong</li>
+          <li>A source supporting the correction</li>
+        </ul>
+        <p>
+          Corrections are usually made within a few days. Significant corrections are dated at the bottom of the page.
+        </p>
+      </section>
+
+      <section>
+        <h2>7. What we don't do</h2>
+        <ul class="meth-list">
+          <li><strong>No paid placement.</strong> Country rankings, featured destinations, and page prominence are editorial decisions. No one pays to appear on TerraLenses.</li>
+          <li><strong>No affiliate commissions</strong> on hotel bookings, tour operators, or travel products. Advertising on the site is through generic display ads (Google AdSense), not sponsored placement.</li>
+          <li><strong>No undisclosed review copies.</strong> When destinations or services are covered, the coverage is based on publicly available information or personal travel, not sponsored trips.</li>
+          <li><strong>No scraping user data.</strong> See our <a href="/privacy/">privacy policy</a> for details — we use privacy-friendly Plausible analytics (no cookies, no personal data) and do not sell, share, or resell any reader information.</li>
+        </ul>
+      </section>
+
+    </div>
+  </main>
+</Base>
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  .meth-wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    font-family: 'DM Sans', sans-serif;
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  .breadcrumb {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.3);
+    margin-bottom: 32px;
+  }
+  .breadcrumb a { color: rgba(255, 255, 255, 0.45); text-decoration: none; }
+  .breadcrumb a:hover { color: rgba(255, 255, 255, 0.75); }
+
+  .meth-header { margin-bottom: 28px; }
+
+  .meth-kicker {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #60a5fa;
+    margin: 0 0 18px;
+  }
+
+  .meth-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4.2vw, 2.6rem);
+    font-weight: 700;
+    color: #f0f4ff;
+    line-height: 1.18;
+    margin: 0 0 20px;
+    letter-spacing: -0.01em;
+  }
+
+  .meth-lede {
+    font-size: 18px;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+  }
+
+  .meth-divider {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+    margin: 36px 0;
+  }
+
+  section { margin-bottom: 40px; }
+
+  section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+    font-style: italic;
+    color: color-mix(in srgb, #60a5fa 82%, #fff);
+    line-height: 1.22;
+    margin: 0 0 16px;
+    padding-left: 16px;
+    border-left: 3px solid #60a5fa;
+  }
+
+  section p {
+    font-size: 16.5px;
+    line-height: 1.78;
+    margin: 0 0 1.1rem;
+  }
+  section a {
+    color: #60a5fa;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  section strong { color: #f0f4ff; font-weight: 600; }
+  section code {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.88em;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .meth-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.2rem;
+  }
+  .meth-list li {
+    position: relative;
+    padding: 9px 0 9px 26px;
+    font-size: 16px;
+    line-height: 1.7;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .meth-list li:last-child { border-bottom: none; }
+  .meth-list li::before {
+    content: '✦';
+    position: absolute;
+    left: 2px;
+    top: 10px;
+    color: #60a5fa;
+    font-size: 13px;
+  }
+</style>

@@ -1,0 +1,341 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const SITE = 'https://terralenses.com';
+const canonical = `${SITE}/authors/mike/`;
+
+// Load all MDX country pages authored by Mike
+const allCountries = await getCollection('countries');
+const mikeCountries = allCountries
+  .filter((c: any) => c.data.author === 'mike' && c.slug.startsWith('en/'))
+  .sort((a: any, b: any) => a.data.name.localeCompare(b.data.name))
+  .map((c: any) => ({
+    name: c.data.name,
+    slug: c.slug.replace(/^en\//, ''),
+    region: c.data.region,
+    flag: c.data.flagEmoji,
+  }));
+
+// Blog posts are a content collection too
+let mikePosts: any[] = [];
+try {
+  const allPosts = await getCollection('blog');
+  mikePosts = allPosts
+    .sort((a: any, b: any) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+    .map((p: any) => ({
+      title: p.data.title,
+      slug: p.slug,
+      pubDate: p.data.pubDate,
+      description: p.data.description,
+    }));
+} catch { /* blog may not exist */ }
+
+const personSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": canonical,
+  "name": "Mike",
+  "alternateName": "Mike Thomas",
+  "jobTitle": "Travel writer and founder, TerraLenses",
+  "url": canonical,
+  "description": "Travel writer and founder of TerraLenses, an interactive world atlas covering 198 countries. Has visited around 30 countries across five continents.",
+  "worksFor": {
+    "@type": "Organization",
+    "name": "TerraLenses",
+    "url": SITE
+  },
+  "knowsAbout": ["World geography", "Travel writing", "Country research", "Travel photography"]
+});
+---
+<Base
+  title="Mike — Travel Writer and Founder, TerraLenses"
+  description="Mike is the founder of TerraLenses and the author behind its country pages. Travel writer based in France, visited around 30 countries across five continents."
+  lang="en"
+  hreflangEn={canonical}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={personSchema} />
+  </Fragment>
+
+  <main id="main-content">
+    <div class="author-wrap">
+
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a>
+        <span aria-hidden="true">›</span>
+        <a href="/about/">About</a>
+        <span aria-hidden="true">›</span>
+        <span>Mike</span>
+      </nav>
+
+      <header class="author-header">
+        <div class="author-identity">
+          <div class="author-avatar" aria-hidden="true">
+            <span class="author-avatar-initial">M</span>
+          </div>
+          <div class="author-name-block">
+            <p class="author-role">Author & founder</p>
+            <h1 class="author-name">Mike</h1>
+            <p class="author-sub">TerraLenses · Travel writer · France</p>
+          </div>
+        </div>
+      </header>
+
+      <section class="author-bio">
+        <h2>About</h2>
+        <p>
+          I'm a French traveller in my thirties. Over the past fifteen years I've visited roughly <strong>thirty countries</strong> across five continents — long overland trips in Southeast Asia and South America, shorter forays through the Middle East, North Africa, and Europe, and a steady circuit of European destinations closer to home.
+        </p>
+        <p>
+          I started TerraLenses in 2024 because the country reference I wanted didn't exist online — something that would pair decent data with honest long-form writing and actually cover the full world rather than just the Lonely-Planet greatest hits. The site has grown from a handful of pages to a full interactive atlas covering 198 countries, with 20+ "flagship" country profiles written as proper 2,000-word pieces.
+        </p>
+        <p>
+          Writing on TerraLenses is mine; <a href="/methodology/">the methodology page</a> explains how I collect and verify the underlying data. If you find an error or want to suggest a correction, <a href="/contact/">send me an email</a> — I read everything.
+        </p>
+      </section>
+
+      <section class="author-credentials">
+        <h2>Expertise and interests</h2>
+        <ul class="cred-list">
+          <li><strong>Geographic focus:</strong> every continent, with particular depth on Europe (lived), Southeast Asia (extensive travel), and West/North Africa (research focus).</li>
+          <li><strong>Editorial interests:</strong> country-level history and geography, cultural context, food traditions, travel practicalities, comparative geography.</li>
+          <li><strong>Research approach:</strong> primary sources first (UNESCO, World Bank, national statistics agencies), supplemented by reputable editorial sources (Encyclopaedia Britannica, established travel journalism).</li>
+          <li><strong>Tools:</strong> OpenStreetMap and Mapbox for mapping; the Astro framework for the site itself; plain research and writing.</li>
+        </ul>
+      </section>
+
+      {mikeCountries.length > 0 && (
+        <section class="author-works">
+          <h2>Country profiles ({mikeCountries.length})</h2>
+          <p class="works-intro">
+            Enriched long-form country pages I've written or edited. Each is a 1,500-2,500 word piece with sources cited at the bottom.
+          </p>
+          <div class="works-grid">
+            {mikeCountries.map((c: any) => (
+              <a href={`/country/${c.slug}/`} class="work-card">
+                <span class="work-flag">{c.flag || '🌍'}</span>
+                <span class="work-name">{c.name}</span>
+                <span class="work-region">{c.region}</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {mikePosts.length > 0 && (
+        <section class="author-works">
+          <h2>Blog articles</h2>
+          <div class="blog-list">
+            {mikePosts.slice(0, 10).map((p: any) => (
+              <a href={`/blog/${p.slug}/`} class="blog-item">
+                <span class="blog-date">{p.pubDate.toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' })}</span>
+                <span class="blog-title">{p.title}</span>
+                <span class="blog-desc">{p.description}</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section class="author-contact">
+        <h2>Get in touch</h2>
+        <p>
+          Email: <a href="mailto:mic.thomas1334@gmail.com">mic.thomas1334@gmail.com</a><br/>
+          Contact form: <a href="/contact/">/contact</a>
+        </p>
+      </section>
+
+    </div>
+  </main>
+</Base>
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  .author-wrap {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    font-family: 'DM Sans', sans-serif;
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  .breadcrumb {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.3);
+    margin-bottom: 32px;
+  }
+  .breadcrumb a { color: rgba(255, 255, 255, 0.45); text-decoration: none; }
+  .breadcrumb a:hover { color: rgba(255, 255, 255, 0.75); }
+
+  .author-header {
+    margin-bottom: 40px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .author-identity {
+    display: flex;
+    gap: 22px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .author-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, color-mix(in srgb, #60a5fa 28%, transparent) 0%, color-mix(in srgb, #60a5fa 8%, transparent) 100%);
+    border: 1.5px solid color-mix(in srgb, #60a5fa 50%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .author-avatar-initial {
+    font-family: 'Playfair Display', serif;
+    font-size: 44px;
+    font-weight: 700;
+    color: #60a5fa;
+    font-style: italic;
+  }
+
+  .author-role {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #60a5fa;
+    margin: 0 0 6px;
+  }
+  .author-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 4.5vw, 2.8rem);
+    font-weight: 700;
+    color: #f0f4ff;
+    line-height: 1;
+    margin: 0 0 8px;
+  }
+  .author-sub {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+  }
+
+  section { margin-bottom: 40px; }
+
+  section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+    font-style: italic;
+    color: color-mix(in srgb, #60a5fa 82%, #fff);
+    line-height: 1.22;
+    margin: 0 0 16px;
+    padding-left: 16px;
+    border-left: 3px solid #60a5fa;
+  }
+
+  section p {
+    font-size: 16.5px;
+    line-height: 1.78;
+    margin: 0 0 1.1rem;
+  }
+  section a {
+    color: #60a5fa;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  section strong { color: #f0f4ff; font-weight: 600; }
+
+  .cred-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .cred-list li {
+    position: relative;
+    padding: 10px 0 10px 26px;
+    font-size: 16px;
+    line-height: 1.7;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .cred-list li:last-child { border-bottom: none; }
+  .cred-list li::before {
+    content: '✦';
+    position: absolute;
+    left: 2px;
+    top: 11px;
+    color: #60a5fa;
+    font-size: 13px;
+  }
+
+  .works-intro {
+    font-size: 14.5px;
+    color: rgba(255, 255, 255, 0.52);
+    font-style: italic;
+    margin: 0 0 18px;
+  }
+
+  .works-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+  }
+  .work-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-decoration: none;
+    color: #f0f4ff;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .work-card:hover {
+    border-color: color-mix(in srgb, #60a5fa 50%, transparent);
+    background: rgba(96, 165, 250, 0.05);
+  }
+  .work-flag { font-size: 22px; }
+  .work-name { font-size: 15px; font-weight: 600; color: #f0f4ff; }
+  .work-region { font-size: 12px; color: rgba(255, 255, 255, 0.45); }
+
+  .blog-list { display: flex; flex-direction: column; gap: 2px; }
+  .blog-item {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    text-decoration: none;
+    transition: background 0.12s;
+  }
+  .blog-item:hover { background: rgba(255, 255, 255, 0.025); }
+  .blog-date {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.38);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding-top: 2px;
+  }
+  .blog-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #f0f4ff;
+    display: block;
+  }
+  .blog-desc {
+    font-size: 13.5px;
+    color: rgba(255, 255, 255, 0.55);
+    display: block;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+</style>

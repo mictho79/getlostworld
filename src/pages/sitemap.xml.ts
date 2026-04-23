@@ -80,6 +80,11 @@ export const GET: APIRoute = async () => {
     url(base + '/legal/',     '0.3', 'yearly',  base + '/fr/legal/',     base + '/es/legal/'),
     url(base + '/privacy/',   '0.3', 'yearly',  base + '/fr/privacy/',   base + '/es/privacy/'),
     url(base + '/contact/',   '0.3', 'yearly',  base + '/fr/contact/',   base + '/es/contact/'),
+    // ── E-E-A-T pages (EN only for now) ────────────────────
+    url(base + '/about/',          '0.7', 'monthly'),
+    url(base + '/authors/mike/',   '0.6', 'monthly'),
+    url(base + '/methodology/',    '0.5', 'yearly'),
+    url(base + '/cookies/',        '0.3', 'yearly'),
     // ── FR static (alternate, no hreflang duplication) ──────
     url(base + '/fr/',           '0.9', 'weekly'),
     url(base + '/fr/map/',       '0.8', 'weekly'),

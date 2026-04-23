@@ -1,0 +1,255 @@
+---
+import Base from '../layouts/Base.astro';
+
+const SITE = 'https://terralenses.com';
+const canonical = `${SITE}/about/`;
+
+const personSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  "url": canonical,
+  "mainEntity": {
+    "@type": "Person",
+    "name": "Mike",
+    "alternateName": "Mike Thomas",
+    "jobTitle": "Travel writer and founder, TerraLenses",
+    "description": "Founder of TerraLenses, passionate traveller who has visited roughly 30 countries across five continents.",
+    "url": `${SITE}/authors/mike/`,
+    "sameAs": [
+      `${SITE}/`
+    ]
+  }
+});
+---
+<Base
+  title="About TerraLenses — Built by a Traveller, for Travellers"
+  description="TerraLenses is an independent interactive world atlas built by Mike, a traveller who has visited around 30 countries. Here is the full story of what we do, why, and how."
+  lang="en"
+  hreflangEn={canonical}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={personSchema} />
+  </Fragment>
+
+  <main id="main-content">
+    <div class="about-wrap">
+
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a>
+        <span aria-hidden="true">›</span>
+        <span>About</span>
+      </nav>
+
+      <header class="about-header">
+        <p class="about-kicker">About TerraLenses</p>
+        <h1 class="about-title">An atlas built one country at a time</h1>
+        <p class="about-lede">
+          TerraLenses is an independent interactive world atlas, built and maintained by <a href="/authors/mike/">Mike</a> — a traveller who has spent the last fifteen years slowly working his way through the world's countries and wanted a place that could tell their stories with the depth they deserve.
+        </p>
+      </header>
+
+      <hr class="about-divider" />
+
+      <section class="about-section">
+        <h2>Why this site exists</h2>
+        <p>
+          Most country information online is either too shallow (a Wikipedia skim, a listicle, a stock-photo travel site) or too scattered (a UN statistic here, a ministry page there, a travel guide somewhere else). The idea behind TerraLenses was simple: assemble the kind of country profile a curious, culturally engaged traveller would actually want — one that covers the history, the economy, the food, the landscapes, the practical logistics, and the specific cultural layers that make each country distinct — in a format built for both browsing and reading in depth.
+        </p>
+        <p>
+          The site now covers <strong>198 countries</strong> through an interactive 3D globe, a searchable map, structured country pages, side-by-side comparisons, themed rankings, and editorial long-form pages that aim for 1,500-2,500 words of original writing per country. New countries get the enriched treatment progressively; the rest carry a condensed profile and the core facts.
+        </p>
+      </section>
+
+      <section class="about-section">
+        <h2>Who runs it</h2>
+        <p>
+          TerraLenses is an independent one-person project. I'm <strong>Mike</strong> — a French traveller in my thirties who has visited roughly thirty countries across five continents (Europe, Asia, the Americas, Africa, Oceania). My interest in places started early and got serious during long backpacking trips through Southeast Asia, Latin America, and Africa; TerraLenses grew out of the notes, photographs, and maps I kept accumulating.
+        </p>
+        <p>
+          The writing on country pages is mine, fact-checked against authoritative sources (UNESCO, World Bank, national statistics agencies, tourism authorities, Encyclopaedia Britannica). Every country page lists its references at the bottom so readers can follow up in the original sources.
+        </p>
+        <p>
+          You can read more about my background on the <a href="/authors/mike/">author page</a>, see how country data is collected and verified on the <a href="/methodology/">methodology page</a>, or reach me directly through the <a href="/contact/">contact page</a>.
+        </p>
+      </section>
+
+      <section class="about-section">
+        <h2>What TerraLenses is <em>not</em></h2>
+        <ul class="about-list">
+          <li><strong>Not a booking site.</strong> We don't sell flights, hotels, or tours, and we don't take commissions from travel operators. What you read is editorial, not sales.</li>
+          <li><strong>Not a listicle farm.</strong> No "23 jaw-dropping places" clickbait. Country pages are written as coherent pieces, with real sections and real sources.</li>
+          <li><strong>Not a replacement for government travel advice.</strong> For current safety, visa, and entry information, always check your government's official travel advisory before booking — we try to flag known risks but cannot replace live advisory services.</li>
+          <li><strong>Not infallible.</strong> If you spot an error — a wrong statistic, an outdated fact, a disputed historical claim — please <a href="/contact/">get in touch</a>. Corrections are made quickly and dated.</li>
+        </ul>
+      </section>
+
+      <section class="about-section">
+        <h2>How the site is funded</h2>
+        <p>
+          TerraLenses is supported by <strong>display advertising</strong> (through Google AdSense). We do not run sponsored country pages, affiliate commissions on hotel bookings, or paid placements in rankings. Any product or destination appearing on the site is there because it belongs there editorially, not because someone paid for it to be there.
+        </p>
+        <p>
+          Readers who want to help can do the simplest things: share a page they enjoyed, turn off ad-blockers for the site, or send feedback that helps us improve a page.
+        </p>
+      </section>
+
+      <section class="about-section">
+        <h2>Editorial standards</h2>
+        <ul class="about-list">
+          <li><strong>Sources.</strong> Every long-form country page cites its references at the bottom. We prioritise primary sources (UNESCO, national statistics offices, central banks, official tourism boards) and academic or established editorial sources (Encyclopaedia Britannica, World Bank) over secondary travel blogs.</li>
+          <li><strong>Dates.</strong> Each country page carries a publication date and an updated date. Statistics are tagged with the year the data reflects.</li>
+          <li><strong>Corrections.</strong> Factual errors are corrected openly — if a significant correction changes the meaning of a page, we note it at the bottom of the page.</li>
+          <li><strong>AI.</strong> Writing on TerraLenses is drafted by a human, checked against sources, and reviewed before publication. We use AI tools for research assistance and drafting support but treat generated text as a starting point, not a final product.</li>
+          <li><strong>Tone.</strong> We try to avoid the two dominant failure modes of travel writing — the breathless ("a magical paradise") and the generic ("a diverse range of experiences"). If a statement wouldn't survive scrutiny from a well-informed local, it doesn't belong on the page.</li>
+        </ul>
+      </section>
+
+      <section class="about-section">
+        <h2>Contact and feedback</h2>
+        <p>
+          Best way to reach us is by email at <a href="mailto:mic.thomas1334@gmail.com">mic.thomas1334@gmail.com</a>, or through the <a href="/contact/">contact page</a>. I read everything; I don't always respond quickly, but I try to respond to everything substantive.
+        </p>
+        <p class="about-signature">
+          — Mike<br/>
+          <span class="about-sig-detail">TerraLenses, 2026</span>
+        </p>
+      </section>
+
+    </div>
+  </main>
+</Base>
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  .about-wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    font-family: 'DM Sans', sans-serif;
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  .breadcrumb {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.3);
+    margin-bottom: 32px;
+  }
+  .breadcrumb a {
+    color: rgba(255, 255, 255, 0.45);
+    text-decoration: none;
+  }
+  .breadcrumb a:hover { color: rgba(255, 255, 255, 0.75); }
+
+  .about-header { margin-bottom: 28px; }
+
+  .about-kicker {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #60a5fa;
+    margin: 0 0 18px;
+  }
+
+  .about-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4.2vw, 2.8rem);
+    font-weight: 700;
+    color: #f0f4ff;
+    line-height: 1.15;
+    margin: 0 0 22px;
+    letter-spacing: -0.01em;
+  }
+
+  .about-lede {
+    font-size: 18.5px;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.72);
+    margin: 0;
+  }
+
+  .about-divider {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+    margin: 40px 0;
+  }
+
+  .about-section { margin-bottom: 44px; }
+
+  .about-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    font-style: italic;
+    color: color-mix(in srgb, #60a5fa 82%, #fff);
+    line-height: 1.2;
+    margin: 0 0 16px;
+    padding-left: 16px;
+    border-left: 3px solid #60a5fa;
+  }
+
+  .about-section p {
+    font-size: 17px;
+    line-height: 1.78;
+    margin: 0 0 1.2rem;
+  }
+
+  .about-section p:last-child { margin-bottom: 0; }
+
+  .about-section a {
+    color: #60a5fa;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: color-mix(in srgb, #60a5fa 50%, transparent);
+  }
+  .about-section a:hover {
+    text-decoration-color: #60a5fa;
+  }
+
+  .about-section strong { color: #f0f4ff; font-weight: 600; }
+  .about-section em { color: rgba(255, 255, 255, 0.92); }
+
+  .about-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .about-list li {
+    position: relative;
+    padding: 12px 0 12px 28px;
+    font-size: 17px;
+    line-height: 1.7;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .about-list li:last-child { border-bottom: none; }
+  .about-list li::before {
+    content: '✦';
+    position: absolute;
+    left: 4px;
+    top: 14px;
+    color: #60a5fa;
+    font-size: 13px;
+  }
+
+  .about-signature {
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 16px;
+    line-height: 1.6;
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .about-sig-detail {
+    font-style: normal;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: 0.04em;
+  }
+</style>
