@@ -3,18 +3,20 @@ import { getCollection } from 'astro:content';
 import BlogPost from '../../layouts/BlogPost.astro';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
-  const allPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
-  return posts.map(post => ({
-    params: { slug: post.slug },
+  const allBlog = await getCollection('blog');
+  const posts = allBlog.filter((p: any) => p.slug.startsWith('en/'));
+  const allPosts = posts.sort((a: any, b: any) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  return posts.map((post: any) => ({
+    params: { slug: post.slug.replace(/^en\//, '') },
     props:  { post, allPosts },
   }));
 }
 
-const { post, allPosts } = Astro.props;
+const { post, allPosts } = Astro.props as any;
 const { Content } = await post.render();
+const cleanSlug = post.slug.replace(/^en\//, '');
 ---
 
-<BlogPost {...post.data} slug={post.slug} allPosts={allPosts} lang="en">
+<BlogPost {...post.data} slug={cleanSlug} allPosts={allPosts} lang="en">
   <Content />
 </BlogPost>

@@ -10,7 +10,9 @@ const frUrl = `${SITE}/fr/blog/`;
 const esUrl = `${SITE}/es/blog/`;
 
 const allPosts = (await getCollection('blog'))
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  .filter((p: any) => p.slug.startsWith('en/'))
+  .map((p: any) => ({ ...p, slug: p.slug.replace(/^en\//, '') }))
+  .sort((a: any, b: any) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 const CLUSTER_LABELS: Record<string, string> = {
   'country-comparisons': 'Country Comparisons',
