@@ -12,7 +12,12 @@ const { src, alt, credit, creditUrl, caption } = Astro.props;
   <div class="ci-img-wrap">
     <img src={src} alt={alt} loading="lazy" decoding="async" />
     <div class="ci-placeholder" aria-hidden="true">
-      <span class="ci-placeholder-label">📷 {alt.slice(0, 80)}{alt.length > 80 ? '…' : ''}</span>
+      <svg class="ci-placeholder-icon" viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <circle cx="8.5" cy="8.5" r="1.5" />
+        <path d="M21 15l-5-5L5 21" />
+      </svg>
+      <span class="ci-placeholder-label">{alt}</span>
     </div>
   </div>
   {(caption || credit) && (
@@ -66,11 +71,18 @@ const { src, alt, credit, creditUrl, caption } = Astro.props;
     position: absolute;
     inset: 0;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 14px;
     padding: 24px;
     z-index: 1;
     text-align: center;
+  }
+  .ci-placeholder-icon {
+    color: color-mix(in srgb, var(--accent, #5b8fff) 55%, rgba(255,255,255,0.25));
+    opacity: 0.7;
+    position: relative;
   }
   .ci-placeholder::before {
     content: '';
@@ -90,11 +102,10 @@ const { src, alt, credit, creditUrl, caption } = Astro.props;
     max-width: 80%;
     line-height: 1.5;
   }
-  /* Hide placeholder when image loaded successfully */
-  .ci-img-wrap img[src]:not([src=""]) ~ .ci-placeholder {
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
+  /* Placeholder visible by default; JS hides it only once the real image has successfully loaded. */
+  .ci-placeholder { transition: opacity 0.2s; }
+  .ci-img-wrap.ci-loaded .ci-placeholder { opacity: 0; pointer-events: none; }
+  .ci-img-wrap.ci-errored img { display: none; }
 
   .ci-caption {
     display: block;
@@ -123,15 +134,15 @@ const { src, alt, credit, creditUrl, caption } = Astro.props;
 </style>
 
 <script>
-  // Hide placeholder when real image loads; keep it if image errors
-  document.querySelectorAll('.ci-img-wrap img').forEach(function(img) {
-    const holder = img.parentElement?.querySelector('.ci-placeholder');
-    if (!holder) return;
+  // Toggle ci-loaded / ci-errored on the wrapper so CSS can show/hide placeholder.
+  document.querySelectorAll('.ci-img-wrap').forEach(function(wrap) {
+    const img = wrap.querySelector('img');
+    if (!img) return;
     if (img.complete && img.naturalWidth > 0) {
-      holder.style.display = 'none';
+      wrap.classList.add('ci-loaded');
     } else {
-      img.addEventListener('load', function() { holder.style.display = 'none'; });
-      img.addEventListener('error', function() { img.style.display = 'none'; });
+      img.addEventListener('load',  function() { wrap.classList.add('ci-loaded'); });
+      img.addEventListener('error', function() { wrap.classList.add('ci-errored'); });
     }
   });
 </script>
