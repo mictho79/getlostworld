@@ -1,10 +1,18 @@
 ---
 import Base from '../../../layouts/Base.astro';
 import { COUNTRY_DATA as DATA_EN, COUNTRY_VIBES as VIBES_EN, COUNTRY_PEAKS, COUNTRY_DISHES, COUNTRY_CITIES, COUNTRY_INSIGHTS as INSIGHTS_EN, slugify } from '../../../lib/countryData.js';
+import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
   return Object.keys(VIBES_EN as any).map(name => ({ params: { slug: slugify(name) } }));
 }
+
+// ─── Try to load enriched MDX content for this country (FR) ────────────────
+const targetSlug = Astro.params.slug;
+const allCountryEntries = await getCollection('countries');
+const mdxEntry = allCountryEntries.find((e: any) => e.slug === `fr/${targetSlug}`);
+const Content = mdxEntry ? (await mdxEntry.render()).Content : null;
+const mdxData = mdxEntry?.data as any;
 import { COUNTRY_CCN3 } from '../../../lib/countryCodes.js';
 import { TRAVEL_ADVISORY } from '../../../lib/travelScores.js';
 import { geojsonToSvgPath } from '../../../lib/geojsonSvg.js';
@@ -391,50 +399,77 @@ const jsonLd = JSON.stringify({
       </button>
     </div>
 
-    <!-- Did you know -->
-    {country.fact && (
-      <section class="cp-section">
-        <h2 class="cp-section-label">{t.didYouKnow}</h2>
-        <blockquote class="cp-fact">{country.fact}</blockquote>
-      </section>
-    )}
+    {Content ? (
+      <>
+        <div class="cp-byline">
+          <span class="cp-byline-author">Par <a href="/authors/mike/">Mike</a></span>
+          <span class="cp-byline-sep">·</span>
+          <time datetime={mdxData?.updatedDate?.toISOString().slice(0,10) ?? mdxData?.pubDate?.toISOString().slice(0,10)}>
+            Mis à jour le {(mdxData?.updatedDate ?? mdxData?.pubDate)?.toLocaleDateString('fr-FR', { year:'numeric', month:'long', day:'numeric' })}
+          </time>
+        </div>
+        <article class="cp-mdx">
+          <Content />
+        </article>
+        {mdxData?.sources?.length > 0 && (
+          <section class="cp-sources">
+            <h2 class="cp-section-label">Sources et références</h2>
+            <ol class="cp-sources-list">
+              {mdxData.sources.map((s: any) => (
+                <li><a href={s.url} rel="noopener noreferrer nofollow" target="_blank">{s.label}</a></li>
+              ))}
+            </ol>
+          </section>
+        )}
+      </>
+    ) : (
+      <>
+        <!-- Did you know -->
+        {country.fact && (
+          <section class="cp-section">
+            <h2 class="cp-section-label">{t.didYouKnow}</h2>
+            <blockquote class="cp-fact">{country.fact}</blockquote>
+          </section>
+        )}
 
-    <!-- SEO Insight paragraphs -->
-    {insights.length > 0 && (
-      <section class="cp-section">
-        <h2 class="cp-section-label">{t.exploreSection} {withArticleFR(country.name, nameFR)}</h2>
-        <div class="cp-insights">
-          {insights.map(ins => (
-            <div class="cp-insight">
-              <div class="cp-insight-head">
-                <span class="cp-insight-icon">{ins.icon}</span>
-                <h3 class="cp-insight-title">{ins.title}</h3>
+        <!-- SEO Insight paragraphs -->
+        {insights.length > 0 && (
+          <section class="cp-section">
+            <h2 class="cp-section-label">{t.exploreSection} {withArticleFR(country.name, nameFR)}</h2>
+            <div class="cp-insights">
+              {insights.map(ins => (
+                <div class="cp-insight">
+                  <div class="cp-insight-head">
+                    <span class="cp-insight-icon">{ins.icon}</span>
+                    <h3 class="cp-insight-title">{ins.title}</h3>
+                  </div>
+                  <p class="cp-insight-text">{ins.text}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <!-- Cities -->
+        {country.cities.length > 0 && (
+          <section class="cp-section">
+            <h2 class="cp-section-label">{t.majorCities}</h2>
+            <div class="cp-cities">
+              <div class="cp-city cp-city--capital">
+                <span class="cp-city-dot cp-city-dot--capital"></span>
+                <span class="cp-city-name">{country.capital}</span>
+                <span class="cp-city-tag">{t.capitalTag}</span>
               </div>
-              <p class="cp-insight-text">{ins.text}</p>
+              {country.cities.map((city: {name:string}) => (
+                <div class="cp-city">
+                  <span class="cp-city-dot"></span>
+                  <span class="cp-city-name">{city.name}</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
-    )}
-
-    <!-- Cities -->
-    {country.cities.length > 0 && (
-      <section class="cp-section">
-        <h2 class="cp-section-label">{t.majorCities}</h2>
-        <div class="cp-cities">
-          <div class="cp-city cp-city--capital">
-            <span class="cp-city-dot cp-city-dot--capital"></span>
-            <span class="cp-city-name">{country.capital}</span>
-            <span class="cp-city-tag">{t.capitalTag}</span>
-          </div>
-          {country.cities.map(city => (
-            <div class="cp-city">
-              <span class="cp-city-dot"></span>
-              <span class="cp-city-name">{city.name}</span>
-            </div>
-          ))}
-        </div>
-      </section>
+          </section>
+        )}
+      </>
     )}
 
     <!-- Neighbouring countries -->
@@ -1048,6 +1083,90 @@ const jsonLd = JSON.stringify({
   .cp-modal-dropdown .ac-option.ac-option--active {
     background: rgba(255,255,255,0.07);
     color: rgba(255,255,255,0.95);
+  }
+
+  /* MDX enriched country page (FR) */
+  .cp-byline {
+    max-width: 780px; margin: 0 auto 20px; font-family: 'DM Sans', sans-serif;
+    font-size: 13px; color: rgba(255,255,255,0.38);
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .cp-byline-author a {
+    color: rgba(255,255,255,0.72); text-decoration: none; font-weight: 500;
+    border-bottom: 1px solid color-mix(in srgb, var(--accent, #5b8fff) 50%, transparent);
+    padding-bottom: 1px;
+  }
+  .cp-byline-author a:hover { color: var(--accent, #5b8fff); }
+  .cp-byline-sep { color: rgba(255,255,255,0.2); }
+  .cp-mdx {
+    max-width: 780px; margin: 0 auto;
+    font-family: 'DM Sans', sans-serif; font-size: 17px; line-height: 1.82;
+    color: rgba(255,255,255,0.8); position: relative; z-index: 2;
+  }
+  .cp-mdx :global(h2) {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.55rem, 3.2vw, 2.05rem);
+    font-weight: 700; font-style: italic;
+    color: color-mix(in srgb, var(--accent, #5b8fff) 82%, #fff);
+    line-height: 1.22; margin: 3.2rem 0 1.1rem;
+    letter-spacing: -0.005em; position: relative; padding-left: 18px;
+  }
+  .cp-mdx :global(h2::before) {
+    content: ''; position: absolute; left: 0; top: 0.4em; bottom: 0.35em;
+    width: 3px;
+    background: linear-gradient(180deg, var(--accent, #5b8fff) 0%, color-mix(in srgb, var(--accent, #5b8fff) 30%, transparent) 100%);
+    border-radius: 2px;
+  }
+  .cp-mdx :global(h2:first-child) { margin-top: 1rem; }
+  .cp-mdx :global(h3) {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem; font-weight: 700; color: #ffffff;
+    margin: 2.1rem 0 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .cp-mdx :global(h3::after) {
+    content: ''; display: inline-block; width: 32px; height: 1px;
+    background: color-mix(in srgb, var(--accent, #5b8fff) 70%, transparent);
+    margin-left: 14px; vertical-align: middle; margin-bottom: 3px;
+  }
+  .cp-mdx :global(p) { margin: 0 0 1.3rem; }
+  .cp-mdx :global(strong) { color: #f0f4ff; font-weight: 600; }
+  .cp-mdx :global(em) { color: rgba(255,255,255,0.92); }
+  .cp-mdx :global(a) {
+    color: var(--accent, #5b8fff);
+    text-decoration: underline; text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+    text-decoration-color: color-mix(in srgb, var(--accent, #5b8fff) 50%, transparent);
+  }
+  .cp-mdx :global(a:hover) { text-decoration-color: var(--accent, #5b8fff); }
+  .cp-mdx :global(ul), .cp-mdx :global(ol) { padding-left: 1.5rem; margin: 0 0 1.3rem; }
+  .cp-mdx :global(li) { margin-bottom: 0.55rem; }
+  .cp-mdx :global(li::marker) { color: var(--accent, #5b8fff); }
+  .cp-mdx :global(sup) { font-size: 0.72em; color: var(--accent, #5b8fff); font-weight: 600; }
+  .cp-mdx :global(blockquote) {
+    border-left: 2px solid color-mix(in srgb, var(--accent, #5b8fff) 60%, transparent);
+    margin: 1.6rem 0; padding: 0.2rem 1.3rem;
+    color: rgba(255,255,255,0.7); font-style: italic;
+  }
+  .cp-sources {
+    max-width: 780px; margin: 3rem auto 0; padding-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.08); position: relative; z-index: 2;
+  }
+  .cp-sources .cp-section-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: rgba(255,255,255,0.45); margin-bottom: 1rem;
+  }
+  .cp-sources-list {
+    list-style: decimal; padding-left: 1.5rem;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; line-height: 1.7;
+    color: rgba(255,255,255,0.55);
+  }
+  .cp-sources-list li { margin-bottom: 0.45rem; }
+  .cp-sources-list a {
+    color: rgba(255,255,255,0.72); text-decoration: none;
+    border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 1px;
+  }
+  .cp-sources-list a:hover {
+    color: var(--accent, #5b8fff); border-bottom-color: var(--accent, #5b8fff);
   }
 </style>
 
