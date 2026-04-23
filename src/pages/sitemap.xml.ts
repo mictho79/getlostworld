@@ -46,7 +46,7 @@ export const GET: APIRoute = async () => {
     ['germany', 'italy'],
     ['spain', 'italy'],
     ['portugal', 'spain'],
-    ['united-kingdom', 'france'],
+    ['england', 'france'],
     ['netherlands', 'belgium'],
     // Americas
     ['united-states-of-america', 'canada'],
@@ -62,7 +62,7 @@ export const GET: APIRoute = async () => {
     // Cross-continent popular
     ['france', 'japan'],
     ['germany', 'japan'],
-    ['united-states-of-america', 'united-kingdom'],
+    ['united-states-of-america', 'england'],
     ['australia', 'new-zealand'],
     ['canada', 'australia'],
     // Africa
