@@ -178,7 +178,7 @@ const T = {
     editTwoPlates:           ' — two plates, two worlds.',
 
     // ── Homepage ──────────────────────────────────────────────────────────────
-    tagline:        'Explore 198 countries \u2014 cultures, landscapes, facts, and comparisons.',
+    tagline:        'Explore 203 countries \u2014 cultures, landscapes, facts, and comparisons.',
     searchCountry:  'Search for a country\u2026',
     exploreTheMap:  'Explore the map',
     statCountries:  'Countries',
@@ -359,7 +359,7 @@ const T = {
     editTwoPlates:           ' — deux assiettes, deux mondes.',
 
     // ── Homepage ──────────────────────────────────────────────────────────────
-    tagline:        'Explorez 198 pays \u2014 cultures, paysages, faits et comparaisons.',
+    tagline:        'Explorez 203 pays \u2014 cultures, paysages, faits et comparaisons.',
     searchCountry:  'Rechercher un pays\u2026',
     exploreTheMap:  'Explorer la carte',
     statCountries:  'Pays',

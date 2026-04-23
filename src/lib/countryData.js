@@ -164,6 +164,11 @@ export const COUNTRY_VIBES = {
   "Andorra":"Alpine · Tiny · Duty-free",
   "Antigua and Barbuda":"Beaches · Sailing · Colonial",
   "Vatican City":"Sacred · Tiny · Papal",
+  "Grenada":"Spice · Nutmeg · Volcanic",
+  "Saint Kitts and Nevis":"Smallest · Historic · Twin-island",
+  "Saint Vincent and the Grenadines":"Sailing · Volcanic · Cinematic",
+  "Dominica":"Wild · Volcanic · Rainforest",
+  "Mali":"Sahelian · Ancient · Musical",
 };
 
 export const COUNTRY_DATA = {
@@ -365,6 +370,11 @@ export const COUNTRY_DATA = {
   "Antigua and Barbuda":{ flag:"🇦🇬", capital:"Saint John's", population:"97,000", language:"English", sport:"Cricket", fact:"Antigua and Barbuda has 365 beaches — one for every day of the year — and the natural harbour of English Harbour sheltered Nelson's Dockyard, the only working Georgian dockyard in the world, where Admiral Horatio Nelson was once stationed." },
   "Palau":{ flag:"🇵🇼", capital:"Ngerulmud", population:"18,000", language:"Palauan, English", sport:"Fishing / Diving", fact:"Palau created the world's first shark sanctuary in 2009, banning all commercial shark fishing across its 600,000 km² of ocean — the country's underwater ecosystem is considered one of the seven underwater wonders of the world." },
   "Vatican City":{ flag:"🇻🇦", capital:"Vatican City", population:"~800", language:"Latin, Italian", sport:"Football", fact:"Vatican City is the world's smallest internationally recognised state at 0.44 km² — it has its own newspaper, radio station, television channel, postal service and is the only country with Latin as an official language." },
+  "Grenada":{ flag:"🇬🇩", capital:"Saint George's", population:"118,000", language:"English", sport:"Cricket", fact:"Grenada produces roughly 20% of the world's nutmeg — the spice is so central to the economy that it features on the national flag, the only country to picture a food on its flag." },
+  "Saint Kitts and Nevis":{ flag:"🇰🇳", capital:"Basseterre", population:"55,000", language:"English", sport:"Cricket", fact:"Saint Kitts and Nevis is the smallest sovereign country in the Americas at 261 km² — and Nevis was the birthplace of Alexander Hamilton, the US founding father, in 1755 or 1757." },
+  "Saint Vincent and the Grenadines":{ flag:"🇻🇨", capital:"Kingstown", population:"100,000", language:"English", sport:"Cricket", fact:"The first Pirates of the Caribbean film was largely shot in Saint Vincent — the Wallilabou Bay set is preserved as a tourist attraction, and the Grenadine island of Mustique has long been a celebrity retreat." },
+  "Dominica":{ flag:"🇩🇲", capital:"Roseau", population:"73,000", language:"English", sport:"Cricket", fact:"Dominica is marketed as 'The Nature Island of the Caribbean' — home to the Boiling Lake (world's 2nd-largest hot spring), 365 rivers, and the Kalinago, the Caribbean's last surviving Indigenous community." },
+  "Mali":{ flag:"🇲🇱", capital:"Bamako", population:"23M", language:"Bambara, French", sport:"Football", fact:"The Great Mosque of Djenné in Mali is the world's largest mud-brick building — rebuilt every year by the community after the rainy season in a unique communal plastering festival." },
 };
 
 // ─── Major cities per country (non-capital) ─────────────────────────────────

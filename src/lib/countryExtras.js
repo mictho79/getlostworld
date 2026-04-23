@@ -69,6 +69,16 @@ export const COUNTRY_REGION = {
   'New Zealand':'Oceania', Palau:'Oceania', 'Papua New Guinea':'Oceania',
   Samoa:'Oceania', 'Solomon Islands':'Oceania', Tonga:'Oceania',
   Tuvalu:'Oceania', Vanuatu:'Oceania',
+  // Additional Caribbean countries
+  Grenada:'Americas', 'Saint Kitts and Nevis':'Americas',
+  'Saint Vincent and the Grenadines':'Americas',
+  'Puerto Rico':'Americas', Dominica:'Americas',
+  // Additional Africa countries
+  Mali:'Africa',
+  // UK constituent nations and other territories
+  Scotland:'Europe', Wales:'Europe', 'Northern Ireland':'Europe',
+  Greenland:'Europe',
+  'Hong Kong':'Asia', Taiwan:'Asia', Palestine:'Asia',
 };
 
 export const COUNTRY_EXTRAS = {
