@@ -1,3 +1,6 @@
+import { COMPARE_EDITORIAL_FR } from './compareEditorialFr.js';
+import { COMPARE_EDITORIAL_ES } from './compareEditorialEs.js';
+
 /**
  * Editorial content for the most-searched country pairs.
  * Key format: slugs sorted alphabetically joined by "-vs-"
@@ -573,16 +576,28 @@ export const COMPARE_EDITORIAL = {
   },
 };
 
+const EDITORIAL_BY_LANG = {
+  en: COMPARE_EDITORIAL,
+  fr: COMPARE_EDITORIAL_FR,
+  es: COMPARE_EDITORIAL_ES,
+};
+
 /**
- * Returns editorial data for a given slug pair, trying both orderings.
+ * Returns editorial data for a given slug pair in the requested language,
+ * trying both orderings. Falls back to EN if the translation is missing.
  */
-export function getEditorial(slugA, slugB) {
+export function getEditorial(slugA, slugB, lang = 'en') {
+  const table = EDITORIAL_BY_LANG[lang] || COMPARE_EDITORIAL;
   const key1 = `${slugA}-vs-${slugB}`;
   const key2 = `${slugB}-vs-${slugA}`;
-  const data = COMPARE_EDITORIAL[key1] || COMPARE_EDITORIAL[key2];
+  // Try translated table first, then fall back to EN so pages never break.
+  const data =
+    table[key1] || table[key2] ||
+    COMPARE_EDITORIAL[key1] || COMPARE_EDITORIAL[key2];
   if (!data) return null;
-  // If reversed, swap A/B in whichToVisit
-  if (COMPARE_EDITORIAL[key2] && !COMPARE_EDITORIAL[key1]) {
+  const usedKey2 =
+    !table[key1] && (table[key2] || (!table[key1] && COMPARE_EDITORIAL[key2]));
+  if (usedKey2) {
     return {
       ...data,
       whichToVisit: { a: data.whichToVisit.b, b: data.whichToVisit.a },

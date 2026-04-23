@@ -1,3 +1,7 @@
+# Canonical domain — 301 everything from the Pages preview URL to the custom domain
+# to avoid duplicate-content indexing. :splat preserves the full path.
+https://getlostworld.pages.dev/*    https://terralenses.com/:splat    301
+
 /country/united-states/    /country/united-states-of-america/    301
 /country/usa/              /country/united-states-of-america/    301
 /country/uk/               /country/england/                     301

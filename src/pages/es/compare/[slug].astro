@@ -81,7 +81,7 @@ const countryA = findCountry(slugA);
 const countryB = findCountry(slugB);
 if (!countryA || !countryB) return Astro.redirect('/es/');
 
-const editorialData = getEditorial(slugA, slugB);
+const editorialData = getEditorial(slugA, slugB, 'es');
 
 const ciA = countryA.insights as Record<string,string>;
 const ciB = countryB.insights as Record<string,string>;
