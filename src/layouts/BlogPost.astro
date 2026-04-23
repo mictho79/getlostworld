@@ -67,7 +67,11 @@ const articleSchema = JSON.stringify({
   "description": description,
   "datePublished": dateIso,
   ...(updatedIso ? { "dateModified": updatedIso } : {}),
-  "author": { "@type": "Organization", "name": "TerraLenses", "url": SITE },
+  "author": {
+    "@type": "Person",
+    "name": "Mike",
+    "url": `${SITE}/authors/mike/`
+  },
   "publisher": {
     "@type": "Organization", "name": "TerraLenses", "url": SITE,
     "logo": { "@type": "ImageObject", "url": `${SITE}/favicon.svg` }

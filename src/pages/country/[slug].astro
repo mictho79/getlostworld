@@ -272,7 +272,27 @@ const jsonLd = JSON.stringify({
         "geo": { "@type": "GeoCoordinates", "latitude": country.latlng[0], "longitude": country.latlng[1] }
       } : {}),
       ...(country.region ? { "containedInPlace": { "@type": "Continent", "name": country.region } } : {})
-    }
+    },
+    ...(mdxData ? [{
+      "@type": "Article",
+      "headline": title,
+      "description": description,
+      "datePublished": mdxData.pubDate?.toISOString().slice(0, 10),
+      ...(mdxData.updatedDate ? { "dateModified": mdxData.updatedDate.toISOString().slice(0, 10) } : {}),
+      "author": {
+        "@type": "Person",
+        "name": "Mike",
+        "url": `${siteBase}authors/mike/`
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "TerraLenses",
+        "url": siteBase,
+        "logo": { "@type": "ImageObject", "url": `${siteBase}favicon.svg` }
+      },
+      "mainEntityOfPage": { "@type": "WebPage", "@id": pageUrl },
+      "about": { "@type": "Place", "name": country.name }
+    }] : [])
   ]
 });
 ---
