@@ -219,4 +219,18 @@ export const COUNTRY_STATS = {
 
   // ── Microstates ───────────────────────────────────────────────────────────
   'Vatican City':                { area:    0.44, pop:      800, borders: 1, island: false },
+
+  // ── Additional Caribbean + Africa + UK nations + territories ─────────────
+  'Dominica':                    { area:     751, pop:    72412, borders: 0, island: true  },
+  'Grenada':                     { area:     344, pop:   117207, borders: 0, island: true  },
+  'Saint Kitts and Nevis':       { area:     261, pop:    54338, borders: 0, island: true  },
+  'Saint Vincent and the Grenadines': { area: 389, pop: 103698, borders: 0, island: true  },
+  'Mali':                        { area: 1240192, pop: 22593590, borders: 7, island: false },
+  'Scotland':                    { area:   77933, pop:  5490000, borders: 1, island: false },
+  'Wales':                       { area:   20779, pop:  3131000, borders: 1, island: false },
+  'Northern Ireland':            { area:   13843, pop:  1910000, borders: 1, island: false },
+  'Hong Kong':                   { area:    1106, pop:  7498100, borders: 1, island: false },
+  'Taiwan':                      { area:   36193, pop: 23588613, borders: 0, island: true  },
+  'Palestine':                   { area:    6220, pop:  5483450, borders: 2, island: false },
+  'Puerto Rico':                 { area:    9104, pop:  3205691, borders: 0, island: true  },
 };

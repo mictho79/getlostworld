@@ -176,7 +176,7 @@ window.COUNTRY_ID_MAP = {
   28:  { name:"Antigua and Barbuda",    slug:"antigua-and-barbuda",     flag:"🇦🇬", region:"Americas" },
   212: { name:"Dominica",               slug:"dominica",                flag:"🇩🇲", region:"Americas" },
   662: { name:"Saint Lucia",            slug:"saint-lucia",             flag:"🇱🇨", region:"Americas" },
-  670: { name:"Saint Vincent and the Grenadines", slug:"saint-vincent", flag:"🇻🇨", region:"Americas" },
+  670: { name:"Saint Vincent and the Grenadines", slug:"saint-vincent-and-the-grenadines", flag:"🇻🇨", region:"Americas" },
   659: { name:"Saint Kitts and Nevis",  slug:"saint-kitts-and-nevis",   flag:"🇰🇳", region:"Americas" },
   748: { name:"Eswatini",               slug:"eswatini",                flag:"🇸🇿", region:"Africa" },
   174: { name:"Comoros",                slug:"comoros",                 flag:"🇰🇲", region:"Africa" },

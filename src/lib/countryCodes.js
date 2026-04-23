@@ -50,5 +50,7 @@ export const COUNTRY_CCN3 = {
   "Greenland":"304","Afghanistan":"004","Bhutan":"064","Maldives":"462",
   "Sri Lanka":"144","Oman":"512","Qatar":"634","Bahrain":"048",
   "United Arab Emirates":"784","Kuwait":"414","Armenia":"051",
-  "Timor-Leste":"626","Brunei":"096","Mongolia":"496"
+  "Timor-Leste":"626","Brunei":"096","Mongolia":"496",
+  "Dominica":"212","Grenada":"308","Saint Kitts and Nevis":"659",
+  "Saint Vincent and the Grenadines":"670","Hong Kong":"344","Puerto Rico":"630"
 };
